@@ -5,6 +5,10 @@ Sa-Token默认的Redis集成方式会把权限数据和业务缓存放在一起�
 
 > 搭建两个Redis服务器，一个专门用来做业务缓存，另一台专门存放Sa-Token权限数据 
 
+
+<button class="show-img" img-src="https://oss.dev33.cn/sa-token/doc/g/g3--alone-redis.gif">加载动态演示图</button>
+
+
 要将Sa-Token的数据单独抽离出来很简单，你只需要为Sa-Token单独配置一个Redis连接信息即可 
 
 --- 
@@ -76,18 +80,18 @@ public class TestController {
 	
 	// 测试Sa-Token缓存
 	@RequestMapping("login")
-	public AjaxJson login(@RequestParam(defaultValue="10001") String id) {
+	public SaResult login(@RequestParam(defaultValue="10001") String id) {
 		System.out.println("--------------- 测试Sa-Token缓存");
 		StpUtil.login(id);	
-		return AjaxJson.getSuccess();
+		return SaResult.ok();
 	}
 	
 	// 测试业务缓存
 	@RequestMapping("test")
-	public AjaxJson test() {
+	public SaResult test() {
 		System.out.println("--------------- 测试业务缓存");
 		stringRedisTemplate.opsForValue().set("hello", "Hello World");
-		return AjaxJson.getSuccess();
+		return SaResult.ok();
 	}
 	
 }

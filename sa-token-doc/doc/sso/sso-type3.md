@@ -41,6 +41,7 @@ private void configSso(SaTokenConfig cfg) {
 	
 	// 配置 Http 请求处理器
 	cfg.sso.setSendHttp(url -> {
+		System.out.println("发起请求：" + url);
 		return OkHttps.sync(url).get().getBody().toString();
 	});
 }
@@ -70,12 +71,12 @@ sa-token:
 ``` java
 // 自定义接口：获取userinfo 
 @RequestMapping("/sso/userinfo")
-public Object userinfo(String loginId, String secretkey) {
+public Object userinfo(String loginId) {
 	System.out.println("---------------- 获取userinfo --------");
 	
-	// 校验调用秘钥 
-	SaSsoUtil.checkSecretkey(secretkey);
-	
+	// 校验签名，防止敏感信息外泄  
+	SaSsoUtil.checkSign(SaHolder.getRequest());
+
 	// 自定义返回结果（模拟）
 	return SaResult.ok()
 			.set("id", loginId)
@@ -129,6 +130,10 @@ public Object myinfo() {
 4. Server 端遍历Set集合，逐个通知 Client 端下线。
 5. Server 端注销下线。
 6. 单点注销完成。
+
+
+<button class="show-img" img-src="https://oss.dev33.cn/sa-token/doc/g/g3--sso3-logout.gif">加载动态演示图</button>
+
 
 这些逻辑 Sa-Token 内部已经封装完毕，你只需按照文档增加以下配置即可：
 

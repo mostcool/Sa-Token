@@ -28,7 +28,7 @@
 
 - [[ EasyAdmin ]](https://gitee.com/lakernote/easy-admin)：一个基于SpringBoot2 + Sa-Token + Mybatis-Plus + Snakerflow + Layui 的后台管理系统，灵活多变可前后端分离，也可单体，内置代码生成器、权限管理、工作流引擎等
 
-- [[ RuoYi-Vue-Plus ]](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/tree/satoken/)：基于 RuoYi-Vue 集成 SaToken + Lombok + Mybatis-Plus + Undertow + knife4j + Hutool + Feign 重写所有原生业务 定期与 RuoYi-Vue 同步
+- [[ RuoYi-Vue-Plus ]](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus/)：重写RuoYi-Vue所有功能 集成 Sa-Token+Mybatis-Plus+Jackson+Xxl-Job+knife4j+Hutool+OSS 定期同步
 
 - [[ RuoYi-Cloud-Plus ]](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)：重写RuoYi-Cloud所有功能 整合 SpringCloudAlibaba + Sa-Token + Dubbo + Mybatis-Plus + Xxl-Job 全方位升级 定期同步
 
@@ -60,8 +60,12 @@
 
 - [[ Huanxing-mall ]](https://gitee.com/lijiaxing_boy/huanxing-mall)：HuanXing 商城基于SpringCloud 2021 & Alibaba  + Sa-token，前端基于 Vue3 +Element plus 的微服务商城 
 
+- [[ SpringMvc+Sa-Token ]](https://gitee.com/SRD_01/spring-mvc-sa-token): Jsp+SpringMVC+SSO+Sa-Token+Redis | Spring MVC 集成 SaToken Demo 项目
 
+
+- [[ 自定义快速搭建平台 ]](https://gitee.com/CodeLiQing/custom-quick-build-platform): MybatisPlus+SpringMVC+SSO+Sa-Token+Redis | 基于springboot+as-token+neety+代码生产器（vm实现）| 以及前端vue的element-ui 和大屏框架DataV  
 <br>
+
 
 --- 
 
