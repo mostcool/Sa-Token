@@ -11,10 +11,12 @@ import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.config.SaSsoConfig;
 import cn.dev33.satoken.context.model.SaRequest;
 import cn.dev33.satoken.session.SaSession;
-import cn.dev33.satoken.sso.SaSsoConsts.ParamName;
+import cn.dev33.satoken.sso.error.SaSsoErrorCode;
 import cn.dev33.satoken.sso.exception.SaSsoException;
-import cn.dev33.satoken.sso.exception.SaSsoExceptionCode;
+import cn.dev33.satoken.sso.name.ApiName;
+import cn.dev33.satoken.sso.name.ParamName;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaStrategy;
 import cn.dev33.satoken.util.SaFoxUtil;
 import cn.dev33.satoken.util.SaResult;
@@ -25,28 +27,68 @@ import cn.dev33.satoken.util.SaResult;
  *
  */
 public class SaSsoTemplate {
+
+	// ---------------------- 全局配置 ---------------------- 
+
+	/**
+	 * 所有 API 名称 
+	 */
+	public ApiName apiName = new ApiName();
 	
 	/**
-	 * 单点登录模块使用的 StpLogic 对象 
+	 * 所有参数名称 
 	 */
-	public StpLogic stpLogic;
-	public SaSsoTemplate(StpLogic stpLogic) {
-		this.stpLogic = stpLogic;
+	public ParamName paramName = new ParamName();
+
+	/**
+	 * @param paramName 替换 paramName 对象 
+	 * @return 对象自身
+	 */
+	public SaSsoTemplate setParamName(ParamName paramName) {
+		this.paramName = paramName;
+		return this;
 	}
+	
+	/**
+	 * @param apiName 替换 apiName 对象 
+	 * @return 对象自身
+	 */
+	public SaSsoTemplate setApiName(ApiName apiName) {
+		this.apiName = apiName;
+		return this;
+	}
+
+	/**
+	 * 获取底层使用的会话对象 
+	 * @return /
+	 */
+	public StpLogic getStpLogic() {
+		return StpUtil.stpLogic;
+	}
+
+	/**
+	 * 获取底层使用的配置对象 
+	 * @return /
+	 */
+	public SaSsoConfig getSsoConfig() {
+		return SaSsoManager.getConfig();
+	}
+	
 	
 	// ---------------------- Ticket 操作 ---------------------- 
 	
 	/**
 	 * 根据 账号id 创建一个 Ticket码 
 	 * @param loginId 账号id 
+	 * @param client 客户端标识 
 	 * @return Ticket码 
 	 */
-	public String createTicket(Object loginId) {
+	public String createTicket(Object loginId, String client) {
 		// 创建 Ticket
 		String ticket = randomTicket(loginId);
 		
 		// 保存 Ticket
-		saveTicket(ticket, loginId);
+		saveTicket(ticket, loginId, client);
 		saveTicketIndex(ticket, loginId);
 		
 		// 返回 Ticket
@@ -57,10 +99,15 @@ public class SaSsoTemplate {
 	 * 保存 Ticket 
 	 * @param ticket ticket码
 	 * @param loginId 账号id 
+	 * @param client 客户端标识 
 	 */
-	public void saveTicket(String ticket, Object loginId) {
+	public void saveTicket(String ticket, Object loginId, String client) {
+		String value = String.valueOf(loginId);
+		if(SaFoxUtil.isNotEmpty(client)) {
+			value += "," + client;
+		}
 		long ticketTimeout = SaSsoManager.getConfig().getTicketTimeout();
-		SaManager.getSaTokenDao().set(splicingTicketSaveKey(ticket), String.valueOf(loginId), ticketTimeout); 
+		SaManager.getSaTokenDao().set(splicingTicketSaveKey(ticket), value, ticketTimeout); 
 	}
 	
 	/**
@@ -104,7 +151,13 @@ public class SaSsoTemplate {
 		if(SaFoxUtil.isEmpty(ticket)) {
 			return null;
 		}
-		return SaManager.getSaTokenDao().get(splicingTicketSaveKey(ticket));
+		String loginId = SaManager.getSaTokenDao().get(splicingTicketSaveKey(ticket));
+		// 如果是 "a,b" 的格式，则只取最前面的一项 
+		if(loginId != null && loginId.indexOf(",") > -1) {
+			String[] arr = loginId.split(",");
+			loginId = arr[0];
+		}
+		return loginId;
 	}
 
 	/**
@@ -131,16 +184,46 @@ public class SaSsoTemplate {
 	}
 
 	/**
-	 * 校验ticket码，获取账号id，如果此ticket是有效的，则立即删除 
+	 * 校验 Ticket 码，获取账号id，如果此ticket是有效的，则立即删除 
 	 * @param ticket Ticket码
 	 * @return 账号id 
 	 */
 	public Object checkTicket(String ticket) {
-		Object loginId = getLoginId(ticket);
+		return checkTicket(ticket, getSsoConfig().getClient());
+	}
+	
+	/**
+	 * 校验 Ticket 码，获取账号id，如果此ticket是有效的，则立即删除 
+	 * @param ticket Ticket码
+	 * @param client client 标识 
+	 * @return 账号id 
+	 */
+	public Object checkTicket(String ticket, String client) {
+		// 读取 loginId
+		String loginId = SaManager.getSaTokenDao().get(splicingTicketSaveKey(ticket));
+		
 		if(loginId != null) {
+
+			// 如果是 "a,b" 的格式，则解析出对应的 Client
+			String ticketClient = null;
+			if(loginId.indexOf(",") > -1) {
+				String[] arr = loginId.split(",");
+				loginId = arr[0];
+				ticketClient = arr[1];
+			}
+			
+			// 如果指定了 client 标识，则校验一下 client 标识是否一致 
+			if(SaFoxUtil.isNotEmpty(client) && SaFoxUtil.notEquals(client, ticketClient)) {
+				throw new SaSsoException("该 ticket 不属于 client=" + client + ", ticket 值: " + ticket)
+					.setCode(SaSsoErrorCode.CODE_30011);
+			}
+			
+			// 删除 ticket 信息，使其只有一次性有效
 			deleteTicket(ticket);
 			deleteTicketIndex(loginId);
 		}
+		
+		// 
 		return loginId;
 	}
 	
@@ -170,7 +253,7 @@ public class SaSsoTemplate {
 		
 		// 1、是否是一个有效的url 
 		if(SaFoxUtil.isUrl(url) == false) {
-			throw new SaSsoException("无效redirect：" + url).setCode(SaSsoExceptionCode.CODE_20001);
+			throw new SaSsoException("无效redirect：" + url).setCode(SaSsoErrorCode.CODE_30001);
 		}
 		
 		// 2、截取掉?后面的部分 
@@ -182,7 +265,7 @@ public class SaSsoTemplate {
 		// 3、是否在[允许地址列表]之中 
 		List<String> authUrlList = Arrays.asList(getAllowUrl().replaceAll(" ", "").split(",")); 
 		if(SaStrategy.me.hasElement.apply(authUrlList, url) == false) {
-			throw new SaSsoException("非法redirect：" + url).setCode(SaSsoExceptionCode.CODE_20002);
+			throw new SaSsoException("非法redirect：" + url).setCode(SaSsoErrorCode.CODE_30002);
 		}
 		
 		// 校验通过 √ 
@@ -201,7 +284,7 @@ public class SaSsoTemplate {
 		if(SaFoxUtil.isEmpty(loginId) || SaFoxUtil.isEmpty(sloCallbackUrl)) {
 			return;
 		}
-		SaSession session = stpLogic.getSessionByLoginId(loginId);
+		SaSession session = getStpLogic().getSessionByLoginId(loginId);
 		Set<String> urlSet = session.get(SaSsoConsts.SLO_CALLBACK_SET_KEY, ()-> new HashSet<String>());
 		urlSet.add(sloCallbackUrl);
 		session.set(SaSsoConsts.SLO_CALLBACK_SET_KEY, urlSet);
@@ -214,7 +297,7 @@ public class SaSsoTemplate {
 	public void ssoLogout(Object loginId) {
 		
 		// 如果这个账号尚未登录，则无操作 
-		SaSession session = stpLogic.getSessionByLoginId(loginId, false);
+		SaSession session = getStpLogic().getSessionByLoginId(loginId, false);
 		if(session == null) {
 			return;
 		}
@@ -228,7 +311,7 @@ public class SaSsoTemplate {
 		}
 		
 		// step.2 Server端注销 
-		stpLogic.logout(loginId);
+		getStpLogic().logout(loginId);
 	}
 
 	/**
@@ -253,7 +336,14 @@ public class SaSsoTemplate {
 	public String buildServerAuthUrl(String clientLoginUrl, String back) {
 		
 		// 服务端认证地址 
-		String serverUrl = SaSsoManager.getConfig().getAuthUrl();
+		String serverUrl = SaSsoManager.getConfig().splicingAuthUrl();
+		
+		// 拼接客户端标识 
+		String client = SaSsoManager.getConfig().getClient();
+		if(SaFoxUtil.isNotEmpty(client)) {
+			serverUrl = SaFoxUtil.joinParam(serverUrl, paramName.client, client); 
+		}
+		
 		
 		// 对back地址编码 
 		back = (back == null ? "" : back);
@@ -265,10 +355,10 @@ public class SaSsoTemplate {
 		 * 部分 Servlet 版本 request.getRequestURL() 返回的 url 带有 query 参数，形如：http://domain.com?id=1，
 		 * 如果不加判断会造成最终生成的 serverAuthUrl 带有双 back 参数 ，这个 if 判断正是为了解决此问题 
 		 */
-		if(clientLoginUrl.indexOf(ParamName.back + "=" + back) == -1) {
-			clientLoginUrl = SaFoxUtil.joinParam(clientLoginUrl, ParamName.back, back); 
+		if(clientLoginUrl.indexOf(paramName.back + "=" + back) == -1) {
+			clientLoginUrl = SaFoxUtil.joinParam(clientLoginUrl, paramName.back, back); 
 		}
-		String serverAuthUrl = SaFoxUtil.joinParam(serverUrl, ParamName.redirect, clientLoginUrl);
+		String serverAuthUrl = SaFoxUtil.joinParam(serverUrl, paramName.redirect, clientLoginUrl);
 		
 		// 返回 
 		return serverAuthUrl;
@@ -277,10 +367,11 @@ public class SaSsoTemplate {
 	/**
 	 * 构建URL：Server端向Client下放ticke的地址 
 	 * @param loginId 账号id 
+	 * @param client 客户端标识 
 	 * @param redirect Client端提供的重定向地址 
 	 * @return see note 
 	 */
-	public String buildRedirectUrl(Object loginId, String redirect) {
+	public String buildRedirectUrl(Object loginId, String client, String redirect) {
 		
 		// 校验 重定向地址 是否合法 
 		checkRedirectUrl(redirect);
@@ -289,10 +380,10 @@ public class SaSsoTemplate {
 		deleteTicket(getTicketValue(loginId));
 		
 		// 创建 新Ticket
-		String ticket = createTicket(loginId);
+		String ticket = createTicket(loginId, client);
 		
 		// 构建 授权重定向地址 （Server端 根据此地址向 Client端 下放Ticket）
-		return SaFoxUtil.joinParam(encodeBackParam(redirect), ParamName.ticket, ticket);
+		return SaFoxUtil.joinParam(encodeBackParam(redirect), paramName.ticket, ticket);
 	}
 
 	/**
@@ -303,16 +394,16 @@ public class SaSsoTemplate {
 	public String encodeBackParam(String url) {
 		
 		// 获取back参数所在位置 
-		int index = url.indexOf("?" + ParamName.back + "=");
+		int index = url.indexOf("?" + paramName.back + "=");
 		if(index == -1) {
-			index = url.indexOf("&" + ParamName.back + "=");
+			index = url.indexOf("&" + paramName.back + "=");
 			if(index == -1) {
 				return url;
 			}
 		}
 		
 		// 开始编码 
-		int length = ParamName.back.length() + 2;
+		int length = paramName.back.length() + 2;
 		String back = url.substring(index + length);
 		back = SaFoxUtil.encodeUrl(back);
 		
@@ -327,7 +418,7 @@ public class SaSsoTemplate {
 	 * @return Server端 账号资料查询地址 
 	 */
 	public String buildUserinfoUrl(Object loginId) {
-		String userinfoUrl = SaSsoManager.getConfig().getUserinfoUrl();
+		String userinfoUrl = SaSsoManager.getConfig().splicingUserinfoUrl();
 		return addSignParams(userinfoUrl, loginId);
 	}
 
@@ -340,14 +431,20 @@ public class SaSsoTemplate {
 	 */
 	public String buildCheckTicketUrl(String ticket, String ssoLogoutCallUrl) {
 		// 裸地址 
-		String url = SaSsoManager.getConfig().getCheckTicketUrl();
+		String url = SaSsoManager.getConfig().splicingCheckTicketUrl();
+		
+		// 拼接 client 参数
+		String client = getSsoConfig().getClient();
+		if(SaFoxUtil.isNotEmpty(client)) {
+			url = SaFoxUtil.joinParam(url, paramName.client, client);
+		}
 		
 		// 拼接ticket参数 
-		url = SaFoxUtil.joinParam(url, ParamName.ticket, ticket);
+		url = SaFoxUtil.joinParam(url, paramName.ticket, ticket);
 		
 		// 拼接单点注销时的回调URL 
 		if(ssoLogoutCallUrl != null) {
-			url = SaFoxUtil.joinParam(url, ParamName.ssoLogoutCall, ssoLogoutCallUrl);
+			url = SaFoxUtil.joinParam(url, paramName.ssoLogoutCall, ssoLogoutCallUrl);
 		}
 		
 		// 返回 
@@ -360,7 +457,7 @@ public class SaSsoTemplate {
 	 * @return 单点注销URL 
 	 */
 	public String buildSloUrl(Object loginId) {
-		String url = SaSsoManager.getConfig().getSloUrl();
+		String url = SaSsoManager.getConfig().splicingSloUrl();
 		return addSignParams(url, loginId);
 	}
 
@@ -407,7 +504,7 @@ public class SaSsoTemplate {
 		// 默认从配置文件中返回 
 		String secretkey = SaSsoManager.getConfig().getSecretkey();
 		if(SaFoxUtil.isEmpty(secretkey)) {
-			throw new SaSsoException("请配置 secretkey 参数").setCode(SaSsoExceptionCode.CODE_20009);
+			throw new SaSsoException("请配置 secretkey 参数").setCode(SaSsoErrorCode.CODE_30009);
 		}
 		return secretkey;
 	}
@@ -419,7 +516,7 @@ public class SaSsoTemplate {
 	@Deprecated
 	public void checkSecretkey(String secretkey) {
 		 if(SaFoxUtil.isEmpty(secretkey) || secretkey.equals(getSecretkey()) == false) {
-			 throw new SaSsoException("无效秘钥：" + secretkey).setCode(SaSsoExceptionCode.CODE_20003);
+			 throw new SaSsoException("无效秘钥：" + secretkey).setCode(SaSsoErrorCode.CODE_30003);
 		 }
 	}
 	
@@ -433,9 +530,9 @@ public class SaSsoTemplate {
 	 */
 	public String getSign(Object loginId, String timestamp, String nonce, String secretkey) {
 		Map<String, Object> map = new TreeMap<>();
-		map.put(ParamName.loginId, loginId);
-		map.put(ParamName.timestamp, timestamp);
-		map.put(ParamName.nonce, nonce);
+		map.put(paramName.loginId, loginId);
+		map.put(paramName.timestamp, timestamp);
+		map.put(paramName.nonce, nonce);
 		return SaManager.getSaSignTemplate().createSign(map, secretkey);
 	}
 
@@ -453,10 +550,10 @@ public class SaSsoTemplate {
 		String sign = getSign(loginId, timestamp, nonce, getSecretkey());
 		
 		// 追加到url 
-		url = SaFoxUtil.joinParam(url, ParamName.loginId, loginId);
-		url = SaFoxUtil.joinParam(url, ParamName.timestamp, timestamp);
-		url = SaFoxUtil.joinParam(url, ParamName.nonce, nonce);
-		url = SaFoxUtil.joinParam(url, ParamName.sign, sign);
+		url = SaFoxUtil.joinParam(url, paramName.loginId, loginId);
+		url = SaFoxUtil.joinParam(url, paramName.timestamp, timestamp);
+		url = SaFoxUtil.joinParam(url, paramName.nonce, nonce);
+		url = SaFoxUtil.joinParam(url, paramName.sign, sign);
 		return url;
 	}
 
@@ -467,10 +564,10 @@ public class SaSsoTemplate {
 	public void checkSign(SaRequest req) {
 
 		// 参数签名、账号id、时间戳、随机字符串
-		String sign = req.getParamNotNull(ParamName.sign);
-		String loginId = req.getParamNotNull(ParamName.loginId);
-		String timestamp = req.getParamNotNull(ParamName.timestamp);
-		String nonce = req.getParamNotNull(ParamName.nonce);
+		String sign = req.getParamNotNull(paramName.sign);
+		String loginId = req.getParamNotNull(paramName.loginId);
+		String timestamp = req.getParamNotNull(paramName.timestamp);
+		String nonce = req.getParamNotNull(paramName.nonce);
 		
 		// 校验时间戳 
 		checkTimestamp(Long.valueOf(timestamp));
@@ -478,7 +575,7 @@ public class SaSsoTemplate {
 		// 校验签名 
 		String calcSign = getSign(loginId, timestamp, nonce, getSecretkey());
 		if(calcSign.equals(sign) == false) {
-			throw new SaSsoException("签名无效：" + calcSign).setCode(SaSsoExceptionCode.CODE_20008);
+			throw new SaSsoException("签名无效：" + calcSign).setCode(SaSsoErrorCode.CODE_30008);
 		}
 	}
 
@@ -490,7 +587,7 @@ public class SaSsoTemplate {
 		long disparity = Math.abs(System.currentTimeMillis() - timestamp);
 		long allowDisparity = SaSsoManager.getConfig().getTimestampDisparity();
 		if(allowDisparity != -1 && disparity > allowDisparity) {
-			throw new SaSsoException("timestamp 超出允许的范围").setCode(SaSsoExceptionCode.CODE_20007);
+			throw new SaSsoException("timestamp 超出允许的范围").setCode(SaSsoErrorCode.CODE_30007);
 		}
 	}
 	

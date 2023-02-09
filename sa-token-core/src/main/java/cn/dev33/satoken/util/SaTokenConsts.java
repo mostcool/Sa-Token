@@ -7,13 +7,15 @@ package cn.dev33.satoken.util;
  */
 public class SaTokenConsts {
 
+	private SaTokenConsts() {
+	}
 	
 	// =================== sa-token版本信息 ===================  
 	
 	/**
 	 * Sa-Token 当前版本号 
 	 */
-	public static final String VERSION_NO = "v1.30.0";
+	public static final String VERSION_NO = "v1.34.0";
 
 	/**
 	 * Sa-Token 开源地址 Gitee 
@@ -28,7 +30,7 @@ public class SaTokenConsts {
 	/**
 	 * Sa-Token 开发文档地址 
 	 */
-	public static final String DEV_DOC_URL = "http://sa-token.dev33.cn";
+	public static final String DEV_DOC_URL = "https://sa-token.cc";
 	
 	// =================== 常量key标记 ===================  
 	
@@ -51,6 +53,26 @@ public class SaTokenConsts {
 	 * 常量key标记: 在登录时，默认使用的设备类型 
 	 */
 	public static final String DEFAULT_LOGIN_DEVICE = "default-device"; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，默认封禁的服务类型 
+	 */
+	public static final String DEFAULT_DISABLE_SERVICE = "login"; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，默认封禁的等级 
+	 */
+	public static final int DEFAULT_DISABLE_LEVEL = 1; 
+
+	/**
+	 * 常量key标记: 在封禁账号时，可使用的最小封禁级别 
+	 */
+	public static final int MIN_DISABLE_LEVEL = 1; 
+
+	/**
+	 * 常量key标记: 账号封禁级别，表示未被封禁 
+	 */
+	public static final int NOT_DISABLE_LEVEL = -2; 
 	
 	/**
 	 * 常量key标记: 在进行临时身份切换时使用的key 
@@ -58,9 +80,25 @@ public class SaTokenConsts {
 	public static final String SWITCH_TO_SAVE_KEY = "SWITCH_TO_SAVE_KEY_"; 
 
 	/**
-	 * 常量key标记: 在进行Token二级验证时使用的key 
+	 * 常量key标记: 在进行Token二级验证时，使用的key 
 	 */
+	@Deprecated
 	public static final String SAFE_AUTH_SAVE_KEY = "SAFE_AUTH_SAVE_KEY_"; 
+
+	/**
+	 * 常量key标记: 在进行 Token 二级验证时，写入的 value 值
+	 */
+	public static final String SAFE_AUTH_SAVE_VALUE = "SAFE_AUTH_SAVE_VALUE"; 
+
+	/**
+	 * 常量key标记: 在进行 Token 二级验证时，默认的业务类型 
+	 */
+	public static final String DEFAULT_SAFE_AUTH_SERVICE = "important"; 
+
+	/**
+	 * 常量key标记: 临时 Token 认证模块，默认的业务类型 
+	 */
+	public static final String DEFAULT_TEMP_TOKEN_SERVICE = "record"; 
 
 
 	// =================== token-style 相关 ===================  

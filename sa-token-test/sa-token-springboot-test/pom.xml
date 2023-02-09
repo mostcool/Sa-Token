@@ -20,7 +20,25 @@
 		<dependency>
 			<groupId>cn.dev33</groupId>
 			<artifactId>sa-token-spring-boot-starter</artifactId>
-            <version>${revision}</version>
+        </dependency>
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-sso</artifactId>
+            <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-oauth2</artifactId>
+            <scope>test</scope>
+		</dependency>
+		<!-- 冗余（生成单元测试报告） -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-servlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-core</artifactId>
 		</dependency>
 	</dependencies>
 

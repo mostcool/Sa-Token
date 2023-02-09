@@ -5,6 +5,7 @@ import cn.dev33.satoken.context.model.SaRequest;
 import cn.dev33.satoken.context.model.SaResponse;
 import cn.dev33.satoken.oauth2.SaOAuth2Manager;
 import cn.dev33.satoken.oauth2.config.SaOAuth2Config;
+import cn.dev33.satoken.oauth2.error.SaOAuth2ErrorCode;
 import cn.dev33.satoken.oauth2.exception.SaOAuth2Exception;
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Consts.Api;
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Consts.GrantType;
@@ -44,7 +45,7 @@ public class SaOAuth2Handle {
 			if(cfg.getIsCode() && (cm.isCode || cm.isAutoMode)) {
 				return authorize(req, res, cfg);
 			}
-			throw new SaOAuth2Exception("暂未开放的授权模式");
+			throw new SaOAuth2Exception("暂未开放的授权模式").setCode(SaOAuth2ErrorCode.CODE_30131);
 		}
 		
 		// Code授权码 获取 Access-Token
@@ -78,7 +79,7 @@ public class SaOAuth2Handle {
 			if(cfg.getIsImplicit() && (cm.isImplicit || cm.isAutoMode)) {
 				return authorize(req, res, cfg);
 			}
-			throw new SaOAuth2Exception("暂未开放的授权模式");
+			throw new SaOAuth2Exception("暂未开放的授权模式").setCode(SaOAuth2ErrorCode.CODE_30132);
 		}
 
 		// 模式三：密码式
@@ -87,7 +88,7 @@ public class SaOAuth2Handle {
 			if(cfg.getIsPassword() && (cm.isPassword || cm.isAutoMode)) {
 				return password(req, res, cfg);
 			}
-			throw new SaOAuth2Exception("暂未开放的授权模式");
+			throw new SaOAuth2Exception("暂未开放的授权模式").setCode(SaOAuth2ErrorCode.CODE_30133);
 		}
 
 		// 模式四：凭证式
@@ -96,7 +97,7 @@ public class SaOAuth2Handle {
 			if(cfg.getIsClient() && (cm.isClient || cm.isAutoMode)) {
 				return clientToken(req, res, cfg);
 			}
-			throw new SaOAuth2Exception("暂未开放的授权模式");
+			throw new SaOAuth2Exception("暂未开放的授权模式").setCode(SaOAuth2ErrorCode.CODE_30134);
 		}
 
 		// 默认返回
@@ -148,7 +149,7 @@ public class SaOAuth2Handle {
 		}
 
 		// 默认返回
-		throw new SaOAuth2Exception("无效response_type: " + ra.responseType);
+		throw new SaOAuth2Exception("无效response_type: " + ra.responseType).setCode(SaOAuth2ErrorCode.CODE_30125);
 	}
 
 	/**
@@ -213,7 +214,7 @@ public class SaOAuth2Handle {
 		// 校验参数
 		SaOAuth2Util.checkAccessTokenParam(clientId, clientSecret, accessToken);
 
-		// 获取新Token返回
+		// 回收 Access-Token
 		SaOAuth2Util.revokeAccessToken(accessToken);
 		return SaResult.ok();
 	}
@@ -226,7 +227,7 @@ public class SaOAuth2Handle {
 	 * @return 处理结果
 	 */
 	public static Object doLogin(SaRequest req, SaResponse res, SaOAuth2Config cfg) {
-		return cfg.getDoLoginHandle().apply(req.getParamNotNull(Param.name), req.getParamNotNull("pwd"));
+		return cfg.getDoLoginHandle().apply(req.getParamNotNull(Param.name), req.getParamNotNull(Param.pwd));
 	}
 
 	/**
@@ -255,30 +256,31 @@ public class SaOAuth2Handle {
 		String username = req.getParamNotNull(Param.username);
 		String password = req.getParamNotNull(Param.password);
 		String clientId = req.getParamNotNull(Param.client_id);
+		String clientSecret = req.getParamNotNull(Param.client_secret);
 		String scope = req.getParam(Param.scope, "");
 
-		// 2、校验 ClientScope
-		SaOAuth2Util.checkContract(clientId, scope);
+		// 2、校验 ClientScope 和 scope 
+		SaOAuth2Util.checkClientSecretAndScope(clientId, clientSecret, scope);
 
 		// 3、防止因前端误传token造成逻辑干扰
-		SaHolder.getStorage().set(StpUtil.stpLogic.splicingKeyJustCreatedSave(), "no-token");
+		// SaHolder.getStorage().set(StpUtil.stpLogic.splicingKeyJustCreatedSave(), "no-token");
 
-		// 4、调用API 开始登录，如果没能成功登录，则直接退出
+		// 3、调用API 开始登录，如果没能成功登录，则直接退出
 		Object retObj = cfg.getDoLoginHandle().apply(username, password);
 		if(StpUtil.isLogin() == false) {
 			return retObj;
 		}
 
-		// 5、构建 ra对象
+		// 4、构建 ra对象
 		RequestAuthModel ra = new RequestAuthModel();
 		ra.clientId = clientId;
 		ra.loginId = StpUtil.getLoginId();
 		ra.scope = scope;
 
-		// 7、生成 Access-Token
+		// 5、生成 Access-Token
 		AccessTokenModel at = SaOAuth2Util.generateAccessToken(ra, true);
 
-		// 8、返回 Access-Token
+		// 6、返回 Access-Token
 		return SaResult.data(at.toLineMap());
 	}
 

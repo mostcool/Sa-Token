@@ -43,10 +43,8 @@ public class SaResult extends LinkedHashMap<String, Object> implements Serializa
 	 * 根据 Map 快速构建 
 	 * @param map / 
 	 */
-	public SaResult(Map<String, Object> map) {
-		for (String key: map.keySet()) {
-			this.set(key, map.get(key));
-		}
+	public SaResult(Map<String, ?> map) {
+		this.setMap(map);
 	}
 	
 	/**
@@ -108,6 +106,17 @@ public class SaResult extends LinkedHashMap<String, Object> implements Serializa
 	public SaResult set(String key, Object data) {
 		this.put(key, data);
 		return this;
+	}
+
+	/**
+	 * 获取一个值 根据自定义key 
+	 * @param <T> 要转换为的类型 
+	 * @param key key
+	 * @param cs 要转换为的类型 
+	 * @return 值 
+	 */
+	public <T> T get(String key, Class<T> cs) {
+		return SaFoxUtil.getValueByType(get(key), cs);
 	}
 
 	/**

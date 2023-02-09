@@ -42,7 +42,12 @@ sa.ajax = function(url, data, successFn) {
 // ----------------------------------- 相关事件 -----------------------------------
 
 // 检查当前是否已经登录，如果已登录则直接开始跳转，如果未登录则等待用户输入账号密码 
-sa.ajax("/getRedirectUrl", {redirect: getParam('redirect', ''), mode: getParam('mode', '')}, function(res) {
+var pData = {
+	client: getParam('client', ''), 
+	redirect: getParam('redirect', ''), 
+	mode: getParam('mode', '')
+};
+sa.ajax("/sso/getRedirectUrl", pData, function(res) {
 	if(res.code == 200) {
 		// 已登录，并且redirect地址有效，开始跳转  
 		location.href = decodeURIComponent(res.data);
@@ -98,5 +103,5 @@ function getParam(name, defaultValue){
 }
 
 // 打印信息 
-var str = "This page is provided by Sa-Token, Please refer to: " + "http://sa-token.dev33.cn/";
+var str = "This page is provided by Sa-Token, Please refer to: " + "https://sa-token.cc/";
 console.log(str);

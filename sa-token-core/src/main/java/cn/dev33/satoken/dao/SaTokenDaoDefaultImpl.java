@@ -73,7 +73,7 @@ public class SaTokenDaoDefaultImpl implements SaTokenDao {
 
 	@Override
 	public void updateTimeout(String key, long timeout) {
-		expireMap.put(key, System.currentTimeMillis() + timeout * 1000);
+		expireMap.put(key, (timeout == SaTokenDao.NEVER_EXPIRE) ? (SaTokenDao.NEVER_EXPIRE) : (System.currentTimeMillis() + timeout * 1000));
 	}
 
 	
@@ -115,7 +115,7 @@ public class SaTokenDaoDefaultImpl implements SaTokenDao {
 
 	@Override
 	public void updateObjectTimeout(String key, long timeout) {
-		expireMap.put(key, System.currentTimeMillis() + timeout * 1000);
+		expireMap.put(key, (timeout == SaTokenDao.NEVER_EXPIRE) ? (SaTokenDao.NEVER_EXPIRE) : (System.currentTimeMillis() + timeout * 1000));
 	}
 	
 	
@@ -240,8 +240,8 @@ public class SaTokenDaoDefaultImpl implements SaTokenDao {
 	// --------------------- 会话管理 
 	
 	@Override
-	public List<String> searchData(String prefix, String keyword, int start, int size) {
-		return SaFoxUtil.searchList(expireMap.keySet(), prefix, keyword, start, size);
+	public List<String> searchData(String prefix, String keyword, int start, int size, boolean sortType) {
+		return SaFoxUtil.searchList(expireMap.keySet(), prefix, keyword, start, size, sortType);
 	}
 
 

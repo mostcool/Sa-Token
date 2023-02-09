@@ -32,7 +32,7 @@ import cn.dev33.satoken.strategy.SaStrategy;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 /**
- * Sa-Token持久层接口 [Redis版] (使用 jackson 序列化方式)
+ * Sa-Token 持久层实现 [Redis存储、Jackson序列化]
  * 
  * @author kong
  * 
@@ -69,6 +69,10 @@ public class SaTokenDaoRedisJackson implements SaTokenDao {
 	
 	@Autowired
 	public void init(RedisConnectionFactory connectionFactory) {
+		// 不重复初始化 
+		if(this.isInit) {
+			return;
+		}
 		
 		// 指定相应的序列化方案 
 		StringRedisSerializer keySerializer = new StringRedisSerializer();
@@ -93,7 +97,7 @@ public class SaTokenDaoRedisJackson implements SaTokenDao {
 			timeModule.addSerializer(new LocalTimeSerializer(TIME_FORMATTER));
 			timeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(TIME_FORMATTER));
 			this.objectMapper.registerModule(timeModule);
-			// 重写Session生成策略 
+			// 重写 SaSession 生成策略 
 			SaStrategy.me.createSession = (sessionId) -> new SaSessionForJacksonCustomized(sessionId);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -112,11 +116,9 @@ public class SaTokenDaoRedisJackson implements SaTokenDao {
 		template.afterPropertiesSet();
 		
 		// 开始初始化相关组件 
-		if(this.isInit == false) {
-			this.stringRedisTemplate = stringTemplate;
-			this.objectRedisTemplate = template;
-			this.isInit = true;
-		}
+		this.stringRedisTemplate = stringTemplate;
+		this.objectRedisTemplate = template;
+		this.isInit = true;
 	}
 	
 	
@@ -271,10 +273,10 @@ public class SaTokenDaoRedisJackson implements SaTokenDao {
 	 * 搜索数据 
 	 */
 	@Override
-	public List<String> searchData(String prefix, String keyword, int start, int size) {
+	public List<String> searchData(String prefix, String keyword, int start, int size, boolean sortType) {
 		Set<String> keys = stringRedisTemplate.keys(prefix + "*" + keyword + "*");
 		List<String> list = new ArrayList<String>(keys);
-		return SaFoxUtil.searchList(list, start, size);
+		return SaFoxUtil.searchList(list, start, size, sortType);
 	}
 	
 }

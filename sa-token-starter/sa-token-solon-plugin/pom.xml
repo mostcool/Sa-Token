@@ -20,13 +20,25 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon</artifactId>
-            <version>1.7.5</version>
         </dependency>
 
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-core</artifactId>
-            <version>${revision}</version>
+        </dependency>
+
+        <!-- OAuth2.0 (optional) -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-oauth2</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- SSO (optional) -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-sso</artifactId>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

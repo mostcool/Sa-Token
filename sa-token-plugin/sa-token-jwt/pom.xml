@@ -21,13 +21,11 @@
 		<dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-core</artifactId>
-            <version>${revision}</version>
         </dependency>
 		<!-- hutool (jwt) -->
         <dependency>
 		    <groupId>cn.hutool</groupId>
-		    <artifactId>hutool-all</artifactId>
-		    <version>5.7.14</version>
+		    <artifactId>hutool-jwt</artifactId>
 		</dependency>
 	</dependencies>
 

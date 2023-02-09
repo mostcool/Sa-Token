@@ -2,10 +2,12 @@ package cn.dev33.satoken.config;
 
 import java.io.Serializable;
 
+import cn.dev33.satoken.util.SaFoxUtil;
+
 /**
  * Sa-Token 配置类 Model 
  * <p>
- * 你可以通过yml、properties、java代码等形式配置本类参数，具体请查阅官方文档: http://sa-token.dev33.cn/
+ * 你可以通过yml、properties、java代码等形式配置本类参数，具体请查阅官方文档: https://sa-token.cc/
  * 
  * @author kong
  *
@@ -41,11 +43,14 @@ public class SaTokenConfig implements Serializable {
 	private Boolean isReadBody = true;
 
 	/** 是否尝试从header里读取token */
-	private Boolean isReadHead = true;
+	private Boolean isReadHeader = true;
 
 	/** 是否尝试从cookie里读取token */
 	private Boolean isReadCookie = true;
 
+	/** 是否在登录后将 Token 写入到响应头 */
+	private Boolean isWriteHeader = false;
+	
 	/** token风格(默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik) */
 	private String tokenStyle = "uuid";
 
@@ -67,15 +72,17 @@ public class SaTokenConfig implements Serializable {
 	/** 是否打印操作日志 */
 	private Boolean isLog = false;
 
+	/** 日志等级（trace、debug、info、warn、error、fatal） */
+	private String logLevel = "trace";
+
+	/** 日志等级 int 值（1=trace、2=debug、3=info、4=warn、5=error、6=fatal） */
+	private int logLevelInt = 1;
+
+
 	/**
 	 * jwt秘钥 (只有集成 jwt 模块时此参数才会生效)   
 	 */
 	private String jwtSecretKey;
-	
-	/**
-	 * Id-Token的有效期 (单位: 秒)
-	 */
-	private long idTokenTimeout = 60 * 60 * 24;
 
 	/**
 	 * Http Basic 认证的账号和密码 
@@ -85,8 +92,14 @@ public class SaTokenConfig implements Serializable {
 	/** 配置当前项目的网络访问地址 */
 	private String currDomain;
 
-	/** 是否校验Id-Token（部分rpc插件有效） */
-	private Boolean checkIdToken = false;
+	/**
+	 * Same-Token 的有效期 (单位: 秒)
+	 */
+	private long sameTokenTimeout = 60 * 60 * 24;
+
+	/** 是否校验Same-Token（部分rpc插件有效） */
+	private Boolean checkSameToken = false;
+
 
 	/**
 	 * Cookie配置对象 
@@ -211,16 +224,16 @@ public class SaTokenConfig implements Serializable {
 	/**
 	 * @return 是否尝试从header里读取token
 	 */
-	public Boolean getIsReadHead() {
-		return isReadHead;
+	public Boolean getIsReadHeader() {
+		return isReadHeader;
 	}
 
 	/**
-	 * @param isReadHead 是否尝试从header里读取token
+	 * @param isReadHeader 是否尝试从header里读取token
 	 * @return 对象自身
 	 */
-	public SaTokenConfig setIsReadHead(Boolean isReadHead) {
-		this.isReadHead = isReadHead;
+	public SaTokenConfig setIsReadHeader(Boolean isReadHeader) {
+		this.isReadHeader = isReadHeader;
 		return this;
 	}
 
@@ -237,6 +250,22 @@ public class SaTokenConfig implements Serializable {
 	 */
 	public SaTokenConfig setIsReadCookie(Boolean isReadCookie) {
 		this.isReadCookie = isReadCookie;
+		return this;
+	}
+
+	/**
+	 * @return 是否在登录后将 Token 写入到响应头
+	 */
+	public Boolean getIsWriteHeader() {
+		return isWriteHeader;
+	}
+
+	/**
+	 * @param isWriteHeader 是否在登录后将 Token 写入到响应头
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setIsWriteHeader(Boolean isWriteHeader) {
+		this.isWriteHeader = isWriteHeader;
 		return this;
 	}
 
@@ -355,6 +384,40 @@ public class SaTokenConfig implements Serializable {
 	}
 
 	/**
+	 * @return 日志等级（trace、debug、info、warn、error、fatal）
+	 */
+	public String getLogLevel() {
+		return logLevel;
+	}
+
+	/**
+	 * @param logLevel 日志等级（trace、debug、info、warn、error、fatal）
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setLogLevel(String logLevel) {
+		this.logLevel = logLevel;
+		this.logLevelInt = SaFoxUtil.translateLogLevelToInt(logLevel);
+		return this;
+	}
+
+	/**
+	 * @return 日志等级 int 值（1=trace、2=debug、3=info、4=warn、5=error、6=fatal）
+	 */
+	public int getLogLevelInt() {
+		return logLevelInt;
+	}
+
+	/**
+	 * @param logLevelInt 日志等级 int 值（1=trace、2=debug、3=info、4=warn、5=error、6=fatal）
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setLogLeveInt(int logLevelInt) {
+		this.logLevelInt = logLevelInt;
+		this.logLevel = SaFoxUtil.translateLogLevelToString(logLevelInt);
+		return this;
+	}
+	
+	/**
 	 * @return jwt秘钥 (只有集成 jwt 模块时此参数才会生效)    
 	 */
 	public String getJwtSecretKey() {
@@ -367,22 +430,6 @@ public class SaTokenConfig implements Serializable {
 	 */
 	public SaTokenConfig setJwtSecretKey(String jwtSecretKey) {
 		this.jwtSecretKey = jwtSecretKey;
-		return this;
-	}
-
-	/**
-	 * @return Id-Token的有效期 (单位: 秒)
-	 */
-	public long getIdTokenTimeout() {
-		return idTokenTimeout;
-	}
-
-	/**
-	 * @param idTokenTimeout Id-Token的有效期 (单位: 秒)
-	 * @return 对象自身
-	 */
-	public SaTokenConfig setIdTokenTimeout(long idTokenTimeout) {
-		this.idTokenTimeout = idTokenTimeout;
 		return this;
 	}
 
@@ -419,18 +466,34 @@ public class SaTokenConfig implements Serializable {
 	}
 
 	/**
-	 * @return 是否校验Id-Token（部分rpc插件有效）
+	 * @return Same-Token 的有效期 (单位: 秒)
 	 */
-	public Boolean getCheckIdToken() {
-		return checkIdToken;
+	public long getSameTokenTimeout() {
+		return sameTokenTimeout;
 	}
 
 	/**
-	 * @param checkIdToken 是否校验Id-Token（部分rpc插件有效）
-	 * @return 对象自身 
+	 * @param sameTokenTimeout Same-Token 的有效期 (单位: 秒)
+	 * @return 对象自身
 	 */
-	public SaTokenConfig setCheckIdToken(Boolean checkIdToken) {
-		this.checkIdToken = checkIdToken;
+	public SaTokenConfig setSameTokenTimeout(long sameTokenTimeout) {
+		this.sameTokenTimeout = sameTokenTimeout;
+		return this;
+	}
+
+	/**
+	 * @return 是否校验Same-Token（部分rpc插件有效）
+	 */
+	public Boolean getCheckSameToken() {
+		return checkSameToken;
+	}
+
+	/**
+	 * @param checkSameToken 是否校验Same-Token（部分rpc插件有效）
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setCheckSameToken(Boolean checkSameToken) {
+		this.checkSameToken = checkSameToken;
 		return this;
 	}
 	
@@ -460,8 +523,9 @@ public class SaTokenConfig implements Serializable {
 				+ ", isShare=" + isShare 
 				+ ", maxLoginCount=" + maxLoginCount 
 				+ ", isReadBody=" + isReadBody
-				+ ", isReadHead=" + isReadHead 
+				+ ", isReadHeader=" + isReadHeader 
 				+ ", isReadCookie=" + isReadCookie
+				+ ", isWriteHeader=" + isWriteHeader
 				+ ", tokenStyle=" + tokenStyle
 				+ ", dataRefreshPeriod=" + dataRefreshPeriod 
 				+ ", tokenSessionCheckLogin=" + tokenSessionCheckLogin
@@ -469,57 +533,76 @@ public class SaTokenConfig implements Serializable {
 				+ ", tokenPrefix=" + tokenPrefix
 				+ ", isPrint=" + isPrint 
 				+ ", isLog=" + isLog 
+				+ ", logLevel=" + logLevel 
+				+ ", logLevelInt=" + logLevelInt
 				+ ", jwtSecretKey=" + jwtSecretKey 
-				+ ", idTokenTimeout=" + idTokenTimeout 
 				+ ", basic=" + basic 
 				+ ", currDomain=" + currDomain 
-				+ ", checkIdToken=" + checkIdToken 
+				+ ", sameTokenTimeout=" + sameTokenTimeout
+				+ ", checkSameToken=" + checkSameToken 
 				+ ", cookie=" + cookie 
 				+ "]";
 	}
 
 	
 	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsConcurrent() ，使用方式保持不变 </h1>
-	 * @param allowConcurrentLogin see note
-	 * @return  see note
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getIsReadHeader() ，使用方式保持不变 </h1>
+	 * @return 是否尝试从header里读取token
 	 */
 	@Deprecated
-	public SaTokenConfig setAllowConcurrentLogin(Boolean allowConcurrentLogin) {
-		this.isConcurrent = allowConcurrentLogin;
-		return this;
+	public Boolean getIsReadHead() {
+		return isReadHeader;
 	}
 
 	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsConcurrent() ，使用方式保持不变 </h1>
-	 * @param isV see note
-	 * @return see note
-	 */
-	@Deprecated
-	public SaTokenConfig setIsV(Boolean isV) {
-		this.isPrint = isV;
-		return this;
-	}
-
-	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getCookie().getDomain() ，使用方式保持不变 </h1>
-	 * @return 写入Cookie时显式指定的作用域, 常用于单点登录二级域名共享Cookie的场景
-	 */
-	@Deprecated
-	public String getCookieDomain() {
-		return getCookie().getDomain();
-	}
-
-	/**
-	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getCookie().setDomain() ，使用方式保持不变 </h1>
-	 * @param cookieDomain 写入Cookie时显式指定的作用域, 常用于单点登录二级域名共享Cookie的场景
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setIsReadHeader() ，使用方式保持不变 </h1>
+	 * @param isReadHead 是否尝试从header里读取token
 	 * @return 对象自身
 	 */
 	@Deprecated
-	public SaTokenConfig setCookieDomain(String cookieDomain) {
-		this.getCookie().setDomain(cookieDomain);
+	public SaTokenConfig setIsReadHead(Boolean isReadHead) {
+		this.isReadHeader = isReadHead;
 		return this;
 	}
 
+	/**
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getSameTokenTimeout() ，使用方式保持不变 </h1>
+	 * @return Id-Token的有效期 (单位: 秒)
+	 */
+	@Deprecated
+	public long getIdTokenTimeout() {
+		return sameTokenTimeout;
+	}
+
+	/**
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setSameTokenTimeout() ，使用方式保持不变 </h1>
+	 * @param idTokenTimeout Id-Token的有效期 (单位: 秒)
+	 * @return 对象自身
+	 */
+	@Deprecated
+	public SaTokenConfig setIdTokenTimeout(long idTokenTimeout) {
+		this.sameTokenTimeout = idTokenTimeout;
+		return this;
+	}
+
+	/**
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 getCheckSameToken() ，使用方式保持不变 </h1>
+	 * @return 是否校验Id-Token（部分rpc插件有效）
+	 */
+	@Deprecated
+	public Boolean getCheckIdToken() {
+		return checkSameToken;
+	}
+
+	/**
+	 * <h1> 本函数设计已过时，未来版本可能移除此函数，请及时更换为 setCheckSameToken() ，使用方式保持不变 </h1>
+	 * @param checkIdToken 是否校验Id-Token（部分rpc插件有效）
+	 * @return 对象自身 
+	 */
+	@Deprecated
+	public SaTokenConfig setCheckIdToken(Boolean checkIdToken) {
+		this.checkSameToken = checkIdToken;
+		return this;
+	}
 
 }

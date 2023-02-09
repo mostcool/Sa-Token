@@ -1,7 +1,6 @@
 package cn.dev33.satoken.sso;
 
 import cn.dev33.satoken.context.model.SaRequest;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 
 /**
@@ -14,7 +13,7 @@ public class SaSsoUtil {
 	/**
 	 * 底层 SaSsoTemplate 对象 
 	 */
-	public static SaSsoTemplate saSsoTemplate = new SaSsoTemplate(StpUtil.stpLogic);
+	public static SaSsoTemplate ssoTemplate = new SaSsoTemplate();
 	
 
 	// ---------------------- Ticket 操作 ---------------------- 
@@ -22,10 +21,11 @@ public class SaSsoUtil {
 	/**
 	 * 根据 账号id 创建一个 Ticket码 
 	 * @param loginId 账号id 
+	 * @param client 客户端标识 
 	 * @return Ticket码 
 	 */
-	public static String createTicket(Object loginId) {
-		return saSsoTemplate.createTicket(loginId);
+	public static String createTicket(Object loginId, String client) {
+		return ssoTemplate.createTicket(loginId, client);
 	}
 	
 	/**
@@ -33,7 +33,7 @@ public class SaSsoUtil {
 	 * @param ticket Ticket码
 	 */
 	public static void deleteTicket(String ticket) {
-		saSsoTemplate.deleteTicket(ticket);
+		ssoTemplate.deleteTicket(ticket);
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class SaSsoUtil {
 	 * @param loginId 账号id 
 	 */
 	public static void deleteTicketIndex(Object loginId) {
-		saSsoTemplate.deleteTicketIndex(loginId);
+		ssoTemplate.deleteTicketIndex(loginId);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class SaSsoUtil {
 	 * @return 账号id 
 	 */
 	public static Object getLoginId(String ticket) {
-		return saSsoTemplate.getLoginId(ticket);
+		return ssoTemplate.getLoginId(ticket);
 	}
 
 	/**
@@ -61,16 +61,26 @@ public class SaSsoUtil {
 	 * @return 账号id 
 	 */
 	public static <T> T getLoginId(String ticket, Class<T> cs) {
-		return saSsoTemplate.getLoginId(ticket, cs);
+		return ssoTemplate.getLoginId(ticket, cs);
 	}
 
 	/**
-	 * 校验ticket码，获取账号id，如果此ticket是有效的，则立即删除 
+	 * 校验 Ticket 码，获取账号id，如果此ticket是有效的，则立即删除 
 	 * @param ticket Ticket码
 	 * @return 账号id 
 	 */
 	public static Object checkTicket(String ticket) {
-		return saSsoTemplate.checkTicket(ticket);
+		return ssoTemplate.checkTicket(ticket);
+	}
+	
+	/**
+	 * 校验ticket码，获取账号id，如果此ticket是有效的，则立即删除 
+	 * @param ticket Ticket码
+	 * @param client client 标识 
+	 * @return 账号id 
+	 */
+	public static Object checkTicket(String ticket, String client) {
+		return ssoTemplate.checkTicket(ticket, client);
 	}
 
 	/**
@@ -78,7 +88,7 @@ public class SaSsoUtil {
 	 * @return see note 
 	 */
 	public static String getAllowUrl() {
-		return saSsoTemplate.getAllowUrl();
+		return ssoTemplate.getAllowUrl();
 	}
 
 	/**
@@ -86,7 +96,7 @@ public class SaSsoUtil {
 	 * @param url 下放ticket的url地址 
 	 */
 	public static void checkRedirectUrl(String url) {
-		saSsoTemplate.checkRedirectUrl(url);
+		ssoTemplate.checkRedirectUrl(url);
 	}
 
 	
@@ -99,7 +109,7 @@ public class SaSsoUtil {
 	 * @return 构建完毕的URL 
 	 */
 	public static String buildCheckTicketUrl(String ticket, String ssoLogoutCallUrl) {
-		return saSsoTemplate.buildCheckTicketUrl(ticket, ssoLogoutCallUrl);
+		return ssoTemplate.buildCheckTicketUrl(ticket, ssoLogoutCallUrl);
 	}
 
 	/**
@@ -108,7 +118,7 @@ public class SaSsoUtil {
 	 * @param sloCallbackUrl 单点注销时的回调URL 
 	 */
 	public static void registerSloCallbackUrl(Object loginId, String sloCallbackUrl) {
-		saSsoTemplate.registerSloCallbackUrl(loginId, sloCallbackUrl);
+		ssoTemplate.registerSloCallbackUrl(loginId, sloCallbackUrl);
 	}
 
 	/**
@@ -117,7 +127,7 @@ public class SaSsoUtil {
 	 * @return 单点注销URL 
 	 */
 	public static String buildSloUrl(Object loginId) {
-		return saSsoTemplate.buildSloUrl(loginId);
+		return ssoTemplate.buildSloUrl(loginId);
 	}
 
 	/**
@@ -125,7 +135,7 @@ public class SaSsoUtil {
 	 * @param loginId 指定账号 
 	 */
 	public static void ssoLogout(Object loginId) {
-		saSsoTemplate.ssoLogout(loginId);
+		ssoTemplate.ssoLogout(loginId);
 	}
 
 	/**
@@ -134,7 +144,7 @@ public class SaSsoUtil {
 	 * @return 账号资料 
 	 */
 	public static Object getUserinfo(Object loginId) {
-		return saSsoTemplate.getUserinfo(loginId);
+		return ssoTemplate.getUserinfo(loginId);
 	}
 
 
@@ -147,17 +157,18 @@ public class SaSsoUtil {
 	 * @return [SSO-Server端-认证地址 ]
 	 */
 	public static String buildServerAuthUrl(String clientLoginUrl, String back) {
-		return saSsoTemplate.buildServerAuthUrl(clientLoginUrl, back);
+		return ssoTemplate.buildServerAuthUrl(clientLoginUrl, back);
 	}
 
 	/**
 	 * 构建URL：Server端向Client下放ticke的地址 
 	 * @param loginId 账号id 
+	 * @param client 客户端标识 
 	 * @param redirect Client端提供的重定向地址 
 	 * @return see note 
 	 */
-	public static String buildRedirectUrl(Object loginId, String redirect) {
-		return saSsoTemplate.buildRedirectUrl(loginId, redirect);
+	public static String buildRedirectUrl(Object loginId, String client, String redirect) {
+		return ssoTemplate.buildRedirectUrl(loginId, client, redirect);
 	}
 
 	/**
@@ -166,7 +177,7 @@ public class SaSsoUtil {
 	 * @return Server端 账号资料查询地址 
 	 */
 	public static String buildUserinfoUrl(Object loginId) {
-		return saSsoTemplate.buildUserinfoUrl(loginId);
+		return ssoTemplate.buildUserinfoUrl(loginId);
 	}
 	
 	
@@ -178,7 +189,7 @@ public class SaSsoUtil {
 	 * @return 返回的结果 
 	 */
 	public static SaResult request(String url) {
-		return saSsoTemplate.request(url);
+		return ssoTemplate.request(url);
 	}
 
 	/**
@@ -187,7 +198,7 @@ public class SaSsoUtil {
 	 */
 	@Deprecated
 	public static void checkSecretkey(String secretkey) {
-		saSsoTemplate.checkSecretkey(secretkey);
+		ssoTemplate.checkSecretkey(secretkey);
 	}
 
 	/**
@@ -199,7 +210,7 @@ public class SaSsoUtil {
 	 * @return 签名 
 	 */
 	public static String getSign(Object loginId, String timestamp, String nonce, String secretkey) {
-		return saSsoTemplate.getSign(loginId, timestamp, nonce, secretkey);
+		return ssoTemplate.getSign(loginId, timestamp, nonce, secretkey);
 	}
 
 	/**
@@ -209,7 +220,7 @@ public class SaSsoUtil {
 	 * @return 加工后的url 
 	 */
 	public static String addSignParams(String url, Object loginId) {
-		return saSsoTemplate.addSignParams(url, loginId);
+		return ssoTemplate.addSignParams(url, loginId);
 	}
 
 	/**
@@ -217,7 +228,7 @@ public class SaSsoUtil {
 	 * @param req request 
 	 */
 	public static void checkSign(SaRequest req) {
-		saSsoTemplate.checkSign(req);
+		ssoTemplate.checkSign(req);
 	}
 
 	/**
@@ -225,7 +236,7 @@ public class SaSsoUtil {
 	 * @param timestamp 时间戳 
 	 */
 	public static void checkTimestamp(long timestamp) {
-		saSsoTemplate.checkTimestamp(timestamp);
+		ssoTemplate.checkTimestamp(timestamp);
 	}
 	
 }

@@ -14,20 +14,19 @@
 
 	<name>sa-token-servlet</name>
     <artifactId>sa-token-servlet</artifactId>
-	<description>sa-token authentication by Sservlet API</description>
+	<description>sa-token authentication by Servlet API</description>
 
 	<dependencies>
 		<!-- sa-token-core -->
 		<dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-core</artifactId>
-            <version>${revision}</version>
         </dependency>
-        <!-- Servlet API -->
+        
+        <!-- Servlet API (optional) -->
         <dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
 			<optional>true</optional>
 		</dependency>
 	</dependencies>

@@ -2,7 +2,8 @@ package cn.dev33.satoken.jwt;
 
 import java.util.Map;
 
-import cn.dev33.satoken.exception.SaTokenException;
+import cn.dev33.satoken.jwt.error.SaJwtErrorCode;
+import cn.dev33.satoken.jwt.exception.SaJwtException;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 
@@ -34,7 +35,7 @@ public class StpLogicJwtForSimple extends StpLogic {
 	 */
 	public String jwtSecretKey() {
 		String keyt = getConfig().getJwtSecretKey();
-		SaTokenException.throwByNull(keyt, "请配置jwt秘钥");
+		SaJwtException.throwByNull(keyt, "请配置jwt秘钥", SaJwtErrorCode.CODE_30205);
 		return keyt;
 	}
 	
@@ -49,11 +50,27 @@ public class StpLogicJwtForSimple extends StpLogic {
 	}
 
 	/**
-	 * 获取Token携带的扩展信息
+	 * 获取当前 Token 的扩展信息 
 	 */
 	@Override
 	public Object getExtra(String key) {
-		return SaJwtUtil.getPayloadsNotCheck(getTokenValue(), loginType, jwtSecretKey()).get(key);
+		return getExtra(getTokenValue(), key);
 	}
 
+	/**
+	 * 获取指定 Token 的扩展信息 
+	 */
+	@Override
+	public Object getExtra(String tokenValue, String key) {
+		return SaJwtUtil.getPayloadsNotCheck(tokenValue, loginType, jwtSecretKey()).get(key);
+	}
+
+	
+	@Override
+	public boolean getConfigOfIsShare() {
+		// 为确保 jwt-simple 模式的 token Extra 数据生成不受旧token影响，这里必须让 is-share 恒为 false 
+		// 即：在使用 jwt-simple 模式后，即使配置了 is-share=true 也不能复用旧 Token，必须每次创建新 Token 
+		return false;
+	}
+	
 }

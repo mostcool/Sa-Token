@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.SaCheckBasic;
+import cn.dev33.satoken.annotation.SaCheckDisable;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
@@ -141,25 +142,31 @@ public final class SaStrategy {
 		// 校验 @SaCheckLogin 注解 
 		SaCheckLogin checkLogin = (SaCheckLogin) SaStrategy.me.getAnnotation.apply(target, SaCheckLogin.class);
 		if(checkLogin != null) {
-			SaManager.getStpLogic(checkLogin.type()).checkByAnnotation(checkLogin);
+			SaManager.getStpLogic(checkLogin.type(), false).checkByAnnotation(checkLogin);
 		}
 		
 		// 校验 @SaCheckRole 注解 
 		SaCheckRole checkRole = (SaCheckRole) SaStrategy.me.getAnnotation.apply(target, SaCheckRole.class);
 		if(checkRole != null) {
-			SaManager.getStpLogic(checkRole.type()).checkByAnnotation(checkRole);
+			SaManager.getStpLogic(checkRole.type(), false).checkByAnnotation(checkRole);
 		}
 		
 		// 校验 @SaCheckPermission 注解
 		SaCheckPermission checkPermission = (SaCheckPermission) SaStrategy.me.getAnnotation.apply(target, SaCheckPermission.class);
 		if(checkPermission != null) {
-			SaManager.getStpLogic(checkPermission.type()).checkByAnnotation(checkPermission);
+			SaManager.getStpLogic(checkPermission.type(), false).checkByAnnotation(checkPermission);
 		}
 
 		// 校验 @SaCheckSafe 注解
 		SaCheckSafe checkSafe = (SaCheckSafe) SaStrategy.me.getAnnotation.apply(target, SaCheckSafe.class);
 		if(checkSafe != null) {
-			SaManager.getStpLogic(checkSafe.type()).checkByAnnotation(checkSafe);
+			SaManager.getStpLogic(checkSafe.type(), false).checkByAnnotation(checkSafe);
+		}
+
+		// 校验 @SaCheckDisable 注解
+		SaCheckDisable checkDisable = (SaCheckDisable) SaStrategy.me.getAnnotation.apply(target, SaCheckDisable.class);
+		if(checkDisable != null) {
+			SaManager.getStpLogic(checkDisable.type(), false).checkByAnnotation(checkDisable);
 		}
 		
 		// 校验 @SaCheckBasic 注解
@@ -167,23 +174,32 @@ public final class SaStrategy {
 		if(checkBasic != null) {
 			SaBasicUtil.check(checkBasic.realm(), checkBasic.account());
 		}
-		
 	};
 
 	/**
-	 * 从元素上获取注解（注解鉴权内部实现） 
+	 * 从元素上获取注解  
 	 * <p> 参数 [element元素，要获取的注解类型] 
 	 */
 	public BiFunction<AnnotatedElement, Class<? extends Annotation> , Annotation> getAnnotation = (element, annotationClass)->{
 		// 默认使用jdk的注解处理器 
 		return element.getAnnotation(annotationClass);
 	};
-	
+
+	/**
+	 * 判断一个 Method 或其所属 Class 是否包含指定注解 
+	 * <p> 参数 [Method, 注解] 
+	 */
+	public BiFunction<Method, Class<? extends Annotation>, Boolean> isAnnotationPresent = (method, annotationClass) -> {
+		return me.getAnnotation.apply(method, annotationClass) != null ||
+				me.getAnnotation.apply(method.getDeclaringClass(), annotationClass) != null;
+	};
+
 
 	// 
 	// 重写策略 set连缀风格 
 	// 
 	
+
 	/**
 	 * 重写创建 Token 的策略 
 	 * <p> 参数 [账号id, 账号类型] 
@@ -240,7 +256,7 @@ public final class SaStrategy {
 	}
 
 	/**
-	 * 从元素上获取注解（注解鉴权内部实现） 
+	 * 从元素上获取注解  
 	 * <p> 参数 [element元素，要获取的注解类型] 
 	 * @param getAnnotation / 
 	 * @return 对象自身 
@@ -249,6 +265,16 @@ public final class SaStrategy {
 		this.getAnnotation = getAnnotation;
 		return this;
 	}
-	
+
+	/**
+	 * 判断一个 Method 或其所属 Class 是否包含指定注解 
+	 * <p> 参数 [Method, 注解] 
+	 * @param isAnnotationPresent / 
+	 * @return 对象自身 
+	 */
+	public SaStrategy setIsAnnotationPresent(BiFunction<Method, Class<? extends Annotation>, Boolean> isAnnotationPresent) {
+		this.isAnnotationPresent = isAnnotationPresent;
+		return this;
+	}
 	
 }

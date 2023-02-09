@@ -1,8 +1,10 @@
 package cn.dev33.satoken.temp.jwt;
 
 import cn.dev33.satoken.SaManager;
+import cn.dev33.satoken.exception.ApiDisabledException;
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.temp.SaTempInterface;
+import cn.dev33.satoken.temp.jwt.error.SaTempJwtErrorCode;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 /**
@@ -16,8 +18,8 @@ public class SaTempForJwt implements SaTempInterface {
 	 * 根据value创建一个token 
 	 */
 	@Override
-	public String createToken(Object value, long timeout) {
-		String token = SaJwtUtil.createToken(value, timeout, getJwtSecretKey());
+	public String createToken(String service, Object value, long timeout) {
+		String token = SaJwtUtil.createToken(service, value, timeout, getJwtSecretKey());
 		return token;
 	}
 	
@@ -25,8 +27,8 @@ public class SaTempForJwt implements SaTempInterface {
 	 *  解析token获取value 
 	 */
 	@Override
-	public Object parseToken(String token) {
-		Object value = SaJwtUtil.getValue(token, getJwtSecretKey());
+	public Object parseToken(String service, String token) {
+		Object value = SaJwtUtil.getValue(service, token, getJwtSecretKey());
 		return value;
 	}
 	
@@ -34,8 +36,8 @@ public class SaTempForJwt implements SaTempInterface {
 	 * 返回指定token的剩余有效期，单位：秒 
 	 */
 	@Override
-	public long getTimeout(String token) {
-		long timeout = SaJwtUtil.getTimeout(token, getJwtSecretKey());
+	public long getTimeout(String service, String token) {
+		long timeout = SaJwtUtil.getTimeout(service, token, getJwtSecretKey());
 		return timeout;
 	}
 
@@ -43,8 +45,8 @@ public class SaTempForJwt implements SaTempInterface {
 	 * 删除一个token
 	 */
 	@Override
-	public void deleteToken(String token) {
-		throw new SaTokenException("jwt cannot delete token");
+	public void deleteToken(String service, String token) {
+		throw new ApiDisabledException("jwt cannot delete token").setCode(SaTempJwtErrorCode.CODE_30302);
 	}
 	
 	/**
@@ -55,7 +57,7 @@ public class SaTempForJwt implements SaTempInterface {
 	public String getJwtSecretKey() {
 		String jwtSecretKey = SaManager.getConfig().getJwtSecretKey();
 		if(SaFoxUtil.isEmpty(jwtSecretKey)) {
-			throw new SaTokenException("请配置：jwtSecretKey");
+			throw new SaTokenException("请配置：jwtSecretKey").setCode(SaTempJwtErrorCode.CODE_30301);
 		}
 		return jwtSecretKey;
 	}

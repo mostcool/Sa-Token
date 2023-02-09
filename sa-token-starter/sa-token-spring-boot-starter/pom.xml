@@ -17,38 +17,31 @@
 	<description>springboot integrate sa-token</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>cn.dev33</groupId>
-			<artifactId>sa-token-servlet</artifactId>
-            <version>${revision}</version>
-		</dependency>
+		<!-- spring-boot-starter-web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.5.12</version>
-		</dependency>
-		<!-- OAuth2.0 (optional) -->
-		<dependency>
-			<groupId>cn.dev33</groupId>
-			<artifactId>sa-token-oauth2</artifactId>
-            <version>${revision}</version>
-			<optional>true</optional>
-		</dependency>
-		<!-- SSO (optional) -->
-		<dependency>
-			<groupId>cn.dev33</groupId>
-			<artifactId>sa-token-sso</artifactId>
-            <version>${revision}</version>
-			<optional>true</optional>
 		</dependency>
 		
-		<!-- config -->
+		<!-- config (optional) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-			<version>2.5.12</version>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- sa-token-servlet -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-servlet</artifactId>
+		</dependency>
+		
+		<!-- sa-token-spring-boot-autoconfig -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-spring-boot-autoconfig</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 

@@ -1,28 +1,25 @@
 package cn.dev33.satoken.solon;
 
+import cn.dev33.satoken.solon.oauth2.SaOAuth2AutoConfigure;
+import cn.dev33.satoken.solon.sso.SaSsoAutoConfigure;
 import org.noear.solon.Solon;
-import org.noear.solon.SolonApp;
-import org.noear.solon.core.Aop;
+import org.noear.solon.Utils;
+import org.noear.solon.core.AopContext;
 import org.noear.solon.core.Plugin;
 
 import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.annotation.SaCheckBasic;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.dev33.satoken.annotation.SaCheckSafe;
 import cn.dev33.satoken.basic.SaBasicTemplate;
 import cn.dev33.satoken.basic.SaBasicUtil;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.context.second.SaTokenSecondContextCreator;
 import cn.dev33.satoken.dao.SaTokenDao;
-import cn.dev33.satoken.id.SaIdTemplate;
-import cn.dev33.satoken.id.SaIdUtil;
 import cn.dev33.satoken.json.SaJsonTemplate;
+import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.listener.SaTokenListener;
+import cn.dev33.satoken.log.SaLog;
+import cn.dev33.satoken.same.SaSameTemplate;
 import cn.dev33.satoken.sign.SaSignTemplate;
-import cn.dev33.satoken.solon.integration.SaContextForSolon;
-import cn.dev33.satoken.solon.integration.SaTokenMethodInterceptor;
+import cn.dev33.satoken.solon.model.SaContextForSolon;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
@@ -33,85 +30,103 @@ import cn.dev33.satoken.temp.SaTempInterface;
  * @since 1.4
  */
 public class XPluginImp implements Plugin {
-    
-	@Override
-    public void start(SolonApp app) {
-        Aop.context().beanAroundAdd(SaCheckPermission.class, SaTokenMethodInterceptor.INSTANCE);
-        Aop.context().beanAroundAdd(SaCheckRole.class, SaTokenMethodInterceptor.INSTANCE);
-        Aop.context().beanAroundAdd(SaCheckLogin.class, SaTokenMethodInterceptor.INSTANCE);
-        Aop.context().beanAroundAdd(SaCheckSafe.class, SaTokenMethodInterceptor.INSTANCE);
-        Aop.context().beanAroundAdd(SaCheckBasic.class, SaTokenMethodInterceptor.INSTANCE);
 
-        //集成初始化
+    @Override
+    public void start(AopContext context) {
+        // Sa-Token 日志输出 Bean
+        context.getBeanAsync(SaLog.class, bean -> {
+            SaManager.setLog(bean);
+        });
 
+
+        //注入其它 Bean
+        context.beanOnloaded(c -> {
+            beanInitDo(c);
+            ssoBeanInitDo(c);
+            oauth2BeanInitDo(c);
+        });
+    }
+
+    private void ssoBeanInitDo(AopContext context){
+        if (Utils.loadClass("cn.dev33.satoken.sso.SaSsoManager") != null) {
+            context.beanMake(SaSsoAutoConfigure.class);
+        }
+    }
+
+    private void oauth2BeanInitDo(AopContext context){
+        if(Utils.loadClass("cn.dev33.satoken.oauth2.SaOAuth2Manager") != null){
+            context.beanMake(SaOAuth2AutoConfigure.class);
+        }
+    }
+
+    private void beanInitDo(AopContext context) {
         // 注入上下文Bean
         SaManager.setSaTokenContext(new SaContextForSolon());
 
         //注入配置Bean
         SaTokenConfig saTokenConfig = Solon.cfg().getBean("sa-token", SaTokenConfig.class);
-        SaManager.setConfig(saTokenConfig);
+        if (saTokenConfig != null) {
+            SaManager.setConfig(saTokenConfig);
+        }
 
-        Aop.getAsyn(SaTokenConfig.class, bw -> {
-            SaManager.setConfig(bw.raw());
+        context.getBeanAsync(SaTokenConfig.class, bean -> {
+            SaManager.setConfig(bean);
         });
-
 
         // 注入Dao Bean
-        Aop.getAsyn(SaTokenDao.class, bw -> {
-            SaManager.setSaTokenDao(bw.raw());
+        context.getBeanAsync(SaTokenDao.class, bean -> {
+            SaManager.setSaTokenDao(bean);
         });
 
-        // 注入二级上下文 Bean 
-        Aop.getAsyn(SaTokenSecondContextCreator.class, bw->{
-        	SaTokenSecondContextCreator raw = bw.raw();
-            SaManager.setSaTokenSecondContext(raw.create());
+        // 注入二级上下文 Bean
+        context.getBeanAsync(SaTokenSecondContextCreator.class, bean -> {
+            SaManager.setSaTokenSecondContext(bean.create());
         });
-        
-        // 注入侦听器 Bean
-        Aop.getAsyn(SaTokenListener.class, bw->{
-            SaManager.setSaTokenListener(bw.raw());
+
+        // 注入侦听器 Bean （可以有多个）
+        context.subBeansOfType(SaTokenListener.class, sl -> {
+            SaTokenEventCenter.registerListener(sl);
         });
+
 
         // 注入权限认证 Bean
-        Aop.getAsyn(StpInterface.class, bw->{
-            SaManager.setStpInterface(bw.raw());
+        context.getBeanAsync(StpInterface.class, bean -> {
+            SaManager.setStpInterface(bean);
         });
 
         // 注入持久化 Bean
-        Aop.getAsyn(SaTokenDao.class, bw->{
-            SaManager.setSaTokenDao(bw.raw());
+        context.getBeanAsync(SaTokenDao.class, bean -> {
+            SaManager.setSaTokenDao(bean);
         });
 
         // 临时令牌验证模块 Bean
-        Aop.getAsyn(SaTempInterface.class, bw->{
-            SaManager.setSaTemp(bw.raw());
+        context.getBeanAsync(SaTempInterface.class, bean -> {
+            SaManager.setSaTemp(bean);
         });
 
-        // Sa-Token-Id 身份凭证模块 Bean
-        Aop.getAsyn(SaIdTemplate.class, bw->{
-        	SaIdUtil.saIdTemplate = bw.raw();
+        // Sa-Token Same-Token 模块 Bean
+        context.getBeanAsync(SaSameTemplate.class, bean -> {
+            SaManager.setSaSameTemplate(bean);
         });
 
-        // Sa-Token Http Basic 认证模块 Bean 
-        Aop.getAsyn(SaBasicTemplate.class, bw->{
-        	SaBasicUtil.saBasicTemplate = bw.raw();
+        // Sa-Token Http Basic 认证模块 Bean
+        context.getBeanAsync(SaBasicTemplate.class, bean -> {
+            SaBasicUtil.saBasicTemplate = bean;
         });
 
-        // Sa-Token JSON 转换器 Bean 
-        Aop.getAsyn(SaJsonTemplate.class, bw->{
-        	SaManager.setSaJsonTemplate(bw.raw());
+        // Sa-Token JSON 转换器 Bean
+        context.getBeanAsync(SaJsonTemplate.class, bean -> {
+            SaManager.setSaJsonTemplate(bean);
         });
 
-        // Sa-Token 参数签名算法 Bean 
-        Aop.getAsyn(SaSignTemplate.class, bw->{
-        	SaManager.setSaSignTemplate(bw.raw());
+        // Sa-Token 参数签名算法 Bean
+        context.getBeanAsync(SaSignTemplate.class, bean -> {
+            SaManager.setSaSignTemplate(bean);
         });
 
-        // 自定义 StpLogic 对象 
-        Aop.getAsyn(StpLogic.class, bw->{
-        	StpUtil.setStpLogic(bw.raw());
+        // 自定义 StpLogic 对象 //容器层面只能有一个；要多个得自己在Util上处理
+        context.getBeanAsync(StpLogic.class, bean -> {
+            StpUtil.setStpLogic(bean);
         });
-        
     }
-	
 }
