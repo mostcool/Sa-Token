@@ -7,8 +7,8 @@
 
 ## 内置风格
 
-Sa-Token默认的token生成策略是uuid风格，其模样类似于：`623368f0-ae5e-4475-a53f-93e4225f16ae`。<br>
-如果你对这种风格不太感冒，还可以将token生成设置为其他风格。
+Sa-Token 默认的 token 生成策略是 uuid 风格，其模样类似于：`623368f0-ae5e-4475-a53f-93e4225f16ae`。<br>
+如果你对这种风格不太感冒，还可以将 token 生成设置为其他风格。
 
 怎么设置呢？只需要在yml配置文件里设置 `sa-token.token-style=风格类型` 即可，其有多种取值： 
 
@@ -51,7 +51,7 @@ public class SaTokenConfigure {
     @Autowired
     public void rewriteSaStrategy() {
     	// 重写 Token 生成策略 
-    	SaStrategy.me.createToken = (loginId, loginType) -> {
+    	SaStrategy.instance.createToken = (loginId, loginType) -> {
     		return SaFoxUtil.getRandomString(60);	// 随机60位长度字符串
     	};
     }

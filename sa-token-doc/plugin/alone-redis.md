@@ -15,7 +15,6 @@ Sa-Token默认的Redis集成方式会把权限数据和业务缓存放在一起�
 
 
 ### 1、首先引入Alone-Redis依赖 
-
 <!---------------------------- tabs:start ---------------------------->
 <!-------- tab:Maven 方式 -------->
 ``` xml 
@@ -160,7 +159,7 @@ public class TestController {
 
 ### 4、注意点
 目前 Sa-Token-Alone-Redis 仅对以下插件有 Redis 分离效果：
-- sa-token-dao-redis
-- sa-token-dao-redis-jackson
-- sa-token-dao-redis-fastjson
-- sa-token-dao-redis-fastjson2
+- sa-token-redis
+- sa-token-redis-jackson
+- sa-token-redis-fastjson
+- sa-token-redis-fastjson2

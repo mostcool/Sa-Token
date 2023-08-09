@@ -1,19 +1,21 @@
 package com.pj.satoken;
 
 
+import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.dao.SaTokenDaoOfRedis;
 import cn.dev33.satoken.solon.integration.SaTokenInterceptor;
-import org.noear.solon.Solon;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Configuration;
 
 import com.pj.util.AjaxJson;
 
 import cn.dev33.satoken.context.SaHolder;
+import org.noear.solon.annotation.Inject;
 
 
 /**
  * [Sa-Token 权限认证] 配置类 
- * @author kong
+ * @author click33
  * @author noear
  */
 @Configuration
@@ -42,7 +44,7 @@ public class SaTokenConfigure {
 					return AjaxJson.getError(e.getMessage());
 				})
 
-				// 前置函数：在每次认证函数之前执行
+				// 前置函数：在每次认证函数之前执行（BeforeAuth 不受 includeList 与 excludeList 的限制，所有请求都会进入）
 				.setBeforeAuth(r -> {
 					// ---------- 设置一些安全响应头 ----------
 					SaHolder.getResponse()
@@ -57,4 +59,9 @@ public class SaTokenConfigure {
 					;
 				});
 	}
+//如果需要 redis dao，加这段代表
+//	@Bean
+//	public SaTokenDao saTokenDaoInit(@Inject("${sa-token-dao.redis}") SaTokenDaoOfRedis saTokenDao) {
+//		return saTokenDao;
+//	}
 }

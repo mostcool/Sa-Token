@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://sa-token.cc/logo.png" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.34.0</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.35.0.RC</h1>
 <h5 align="center">一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！</h5>
 <p align="center" class="badge-box">
 	<a href="https://gitee.com/dromara/sa-token/stargazers"><img src="https://gitee.com/dromara/sa-token/badge/star.svg?theme=gvp"></a>
@@ -100,7 +100,7 @@ Sa-Token 目前主要五大功能模块：登录认证、权限认证、单点�
 - **临时Token认证** —— 解决短时间的Token授权问题
 - **模拟他人账号** —— 实时操作任意用户状态数据
 - **临时身份切换** —— 将会话身份临时切换为其它账号
-- **前后台分离** —— APP、小程序等不支持Cookie的终端
+- **前后端分离** —— APP、小程序等不支持Cookie的终端
 - **同端互斥登录** —— 像QQ一样手机电脑同时在线，但是两个手机上互斥登录
 - **多账号认证体系** —— 比如一个商城项目的user表和admin表分开鉴权
 - **Token风格定制** —— 内置六种Token风格，还可：自定义Token生成策略、自定义Token前缀
@@ -136,18 +136,6 @@ Sa-Token 目前主要五大功能模块：登录认证、权限认证、单点�
 
 
 ## 交流群
-QQ交流群：707350988 [点击加入](https://jq.qq.com/?_wv=1027&k=tqbzHT2D)
+加入 Sa-Token 框架 QQ、微信讨论群：[点击加入](/more/join-group.md)
 
-微信交流群：
 
-![微信群](https://dev33-test.oss-cn-beijing.aliyuncs.com/sa-token/i-wx-qr.png ':size=230')
-
-（扫码添加微信，备注：sa-token，邀您加入群聊）
-
-<br>
-
-加入群聊的好处：
-- 第一时间收到框架更新通知。
-- 第一时间收到框架 bug 通知。
-- 第一时间收到新增开源案例通知。
-- 和众多大佬一起互相 (huá shǔi) 交流 (mō yú)。

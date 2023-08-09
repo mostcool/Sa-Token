@@ -6,11 +6,17 @@
 	<artifactId>sa-token-demo-solon</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	
+	<!-- Solon -->
+	<parent>
+		<groupId>org.noear</groupId>
+		<artifactId>solon-parent</artifactId>
+		<version>2.4.0</version>
+		<relativePath/>
+	</parent>
+
 	<!-- 定义 Sa-Token 版本号 -->
 	<properties>
-		<sa-token.version>1.34.0</sa-token.version>
-		<solon.version>1.12.4</solon.version>
+		<sa-token.version>1.35.0.RC</sa-token.version>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -21,13 +27,11 @@
 		<dependency>
 			<groupId>org.noear</groupId>
 			<artifactId>solon-web</artifactId>
-            <version>${solon.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.noear</groupId>
-			<artifactId>solon.logging</artifactId>
-			<version>${solon.version}</version>
+			<artifactId>solon.logging.simple</artifactId>
 		</dependency>
 		
 		<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
@@ -38,18 +42,11 @@
         </dependency>
 		
 		<!-- sa-token整合redis (使用jdk默认序列化方式) -->
-		<!-- <dependency>
+		<dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-dao-redisx</artifactId>
+            <artifactId>sa-token-redisx</artifactId>
             <version>${sa-token.version}</version>
-        </dependency> -->
-
-        
-		<!-- 提供redis连接池 -->
-		<!-- <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-        </dependency> -->
+        </dependency>
 
 		<!-- hutool工具类，用来生成雪花算法唯一id -->
 		<!-- <dependency>

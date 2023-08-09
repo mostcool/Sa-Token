@@ -1,5 +1,7 @@
 # Sa-Token 插件开发指南 
 
+> 注：为 Sa-Token 提交插件请在 sa-token-three-plugin 仓库进行：[点击跳转](https://gitee.com/sa-tokens/sa-token-three-plugin)
+
 --- 
 
 插件，从字面意思理解就是可拔插的组件，作用是在不改变 Sa-Token 现有架构的情况下，替换或扩展一部分底层代码逻辑。
@@ -21,7 +23,7 @@ SaStrategy 的每一个函数都可以单独重写，以 “自定义Token生成
 
 ``` java
 // 重写 Token 生成策略 
-SaStrategy.me.createToken = (loginId, loginType) -> {
+SaStrategy.instance.createToken = (loginId, loginType) -> {
 	return SaFoxUtil.getRandomString(60);    // 随机60位长度字符串
 };
 ```
@@ -114,8 +116,8 @@ SaTokenContext 是对接不同框架的上下文接口，注入流程和第二�
 
 | 插件							| 功能							| 状态			|
 | :--------						| :--------						| :--------		|
-| sa-token-dao-redis			| Sa-Token 与 Redis 的整合		| <font color="green" >已完成</font>			|
-| sa-token-dao-memcached		| Sa-Token 与 memcached 的整合	| 待开发			|
+| sa-token-redis			| Sa-Token 与 Redis 的整合		| <font color="green" >已完成</font>			|
+| sa-token-memcached		| Sa-Token 与 memcached 的整合	| 待开发			|
 
 ##### 其它：
 任何你认为有价值的功能代码，都可以扩展为插件。

@@ -3,7 +3,7 @@
 如果我们的多个系统：部署在不同的域名之下，但是后端可以连接同一个Redis，那么便可以使用 **`[URL重定向传播会话]`** 的方式做到单点登录。
 
 
-### 1、解题思路
+### 1、设计思路
 
 首先我们再次复习一下，多个系统之间为什么无法同步登录状态？
 
@@ -45,7 +45,7 @@
 
 ### 3、搭建 Client 端项目 
 
-> 搭建示例在官方仓库的 `/sa-token-demo/sa-token-demo-sso2-client/`，如遇到难点可结合源码进行测试学习
+> 搭建示例在官方仓库的 `/sa-token-demo/sa-token-demo-sso/sa-token-demo-sso2-client/`，如遇到难点可结合源码进行测试学习
 
 #### 3.1、去除 SSO-Server 的 Cookie 作用域配置 
 在SSO模式一章节中我们打开了配置：
@@ -88,7 +88,7 @@ sa-token.cookie.domain=stp.com
 <!-- Sa-Token 整合redis (使用jackson序列化方式) -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-dao-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-jackson</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
@@ -112,7 +112,7 @@ implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 implementation 'cn.dev33:sa-token-sso:${sa.top.version}'
 
 // Sa-Token 整合 Redis (使用 jackson 序列化方式)
-implementation 'cn.dev33:sa-token-dao-redis-jackson:${sa.top.version}'
+implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 
 // Sa-Token插件：权限缓存与业务缓存分离
@@ -173,8 +173,6 @@ sa-token:
     sso: 
         # SSO-Server端 统一认证地址 
         auth-url: http://sa-sso-server.com:9000/sso/auth
-        # 是否打开单点注销接口
-        is-slo: true
 
     # 配置Sa-Token单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
     alone-redis: 
@@ -197,8 +195,6 @@ server.port=9001
 ######### Sa-Token 配置 #########
 # SSO-Server端 统一认证地址 
 sa-token.sso.auth-url=http://sa-sso-server.com:9000/sso/auth
-# 是否打开单点注销接口
-sa-token.sso.is-slo=true
 
 # 配置 Sa-Token 单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
 # Redis数据库索引

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020-2099 sa-token.cc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cn.dev33.satoken.core.util;
 
 import java.time.Instant;
@@ -16,8 +31,8 @@ import cn.dev33.satoken.util.SaFoxUtil;
 /**
  * SaFoxUtil 工具类测试 
  * 
- * @author kong
- * @since: 2022-2-8 22:14:25
+ * @author click33
+ * @since 2022-2-8 22:14:25
  */
 public class SaFoxUtilTest {
 
@@ -98,16 +113,65 @@ public class SaFoxUtilTest {
     	Assertions.assertEquals(list6.get(0), dataList.get(dataList.size() - 1));
     }
 
-    @Test
-    public void vagueMatch() {
-    	Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello"));
-    	Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello world"));
-    	Assertions.assertFalse(SaFoxUtil.vagueMatch("hello*", "he"));
-    	Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello*"));
-    	Assertions.assertTrue(SaFoxUtil.vagueMatch(null, null));
-    	Assertions.assertFalse(SaFoxUtil.vagueMatch(null, "hello"));
-    	Assertions.assertFalse(SaFoxUtil.vagueMatch("hello*", null));
-    }
+	@Test
+	public void vagueMatch() {
+		// 不模糊
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("hello", "hello"));
+
+		// 正常模糊
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello world"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("hello*", "hello*"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("hello*", "he"));
+
+		// 带 -
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user-*", "user-"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user-*", "user-add"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user-*", "user-*"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user-*", "user"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user-*-add-*", "user-xx-add-1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user-*-add-*", "user-add-1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user-*", "usermgt-list"));
+
+		// 带 /
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user/*", "user/"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user/*", "user/add"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user/*", "user/*"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user/*", "user"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user/*/add/*", "user/xx/add/1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user/*/add/*", "user/add/1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user/*", "usermgt/list"));
+
+		// 带 :
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user:*", "user:"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user:*", "user:add"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user:*", "user:*"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user:*", "user"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user:*:add:*", "user:xx:add:1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user:*:add:*", "user:add:1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user:*", "usermgt:list"));
+
+		// 带 .
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user.*", "user."));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user.*", "user.add"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user.*", "user.*"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user.*", "user"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("user.*.add.*", "user.xx.add.1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user.*.add.*", "user.add.1"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("user.*", "usermgt.list"));
+
+		// 极端情况
+		Assertions.assertTrue(SaFoxUtil.vagueMatch(null, null));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch(null, "hello"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("hello*", null));
+
+		// url 匹配
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("*", "http://sa-sso-client1.com:9001/sso/login"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("http://sa-sso-client1.com:9001/*", "http://sa-sso-client1.com:9001/sso/login"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("http://sa-sso-client1.com:9001/*", "http://sa-sso-client1.com:9001/sso/login?name=1"));
+		Assertions.assertTrue(SaFoxUtil.vagueMatch("http://sa-sso-client1.com:9001/*", "http://sa-sso-client1.com:9001/sso/login?name=1&age=2"));
+		Assertions.assertFalse(SaFoxUtil.vagueMatch("http://sa-sso-client1.com:9001/*", "http://sa-sso-client1.com:9002"));
+	}
 
     @Test
     public void isWrapperType() {

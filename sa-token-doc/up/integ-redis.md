@@ -6,10 +6,10 @@ Sa-Token 默认将数据保存在内存中，此模式读写速度最快，且�
 1. 重启后数据会丢失。
 2. 无法在分布式环境中共享数据。
 
-为此，Sa-Token 提供了扩展接口，你可以轻松将会话数据存储在 `Redis`、`Memcached`等专业的缓存中间件中，
+为此，Sa-Token 提供了扩展接口，你可以轻松将会话数据存储在一些专业的缓存中间件上（比如 Redis），
 做到重启数据不丢失，而且保证分布式环境下多节点的会话一致性。
 
-以下是官方提供的 Redis 集成包：
+以下是框架提供的 Redis 集成包：
 
 ---
 
@@ -21,14 +21,14 @@ Sa-Token 默认将数据保存在内存中，此模式读写速度最快，且�
 <!-- Sa-Token 整合 Redis （使用 jdk 默认序列化方式） -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-dao-redis</artifactId>
+	<artifactId>sa-token-redis</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 ```
 <!-------- tab:Gradle 方式 -------->
 ``` gradle
 // Sa-Token 整合 Redis （使用 jdk 默认序列化方式）
-implementation 'cn.dev33:sa-token-dao-redis:${sa.top.version}'
+implementation 'cn.dev33:sa-token-redis:${sa.top.version}'
 ```
 <!---------------------------- tabs:end ------------------------------>
 
@@ -43,14 +43,14 @@ implementation 'cn.dev33:sa-token-dao-redis:${sa.top.version}'
 <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-dao-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-jackson</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 ```
 <!-------- tab:Gradle 方式 -------->
 ``` gradle
 // Sa-Token 整合 Redis （使用 jackson 序列化方式）
-implementation 'cn.dev33:sa-token-dao-redis-jackson:${sa.top.version}'
+implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
 ```
 <!---------------------------- tabs:end ------------------------------>
 

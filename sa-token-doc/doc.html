@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<title>Sa-Token</title>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-		<meta name="description" content="Sa-Token是一个java权限认证框架，功能全面，上手简单，登录认证、权限认证、Session会话、踢人下线、账号封禁、集成Redis、前后台分离、分布式会话、微服务网关鉴权、单点登录、OAuth2.0、临时Token验证、记住我模式、模拟他人账号、临时身份切换、多账号体系、注解式鉴权、路由拦截式鉴权、花式token、自动续签、同端互斥登录、会话治理、密码加密、jwt集成、Spring集成、WebFlux集成...，有了sa-token，你所有的权限认证问题，都不再是问题">
+		<meta name="description" content="Sa-Token是一个java权限认证框架，功能全面，上手简单，登录认证、权限认证、Session会话、踢人下线、账号封禁、集成Redis、前后端分离、分布式会话、微服务网关鉴权、单点登录、OAuth2.0、临时Token验证、记住我模式、模拟他人账号、临时身份切换、多账号体系、注解式鉴权、路由拦截式鉴权、花式token、自动续签、同端互斥登录、会话治理、密码加密、jwt集成、Spring集成、WebFlux集成...，有了sa-token，你所有的权限认证问题，都不再是问题">
 		<meta name="keywords" content="sa-token,sa-token框架,sa-token文档,java权限认证">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 		<link rel="shortcut icon" type="image/x-icon" href="logo.png">
@@ -18,7 +18,7 @@
 					<div class="logo-box">
 						<img src="logo.png" title="logo" />
 						<h1 class="logo-text">Sa-Token</h1>
-						<sub>v1.34.0</sub>
+						<sub>v1.35.0.RC</sub>
 					</div>
 				</a>
 			</div>
@@ -28,6 +28,7 @@
 				</div>
 				<select class="select-version p-none" onchange="location.href=this.value">
 					<option value="doc.html">最新版</option>
+					<option value="v/v1.34.0/doc.html">v1.34.0</option>
 					<option value="v/v1.33.0/doc.html">v1.33.0</option>
 					<option value="v/v1.32.0/doc.html">v1.32.0</option>
 					<option value="v/v1.31.0/doc.html">v1.31.0</option>
@@ -99,6 +100,7 @@
 				<a class="p-none wzi" href="#/more/link">案例</a>
 				<a class="p-none wzi" href="#/more/demand-commit">需求提交</a>
 				<!-- <a class="p-none wzi" href="#/more/blog">博客</a> -->
+				<a class="p-none wzi" href="#/more/join-group">加入讨论群</a>
 				<a class="p-none wzi" href="#/more/sa-token-donate">赞助</a>
 				<a class="p-none wzi" href="#/sso/sso-pro">🔥 SSO商业版</a>
 				<div class="zk-box">
@@ -134,9 +136,20 @@
 		<div class="main-box">
 			<div id="app">加载中...</div>
 		</div>
+		
+		<!-- 万维广告div -->
 		<div style="position: fixed; right: 0; bottom: 0; z-index: 10000; border: 0px #aaa solid;">
 			<div class="wwads-cn wwads-vertical" data-id="88" style="max-width:150px"></div>
 		</div>
+		
+		<!-- 小助手div -->
+		<div class="p-none help-btn-box" style="position: fixed; right: 40px; bottom: 330px; z-index: 10000; border: 0px #aaa solid;">
+			<div class="help-tips" style="position: relative; left: -30px; top: -10px;"></div>
+			<div class="help-btn" style="width: 60px; height: 60px; text-align: center; border-radius: 50%; background-color: #42b983; cursor: pointer;">
+				<span style="font-size: 18px; color: #FFF; line-height: 60px;">Help</span>
+			</div>
+		</div>
+		
 		
 		<!-- UI逐渐显现 -->
 		<style type="text/css">
@@ -150,8 +163,9 @@
 		
 		<!--  -->
 		<script src="./static/docsify-plugin.js"></script>
+		<script src="./static/is-star-plugin.js?v=3"></script>
 		<script>
-			var saTokenTopVersion = '1.34.0';	// Sa-Token最新版本 
+			var saTokenTopVersion = '1.35.0.RC';	// Sa-Token最新版本 
 			var name = '<img style="width: 60px; height: 60px; vertical-align: middle;" src="logo.png" alt="logo" /> ';
 			name += '<b style="font-size: 28px; vertical-align: middle;">Sa-Token</b> <sub>v' + saTokenTopVersion + '</sub>';
 			window.$docsify = {
@@ -185,7 +199,7 @@
 					tabHeadings: true       // 用标题+粗体来定制选项卡
 				},
 				// 自定义插件 
-				plugins: [myDocsifyPlugin],
+				plugins: [myDocsifyPlugin, window.isStarPlugin],
 			}
 		</script>
 		<script src="static/docsify.min.js"></script>
@@ -234,12 +248,9 @@
 			})();
 		</script>
 		
-		<script type="text/javascript" src="https://cdn.wwads.cn/js/makemoney.js" async></script>
+		<!-- 万维广告 -->
+		<script data-mode="hash" type="text/javascript" src="https://cdn.wwads.cn/js/makemoney.js" async></script>
 		
-		<!-- 友盟 -->
-		<div style="height: 0px; overflow: hidden;">
-			<script type="text/javascript" src="https://s4.cnzz.com/z_stat.php?id=1279646043&web_id=1279646043"></script>
-		</div>
 		<!-- 百度统计 -->
 		<script>
 			var _hmt = _hmt || [];
@@ -257,6 +268,42 @@
 				const newTips = '<b>当前文档为RC预览版文档，仅做学习测试使用，正式项目请使用正式版：<a href="https://sa-token.cc/" target="_blank">https://sa-token.cc/</a></b>';
 				layer.alert(newTips);
 			}
+		</script>
+		
+		<!-- 小助手提示 -->
+		<script>
+			$('.help-btn').click(function(){
+				var str = `
+					<div class="xiaozhushou-intro">
+						<p>1、你在使用 Sa-Token 时遇到任何技术难题，可以向 < sa-token 小助手 > 求助咨询。</p>
+						<p>2、该小助手不属于商业运营，求助咨询完全免费。</p>
+						<p>3、目前该小助手属于试运营阶段，每天只能提供大约 1 小时的求助时间。</p>
+						<p>4、根据运营效果反馈，我们日后可能会提高求助时间，但也可能关闭此功能。</p>
+						<p>5、该小助手由企业微信提供平台支持，感谢企业微信。</p>
+						<p style="margin-top: 30px;">打开方式：</p>
+						<p>1、如果你是使用 PC 端微信，请点此链接：<a href="https://work.weixin.qq.com/kfid/kfcdd45c432fee9655f" target="_blank">https://work.weixin.qq.com/kfid/kfcdd45c432fee9655f</a></p>
+						<p>2、如果你是使用手机端微信，请扫码：</p>
+						<p><img src="https://oss.dev33.cn/sa-token/sa-token-xiaozhushou.jpg" width="200px"></p>
+					</div>
+				`;
+				layer.alert(str, {
+					title: '技术求助', 
+					area: '550px', 
+					offset: '10%',
+				})
+			})
+			try{
+				// 给个小提示
+				const index = layer.tips('框架技术支持，点此求助', '.help-tips', {
+					tips: [1, '#000'] ,//还可配置颜色
+					time: 5000,
+				});
+				// 改为 fixed 定位，否则它会随着滚动条移动，样式就跑偏了
+				$('#layui-layer' + index).css('position', 'fixed');
+			}catch(e){
+				console.error(e);
+			}
+
 		</script>
 		
 		<!-- 修改背景颜色 -->
@@ -317,6 +364,22 @@
 				return 'rgb(' + arr.join(",")  + ', ' + a + ')';
 			}
 			
+		</script>
+		
+		<!-- 赞助页的展开和收缩 -->
+		<script>
+			// 展开
+			function expandZanZhu(){
+				$('.zk-btn--1').hide();
+				$('.zk-btn--2').show();
+				$('.zanzhu-box').height($('.zanzhu-box table').height());
+			}
+			// 折叠
+			function foldZanZhu(){
+				$('.zanzhu-box').height(500);
+				$('.zk-btn--2').hide();
+				$('.zk-btn--1').show();
+			}
 		</script>
 	</body>
 </html>

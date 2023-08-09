@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://sa-token.cc/logo.png" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.34.0</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.35.0.RC</h1>
 <h4 align="center">一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！</h4>
 <p align="center">
 	<a href="https://gitee.com/dromara/sa-token/stargazers"><img src="https://gitee.com/dromara/sa-token/badge/star.svg?theme=gvp"></a>
@@ -18,9 +18,9 @@
 ## 前言：
 - [在线文档：https://sa-token.cc](https://sa-token.cc)
 
-- 注：学习测试请拉取 master 分支，dev 为正在开发的分支，有很多特性并不稳定。
+- 注：学习测试请拉取 master 分支，dev 是开发分支，有很多特性并不稳定（在项目根目录执行 `git checkout master`）。
 
-- 开源不易，点个 star 鼓励一下吧！
+-  开源不易，点个 star 鼓励一下吧！
 
 
 ## Sa-Token 介绍
@@ -148,13 +148,11 @@ Sa-OAuth2 模块分为四种授权模式，解决不同场景下的授权需求
 
 ## 使用 Sa-Token 的开源项目 
 
-- [[ Sa-Plus ]](https://gitee.com/click33/sa-plus)：一个基于 SpringBoot 架构的快速开发框架，内置代码生成器。
-
 - [[ Snowy ]](https://gitee.com/xiaonuobase/snowy)：国内首个国密前后分离快速开发平台，采用 Vue3 + AntDesignVue3 + Vite + SpringBoot + Mp + HuTool + SaToken。
 
-- [[ RuoYi-Vue-Plus ]](https://gitee.com/JavaLionLi/RuoYi-Vue-Plus)：重写RuoYi-Vue所有功能 集成 Sa-Token+Mybatis-Plus+Jackson+Xxl-Job+knife4j+Hutool+OSS 定期同步
+- [[ RuoYi-Vue-Plus ]](https://gitee.com/dromara/RuoYi-Vue-Plus)：重写RuoYi-Vue所有功能 集成 Sa-Token+Mybatis-Plus+Jackson+Xxl-Job+knife4j+Hutool+OSS 定期同步
 
-- [[ RuoYi-Cloud-Plus ]](https://gitee.com/JavaLionLi/RuoYi-Cloud-Plus)：重写RuoYi-Cloud所有功能 整合 SpringCloudAlibaba Dubbo3.0 Sa-Token Mybatis-Plus MQ OSS ES Xxl-Job Docker 全方位升级 定期同步
+- [[ RuoYi-Cloud-Plus ]](https://gitee.com/dromara/RuoYi-Cloud-Plus)：重写RuoYi-Cloud所有功能 整合 SpringCloudAlibaba Dubbo3.0 Sa-Token Mybatis-Plus MQ OSS ES Xxl-Job Docker 全方位升级 定期同步
 
 - [[ EasyAdmin ]](https://gitee.com/lakernote/easy-admin)：一个基于SpringBoot2 + Sa-Token + Mybatis-Plus + Snakerflow + Layui 的后台管理系统，灵活多变可前后端分离，也可单体，内置代码生成器、权限管理、工作流引擎等
 
@@ -170,8 +168,6 @@ Sa-OAuth2 模块分为四种授权模式，解决不同场景下的授权需求
 
 - [[ Bean Searcher ]](https://github.com/ejlchina/bean-searcher)：专注高级查询的只读 ORM，使一行代码实现复杂列表检索！
 
-- [[ Snowy ]](https://xiaonuo.vip/index#pricing)：小诺快速开发平台，同时拥有 Layui、Vue、SpringCloud 三个版本。
-
 - [[ Jpom ]](https://gitee.com/dromara/Jpom)：简而轻的低侵入式在线构建、自动部署、日常运维、项目监控软件。
 
 - [[ TLog ]](https://gitee.com/dromara/TLog)：一个轻量级的分布式日志标记追踪神器。
@@ -184,7 +180,7 @@ Sa-OAuth2 模块分为四种授权模式，解决不同场景下的授权需求
 
 
 ## 交流群
-QQ交流群：707350988 [点击加入](https://jq.qq.com/?_wv=1027&k=tqbzHT2D)
+QQ交流群：837325627 [点击加入](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=98NOhX0Q3a2hcv3eURcnYMBuZUZrlHUH&authKey=td3pmX3BnYNr%2FCRkEDwE5FgGARk29D9HAMwL0bAfK7tqN8XN93jccnEanyZl18mM&noverify=0&group_code=837325627)
 
 微信交流群：
 
@@ -198,5 +194,5 @@ QQ交流群：707350988 [点击加入](https://jq.qq.com/?_wv=1027&k=tqbzHT2D)
 - 第一时间收到框架更新通知。
 - 第一时间收到框架 bug 通知。
 - 第一时间收到新增开源案例通知。
-- 和众多大佬一起互相 (huá shǔi) 交流 (mō yú)。
+- 和众多大佬一起互相 (huá shuǐ) 交流 (mō yú)。
 

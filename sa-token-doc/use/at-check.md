@@ -100,8 +100,8 @@ public SaResult atJurOr() {
 ```
 
 mode有两种取值：
-- `SaMode.AND`, 标注一组权限，会话必须全部具有才可通过校验。
-- `SaMode.OR`, 标注一组权限，会话只要具有其一即可通过校验。
+- `SaMode.AND`，标注一组权限，会话必须全部具有才可通过校验。
+- `SaMode.OR`，标注一组权限，会话只要具有其一即可通过校验。
 
 
 ### 4、角色权限双重 “or校验”
@@ -116,7 +116,7 @@ public SaResult userAdd() {
 }
 ```
 
-orRole 字段代表权限认证未通过时的次要选择，两者只要其一认证成功即可通过校验，其有三种写法：
+orRole 字段代表权限校验未通过时的次要选择，两者只要其一校验成功即可进入请求方法，其有三种写法：
 - 写法一：`orRole = "admin"`，代表需要拥有角色 admin 。
 - 写法二：`orRole = {"admin", "manager", "staff"}`，代表具有三个角色其一即可。
 - 写法三：`orRole = {"admin, manager, staff"}`，代表必须同时具有三个角色。
@@ -151,7 +151,61 @@ public class TestController {
 
 
 
-### 6、在业务逻辑层使用注解鉴权
+### 6、批量注解鉴权
+
+使用 `@SaCheckOr` 表示批量注解鉴权：
+
+``` java
+// 在 `@SaCheckOr` 中可以指定多个注解，只要当前会话满足其中一个注解即可通过验证，进入方法。
+@SaCheckOr(
+		login = @SaCheckLogin,
+		role = @SaCheckRole("admin"),
+		permission = @SaCheckPermission("user.add"),
+		safe = @SaCheckSafe("update-password"),
+		basic = @SaCheckBasic(account = "sa:123456"),
+		disable = @SaCheckDisable("submit-orders")
+)
+@RequestMapping("test")
+public SaResult test() {
+	// ... 
+	return SaResult.ok(); 
+}
+```
+
+每一项属性都可以写成数组形式，例如：
+
+``` java
+// 当前客户端只要有 [ login 账号登录] 或者 [user 账号登录] 其一，就可以通过验证进入方法。
+// 		注意：`type = "login"` 和 `type = "user"` 是多账号模式章节的扩展属性，此处你可以先略过这个知识点。
+@SaCheckOr(
+	login = { @SaCheckLogin(type = "login"), @SaCheckLogin(type = "user") }
+)
+@RequestMapping("test")
+public SaResult test() {
+	// ... 
+	return SaResult.ok(); 
+}
+```
+
+疑问：既然有了 `@SaCheckOr`，为什么没有与之对应的 `@SaCheckAnd` 呢？
+
+因为当你写多个注解时，其天然就是 `and` 校验关系，例如：
+ 
+``` java
+// 当你在一个方法上写多个注解鉴权时，其默认就是要满足所有注解规则后，才可以进入方法，只要有一个不满足，就会抛出异常
+@SaCheckLogin
+@SaCheckRole("admin")
+@SaCheckPermission("user.add")
+@RequestMapping("test")
+public SaResult test() {
+	// ... 
+	return SaResult.ok(); 
+}
+```
+
+
+
+### 7、在业务逻辑层使用注解鉴权
 疑问：我能否将注解写在其它架构层呢，比如业务逻辑层？
 
 使用拦截器模式，只能在`Controller层`进行注解鉴权，如需在任意层级使用注解鉴权，请参考：[AOP注解鉴权](/plugin/aop-at)

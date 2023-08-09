@@ -26,7 +26,7 @@
 而如果我们深入它的源码，[点此阅览](https://gitee.com/dromara/sa-token/blob/master/sa-token-core/src/main/java/cn/dev33/satoken/stp/StpUtil.java) <br/>
 就会发现，此类并没有任何代码逻辑，唯一做的事就是对成员变量`stpLogic`的各个API包装一下进行转发。
 
-这样做有两个优点: 
+这样做有两个好处: 
 - StpLogic 类的所有函数都可以被重写，按需扩展。
 - 在构造方法时随意传入一个不同的 `loginType`，就可以再造一套账号登录体系。
 
@@ -92,7 +92,7 @@ public class SaTokenConfigure {
     @Autowired
     public void rewriteSaStrategy() {
     	// 重写Sa-Token的注解处理器，增加注解合并功能 
-		SaStrategy.me.getAnnotation = (element, annotationClass) -> {
+		SaStrategy.instance.getAnnotation = (element, annotationClass) -> {
 			return AnnotatedElementUtils.getMergedAnnotation(element, annotationClass); 
 		};
     }
@@ -164,28 +164,30 @@ public class StpUserUtil {
 如果自定义的 StpUserUtil 需要使用不同 SaTokenConfig 对象, 也很简单，参考示例如下：
 
 ``` java
-public class StpUserUtil {
+@Configuration
+public class SaTokenConfigure {
 	
-	// 使用匿名子类 重写`stpLogic对象`的一些方法 
-	public static StpLogic stpLogic = new StpLogic("user") {
-		
-		// 首先自定义一个 Config 对象 
-		SaTokenConfig config = new SaTokenConfig()
-			.setTokenName("satoken")
-			.setTimeout(2592000)
-			// ... 其它set
-			;
-		
-		// 然后重写 stpLogic 配置获取方法 
-		@Override
-		public SaTokenConfig getConfig() {
-			return config;
-		}
-	};
-	
-	// ... 
-	
+	@Autowired
+	public void setSaTokenConfig() {
+		// 设定 StpUtil 使用的 SaTokenConfig 配置参数对象
+		SaTokenConfig config1 = new SaTokenConfig();
+		config1.setTokenName("satoken1");
+		config1.setTimeout(1000);
+		config1.setTokenStyle("random-64");
+		// 更多设置 ... 
+		StpUtil.stpLogic.setConfig(config1);
+
+		// 设定 StpUserUtil 使用的 SaTokenConfig 配置参数对象
+		SaTokenConfig config2 = new SaTokenConfig();
+		config2.setTokenName("satoken2");
+		config2.setTimeout(2000);
+		config2.setTokenStyle("tik");
+		// 更多设置 ... 
+		StpUserUtil.stpLogic.setConfig(config2);
+	}
+
 }
+
 ```
 
 ### 9、多账号体系混合鉴权

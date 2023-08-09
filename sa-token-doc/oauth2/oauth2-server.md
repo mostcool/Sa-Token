@@ -143,7 +143,7 @@ public class SaOAuth2ServerController {
 public class SaOAuth2ServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SaOAuth2ServerApplication.class, args);
-		System.out.println("\nSa-Token-OAuth Server端启动成功");
+		System.out.println("\nSa-Token-OAuth Server 端启动成功");
 	}
 }
 ```
@@ -183,8 +183,8 @@ http://sa-oauth-server.com:8001/oauth2/token?grant_type=authorization_code&clien
 ### 5、运行官方示例 
 以上代码只是简单模拟了一下OAuth2.0的授权流程，现在，我们运行一下官方示例，里面有制作好的UI界面
 
-- OAuth2-Server端： `/sa-token-demo/sa-token-demo-oauth2-server/` [源码链接](https://gitee.com/dromara/sa-token/tree/dev/sa-token-demo/sa-token-demo-oauth2-server) <br/>
-- OAuth2-Client端： `/sa-token-demo/sa-token-demo-oauth2-client/` [源码链接](https://gitee.com/dromara/sa-token/tree/dev/sa-token-demo/sa-token-demo-oauth2-client) <br/>
+- OAuth2-Server端： `/sa-token-demo/sa-token-demo-oauth2/sa-token-demo-oauth2-server/` [源码链接](https://gitee.com/dromara/sa-token/tree/master/sa-token-demo/sa-token-demo-oauth2/sa-token-demo-oauth2-server) <br/>
+- OAuth2-Client端： `/sa-token-demo/sa-token-demo-oauth2/sa-token-demo-oauth2-client/` [源码链接](https://gitee.com/dromara/sa-token/tree/master/sa-token-demo/sa-token-demo-oauth2/sa-token-demo-oauth2-client) <br/>
 
 依次启动`OAuth2-Server` 与 `OAuth2-Client`，然后从浏览器访问：[http://sa-oauth-client.com:8002](http://sa-oauth-client.com:8002)
 
