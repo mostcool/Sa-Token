@@ -21,9 +21,28 @@ Sa-Token 采用 Apache-2.0 开源协议，**承诺框架本身与官网文档永
 
 | 赞助人											| 赞助金额		| 留言										| 时间			|
 | :--------										| :--------		| :--------									| :--------		|
+| [时间很快](https://gitee.com/frsimple)			| ¥ 220.0		| 感谢您的开源项目！							| 2023-10-27 	|
+| [立秋](https://gitee.com/code_wh)				| ¥ 2.5			| 感谢您的开源项目！							| 2023-10-27 	|
+| [PotatoLoofah](https://gitee.com/PotatoLoofah)	| ¥ 10.0	| 感谢您的开源项目！							| 2023-10-27 	|
+| [ly-chn](https://gitee.com/ly-chn)			| ¥ 99.0		| 一定的资金支持有助于开源项目走的更加长远		| 2023-10-17 	|
+| [yangs2w](https://gitee.com/yangs2w)			| ¥ 10.0		| 感谢您的开源项目！							| 2023-10-10 	|
+| [lee](https://gitee.com/cngeeklee)			| ¥ 10.0		| 真正的轻量级权限安全框架，希望继续更新		| 2023-10-06 	|
+| [yang](https://gitee.com/hansdm)				| ¥ 10.0		| 感谢您的开源项目！							| 2023-09-27 	|
+| [明道云](https://gitee.com/lunan-yn)			| ¥ 200.0		| 明道云2023年伙伴大会，[报名链接](https://www.mingdao.com/event/mpc/2023)		| 2023-09-25 	|
+| [shenlicao](https://gitee.com/shenlicao)		| ¥ 10.0		| 感谢您的开源项目！							| 2023-09-15 	|
+| [lostyue](https://gitee.com/lostyue)			| ¥ 20.0		| 感谢您的开源项目！							| 2023-09-14 	|
+| [huni](https://gitee.com/simin_sizi)			| ¥ 10.0		| 感谢您的开源项目！							| 2023-09-11 	|
+| [T_T](https://gitee.com/wm26hua)				| ¥ 20.0		| 感谢您的开源项目！							| 2023-09-07 	|
+| [Meteor](https://gitee.com/meteoroc)			| ¥ 2.5			| 感谢您的开源项目！							| 2023-08-23 	|
+| [刘斌](https://gitee.com/xuanfather)			| ¥ 20.0		| 感谢您的开源项目！							| 2023-08-17 	|
+| [快快乐乐小码农](https://gitee.com/happy-little-farmer)	| ¥ 1.0	| 感谢您的开源项目！							| 2023-08-17 	|
+| [失败女神](https://gitee.com/failedgoddess)	| ¥ 50.0		| 感谢您的开源项目！							| 2023-08-03 	|
+| 结弦奏（微信打赏）								| ¥ 50.0		| 感谢您的开源项目！							| 2023-08-07 	|
+| [好心肠的老哥](https://gitee.com/ntdm)			| ¥ 10.0		| 非常好的开源项目，希望越来越好！				| 2023-08-02 	|
 | [XiaoYi](https://gitee.com/getianit)			| ¥ 100.0		| [亚洲云深圳BGP云服务器](https://www.asiayun.com/cart?action=configureproduct&pid=300)		| 2023-07-24 	|
 | [张兆伟](https://gitee.com/zhang865700)		| ¥ 50.0		| 感谢您的开源项目！							| 2023-07-24 	|
 | [mikeinshanghai](https://gitee.com/mikeinshanghai)| ¥ 50.0	| Sa-Token, MeterSphere共成长，共辉煌！		| 2023-07-14 	|
+| 吴其敏（微信打赏）								| ¥ 200.0		| [CAT 是基于 Java 开发的实时应用监控平台，为美团点评提供了全面的实时监控告警服务。](https://github.com/dianping/cat)		| 2023-07-11 	|
 | [Dear胜哥](https://gitee.com/DearShengGe)		| ¥ 10.0		| 有幸在摸鱼时间认真看完了全文档，感觉很是不错。开源不易，望作者继续扩展该框架功能！	| 2023-06-30 	|
 | [SP](https://gitee.com/LSP1999)				| ¥ 10.0		| 就是需要这种简单上手的项目					| 2023-06-15 	|
 | [javahuang](https://gitee.com/javahrp)		| ¥ 200.0		| [SurveyKing：功能最强大的调查问卷系统和考试系统，开源](https://gitee.com/surveyking/surveyking)					| 2023-06-08 	|

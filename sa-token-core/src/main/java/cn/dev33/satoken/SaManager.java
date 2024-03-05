@@ -102,10 +102,13 @@ public class SaManager {
 		SaTokenEventCenter.doRegisterComponent("SaTokenDao", saTokenDao);
 	}
 	private static void setSaTokenDaoMethod(SaTokenDao saTokenDao) {
-		if((SaManager.saTokenDao instanceof SaTokenDaoDefaultImpl)) {
-			((SaTokenDaoDefaultImpl)SaManager.saTokenDao).endRefreshThread();
+		if (SaManager.saTokenDao != null) {
+			SaManager.saTokenDao.destroy();
 		}
 		SaManager.saTokenDao = saTokenDao;
+		if (SaManager.saTokenDao != null) {
+			SaManager.saTokenDao.init();
+		}
 	}
 	public static SaTokenDao getSaTokenDao() {
 		if (saTokenDao == null) {

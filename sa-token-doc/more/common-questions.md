@@ -58,7 +58,8 @@ Sa-Token 的部分 API 只能在 Web 上下文中才能调用，例如：`StpUti
 	- 什么？你说你两个都引入了？那你的项目能启动成功吗？
 4. 如果是 WebFlux 环境而且正确引入了依赖，依然报错，**请检查是否注册了 SaReactorFilter 全局过滤器，在 WebFlux 下这一步是必须的**，具体还是请参考上面的 [ 在WebFlux环境集成 ] 章节。
 5. 需要仔细注意，如果你使用的是 Springboot3.x 版本，就不要错误的引入 `sa-token-spring-boot-starter`，需要引入的是 `sa-token-spring-boot3-starter`，不然就会导致框架报错。
-6. 如果以上步骤排除无误后依然报错，请直接提 issue 或者加入QQ群求助。
+6. 如果你的项目开启了全局懒加载(spring.main.lazy-initialization=true)后，能启动项目，但是访问接口报异常，请直接参考：[Q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器](/more/common-questions?id=q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器)
+7. 如果以上步骤排除无误后依然报错，请直接提 issue 或者加入QQ群求助。
 
 ### Q：报错：NotLoginException：xxx
 
@@ -71,6 +72,7 @@ Sa-Token 的部分 API 只能在 Web 上下文中才能调用，例如：`StpUti
 - 可能4：前端提交了 Token，但是 Token前缀 不对，可参考：[自定义 Token 前缀](/up/token-prefix)
 - 可能5：你的项目属于前后端分离架构，此时浏览器默认不自动提交 Cookie，参考：[前后端分离](/up/not-cookie) 
 - 可能6：你使用了 Nginx 反向代理，而且配置了 自定义Token名称，而且自定义的名称还带有下划线（比如 shop_token），而且还是你的项目还是从 Header头提交Token的，此时 Nginx 默认会吞掉你的下划线参数，可参考：[nginx做转发时，带下划线的header参数丢失](https://blog.csdn.net/zfw_666666/article/details/124420828)
+- 可能7：可能是跨域了，导致前端提交不上 token，看看前端浏览器有没有跨域的报错。
 
 **如果是：Token无效：6ad93254-b286-4ec9-9997-4430b0341ca0**
 - 可能1：前端提交的 token 是乱填的，或者从别的项目拷过来的，或者多个项目一起开发时彼此的 Token 串项目了。
@@ -468,6 +470,60 @@ class MyConfiguration {
 [经验来源](https://gitee.com/dromara/sa-token/issues/I7EXIU)
 
 
+### Q：SpringBoot 3.x 路由拦截鉴权报错：No more pattern data allowed after {*...} or ** pattern element
+
+
+报错原因：SpringBoot3.x 版本默认将路由匹配机制由 `ant_path_matcher` 改为了 `path_pattern_parser` 模式，
+而此模式有一个规则，就是写路由匹配符的时候，不允许 `**` 之后再出现内容。例如：`/admin/**/info` 就是不允许的。
+
+如果你的项目报了这个错，说明你写的路由匹配符出现了上述问题，有三种解决方案：
+1. 等待 SpringMVC 官方增强 `path_pattern_parser` 模式能力，使之可以支持 `**` 之后再出现内容。
+2. 在写路由匹配规则时，避免使 `**` 之后再出现内容。
+3. 将项目的路由匹配机制改为 `ant_path_matcher`。
+
+先改项目的：
+``` yml
+spring:
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
+```
+
+再改 Sa-Token 的：
+``` java
+/**
+ * 自定义 SaTokenContext 实现类，重写 matchPath 方法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
+ */
+@Primary
+@Component
+public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringInJakartaServlet {
+
+    @Override
+    public boolean matchPath(String pattern, String path) {
+        return SaPatternsRequestConditionHolder.match(pattern, path);
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- ---------------------------- 常见疑问 ----------------------------- -->
 
@@ -620,6 +676,39 @@ So：从鉴权粒度的角度来看，需要针对一个模块鉴权的时候，
 ### Q：timeout 过期了，获取到的 NotLoginException 场景值是-2，按照文档说的应该是-3吧。是我理解的不对还是操作有误？
 你的理解是对的，但是框架现在只能做到返回-2，因为 token 过期后，就从 Redis 中消失了，框架没法分辨这个 token 是曾经有过然后过期的，还是从来就没有在Redis中存在过，
 所以只能统一抛出-2，这个行为也和具体使用的 SaTokenDao 有关联，例如集成 sa-token-jwt 插件后，框架就能分辨出来是 token 过期了，抛出-3。
+
+
+### Q：Sa-Token 是否提供类似 RefreshToken 的概念，与 AccessToken 相互配合刷新令牌鉴权。
+关于长短 token，Sa-Token 没有提供直接的 API 支持，但是你可以利用 “临时 token 认证模块” 轻易的达到这一点：
+
+1. 把 `sa-token.timeout` 的值配置小一点，然后把 `StpUtil.login(10001)` 生成的 token 作为短 token ，用来鉴权。
+2. 用 “临时 token 认证模块” 生成长 token， `String refreshToken = SaTempUtil.createToken(10001, 2592000);`。
+3. 把这两个 token 一起返回到前端。
+4. 你再开个接口，可以让前端通过长 token，刷新短 token，参考代码：
+
+``` java
+@RequestMapping("/refreshToken")
+public SaResult refreshToken(String refreshToken) {
+	// 1、验证
+	Object userId = SaTempUtil.parseToken(refreshToken);
+	if(userId == null) {
+		return SaResult.error("无效 refreshToken");
+	}
+
+	// 2、为其生成新的短 token
+	String accessToken = StpUtil.createLoginSession(userId);
+
+	// 3、返回
+	return SaResult.data(accessToken);
+}
+```
+
+
+### Q：怎么改变请求返回的 http 状态码？
+``` java
+SaHolder.getResponse().setStatus(401)
+```
+
 
 
 ### Q：还是有不明白到的地方?

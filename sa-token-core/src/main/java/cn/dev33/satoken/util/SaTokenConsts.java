@@ -36,7 +36,7 @@ public class SaTokenConsts {
 	/**
 	 * Sa-Token 当前版本号 
 	 */
-	public static final String VERSION_NO = "v1.35.0.RC";
+	public static final String VERSION_NO = "v1.37.0";
 
 	/**
 	 * Sa-Token 开源地址 Gitee 
@@ -185,6 +185,28 @@ public class SaTokenConsts {
 	 * 切面、拦截器、过滤器等各种组件的注册优先级顺序
 	 */
 	public static final int ASSEMBLY_ORDER = -100;
+
+	/**
+	 * 请求 path 校验过滤器的注册顺序
+	 */
+	public static final int PATH_CHECK_FILTER_ORDER = -1000;
+
+	/**
+	 * Content-Type  key
+	 */
+	public static final String CONTENT_TYPE_KEY = "Content-Type";
+
+	/**
+	 * Content-Type  text/plain; charset=utf-8
+	 */
+	public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=utf-8";
+
+	/**
+	 * Content-Type  application/json;charset=UTF-8
+	 */
+	public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json;charset=UTF-8";
+
+
 
 	
 	// =================== 废弃 ===================  

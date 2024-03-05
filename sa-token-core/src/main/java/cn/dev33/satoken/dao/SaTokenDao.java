@@ -199,6 +199,20 @@ public interface SaTokenDao {
 	 * @return 查询到的数据集合 
 	 */
 	List<String> searchData(String prefix, String keyword, int start, int size, boolean sortType);
-	
-	
+
+
+	// --------------------- 生命周期 ---------------------
+
+	/**
+	 * 当此 SaTokenDao 实例被装载时触发
+	 */
+	default void init() {
+	}
+
+	/**
+	 * 当此 SaTokenDao 实例被卸载时触发
+	 */
+	default void destroy() {
+	}
+
 }

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.dev33.satoken.spring;
+package cn.dev33.satoken.spring.pathmatch;
 
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
 /**
- * 持有 PathMatcher 全局引用，方便快捷的调用 PathMatcher 相关方法
+ * 路由匹配工具类：持有 PathMatcher 全局引用，方便快捷的调用 PathMatcher 相关方法
  *
  * @author click33
  * @since 1.34.0

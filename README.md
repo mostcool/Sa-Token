@@ -1,7 +1,7 @@
 <p align="center">
 	<img alt="logo" src="https://sa-token.cc/logo.png" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.35.0.RC</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.37.0</h1>
 <h4 align="center">一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！</h4>
 <p align="center">
 	<a href="https://gitee.com/dromara/sa-token/stargazers"><img src="https://gitee.com/dromara/sa-token/badge/star.svg?theme=gvp"></a>
@@ -174,17 +174,22 @@ Sa-OAuth2 模块分为四种授权模式，解决不同场景下的授权需求
 
 - [[ hippo4j ]](https://gitee.com/agentart/hippo4j)：强大的动态线程池框架，附带监控报警功能。
 
+- [[ hertzbeat ]](https://gitee.com/dromara/hertzbeat)：易用友好的开源实时监控告警系统，无需Agent，高性能集群，强大自定义监控能力。
+
+- [[ Solon ]](https://gitee.com/noear/solon)：一个更现代感的应用开发框架：更快、更小、更自由。
+
 
 ## 知识星球
 <img src="https://oss.dev33.cn/sa-token/dromara-xingqiu--sa-token.jpg" width="300px" />
 
 
 ## 交流群
-QQ交流群：837325627 [点击加入](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=98NOhX0Q3a2hcv3eURcnYMBuZUZrlHUH&authKey=td3pmX3BnYNr%2FCRkEDwE5FgGARk29D9HAMwL0bAfK7tqN8XN93jccnEanyZl18mM&noverify=0&group_code=837325627)
+QQ交流群：685792424 [点击加入](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Y05Ld4125W92YSwZ0gA8e3RhG9Q4Vsfx&authKey=IomXuIuhP9g8G7l%2ByfkrRsS7i%2Fna0lIBpkTXxx%2BQEaz0NNEyJq00kgeiC4dUyNLS&noverify=0&group_code=685792424)
 
 微信交流群：
 
-![微信群](https://dev33-test.oss-cn-beijing.aliyuncs.com/sa-token/i-wx-qr.png ':size=230')
+<img src="https://oss.dev33.cn/sa-token/qr/wx-qr-m-400k.png" width="230px" title="微信群" />
+<!-- ![微信群](https://dev33-test.oss-cn-beijing.aliyuncs.com/sa-token/i-wx-qr.png ':size=230') -->
 
 (扫码添加微信，备注：sa-token，邀您加入群聊)
 

@@ -3,9 +3,6 @@
 // 声明 docsify 插件
 var isStarPlugin = function(hook, vm) {
 	
-	// 切换文档的次数，每隔固定次数检测一下 
-	let changePage = -1;
-	
 	// 钩子函数：解析之前执行
 	hook.beforeEach(function(content) {
 		return content;
@@ -18,7 +15,7 @@ var isStarPlugin = function(hook, vm) {
 	
 	// 钩子函数：每次路由切换时数据全部加载完成后调用，没有参数。
 	hook.doneEach(function() {
-		isStarRepo(vm);
+		//isStarRepo(vm);
 	});
 	
 	// 钩子函数：初始化并第一次加载完成数据后调用，没有参数。
@@ -30,14 +27,14 @@ var isStarPlugin = function(hook, vm) {
 
 // 应用参数 
 const client_id = '0cc618beb08db99bff50e500e38c2144d95ada9abb51c00c44592726ecd583f4';
-const client_secret = '2574c2aac8ce2142e34752dc5957dddcb30bc68df5c61de64251a3a6b11a51e5';
+const client_secret = 'xxx';
 const redirect_uri = 'https://sa-token.cc/doc.html';
 const docDomain = 'sa-token.cc';
 // const redirect_uri = 'http://127.0.0.1:8848/sa-token-doc/doc.html';
 // const docDomain = '127.0.0.1:8848';
 		
 // 检查成功后，多少天不再检查 
-const allowDisparity = 1000 * 60 * 60 * 24 * 30;
+const allowDisparity = 1000 * 60 * 60 * 24 * 30 * 3;
 // const allowDisparity = 1000 * 10;
 
 
@@ -51,7 +48,7 @@ function isStarRepo(vm) {
 	
 	// 判断是否在主域名下
 	if(location.host !== docDomain) {
-		console.log('非主域名，不检测...');
+		console.log('not domain, no check...');
 		return;
 	}
 	
@@ -73,7 +70,7 @@ function isStarRepo(vm) {
 	}
 	
 	// 白名单路由不判断
-	const whiteList = ['/', '/more/link', '/more/demand-commit', '/more/join-group', '/more/sa-token-donate', 
+	const whiteList = ['/a', '/more/link', '/more/demand-commit', '/more/join-group', '/more/sa-token-donate', 
 			'/sso/sso-pro', '/more/update-log', '/more/common-questions', '/fun/sa-token-test', '/fun/issue-template'];
 	if(whiteList.indexOf(vm.route.path) >= 0 && getParam('code') === null) {
 		console.log('white route ...');
@@ -110,7 +107,8 @@ function confirmStar() {
 				<div>1、打开 Sa-Token <a href="https://gitee.com/dromara/sa-token" target="_blank">开源仓库主页</a>，在右上角点个 star 。</div>
 				<div>2、点击下方 [ 同意授权检测 ] 按钮，同意 Sa-Token 获取 API 权限进行检测。<a href="javascript:authDetails();" style="text-decoration: none;">？</a></div>
 			</div>
-			<p><b>本章节文档将在 star 后正常开放展示</b></p>
+			<p><b>本章节文档将在 star 后正常开放展示。</b></p>
+			<p style="color: green;">开源不易，希望您不吝支持，激励开源项目走的更加长远 😇😇😇</p>
 		</div>
 		`;
 	
@@ -118,7 +116,7 @@ function confirmStar() {
 			title: '提示', 
 			btn: ['同意授权检测'], 
 			// btn: ['同意授权检测', '暂时不要，我先看看文档'], 
-			area: '450px', 
+			area: '460px', 
 			offset: '25%',
 			closeBtn: false
 		}, 
@@ -129,6 +127,8 @@ function confirmStar() {
 			goAuth();
 		}
 	);
+	
+	// 源码注释提示 
 	const closeLayer = 
 	`	
 		<!-- 
@@ -148,8 +148,7 @@ function goAuth() {
 	const authUrl = "https://gitee.com/oauth/authorize" +
 					"?client_id=" + client_id + 
 					"&redirect_uri=" + redirect_uri + 
-					"&response_type=code" + 
-					"&scope=projects";
+					"&response_type=code";
 	location.href = authUrl;
 }
 

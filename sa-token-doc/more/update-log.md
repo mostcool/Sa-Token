@@ -1,5 +1,32 @@
 # 更新日志 
 
+### v1.37.0 @2023-10-18
+- 修复：修复路由拦截鉴权可被绕过的问题。 **[漏洞修复]**
+- 重构：未登录时调用鉴权 API 抛出未登录异常而不再是无权限异常。
+- 优化：优化 SaTokenDao 组件更换时的逻辑。
+- 文档：提供 SpringBoot3.x 路由匹配出错的解决方案。
+
+
+### v1.36.0 @2023-9-22
+- sa-token-core：
+	- 修复：API接口签名校验参数接口NPE问题，增加必须参数的非空校验处理。
+	- 新增：加密工具类新增 sha384、sha512 实现。 感谢 `@若初995` 提交的pr。   **[重要]**
+	- 修复：`SaFoxUtil.vagueMatch()` 正则匹配的一些问题。  **[漏洞修复]**
+	- 修复：`SaRouter.match()` 路由匹配的一些问题。  **[漏洞修复]**
+- 其它：
+	- 优化：`sa-token-alone-redis` 去掉不必要的配置项判断。
+	- 新增：`sa-token-solon-plugin` 增加对 solon 网关的支持。
+	- 新增：新增第三方插件专用仓库：`sa-token-three-plugin` 。
+	- 升级：`sa-token-solon-plugin` 增加对 solon 网关的支持。
+- 文档：
+	- 新增：新增开启全局懒加载时不能注入上下文处理器的处理方案 。
+	- 新增：新增 RefreshToken 示例。 **[重要]**
+	- 新增：文档新增 sa-token 小助手，可在线实时技术提问。 **[重要]**
+	- 优化：其它一些优化。
+- 新增插件：
+	- `sa-token-redisson-jackson2`：通用 redisson 集成方案 （spring, solon, jfinal 等都可用）
+
+
 
 ### v1.35.0 @2023-6-23
 - sa-token-core：
