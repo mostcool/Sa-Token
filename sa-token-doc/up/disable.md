@@ -37,7 +37,8 @@ StpUtil.checkDisable(10001);
 StpUtil.login(10001); 
 ```
 
-!> 旧版本在 `StpUtil.login()` 时会自动校验账号是否被封禁，v1.31.0 之后将 校验封禁 和 登录 两个动作分离成两个方法，不再自动校验，请注意其中的逻辑更改。
+> [!ATTENTION| label:升级注意：] 
+> 旧版本在 `StpUtil.login()` 时会自动校验账号是否被封禁，v1.31.0 之后将 校验封禁 和 登录 两个动作分离成两个方法，不再自动校验，请注意其中的逻辑更改。
 
 此模块所有方法：
 ``` java
@@ -235,5 +236,5 @@ public SaResult send() {
 
 <a class="case-btn" href="https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-case/src/main/java/com/pj/cases/up/DisableController.java"
 	target="_blank">
-	本章代码示例：Sa-Token 账号禁用  —— [ com.pj.cases.up.DisableController.java ]
+	本章代码示例：Sa-Token 账号禁用  —— [ DisableController.java ]
 </a>

@@ -73,10 +73,10 @@ public class SaTokenConfigure {
 }
 ```
 
-##### 注意事项：
-- 在`[认证函数]`里，你可以写和拦截器里一致的代码，进行路由匹配鉴权，参考：[路由拦截鉴权](/use/route-check)。
-- 由于过滤器中抛出的异常不进入全局异常处理，所以你必须提供`[异常处理函数]`来处理`[认证函数]`里抛出的异常。
-- 在`[异常处理函数]`里的返回值，将作为字符串输出到前端，如果需要定制化返回数据，请注意其中的格式转换。
+> [!WARNING| label:注意事项：] 
+> - 在`[认证函数]`里，你可以写和拦截器里一致的代码，进行路由匹配鉴权，参考：[路由拦截鉴权](/use/route-check)。
+> - 由于过滤器中抛出的异常不进入全局异常处理，所以你必须提供`[异常处理函数]`来处理`[认证函数]`里抛出的异常。
+> - 在`[异常处理函数]`里的返回值，将作为字符串输出到前端，如果需要定制化返回数据，请注意其中的格式转换。
 
 改写 `setError` 函数的响应格式示例：
 ``` java
@@ -88,6 +88,33 @@ public class SaTokenConfigure {
 })
 ```
 JSON 工具类可参考：[Hutool-Json](https://hutool.cn/docs/#/json/JSONUtil)
+
+
+### 自定义过滤器执行顺序
+
+SaServletFilter 默认执行顺序为 `-100`，如果你要自定义过滤器的执行顺序，可以使用 `FilterRegistrationBean` 注册，参考：
+
+``` java
+/**
+ * 注册 [Sa-Token 全局过滤器]
+ */
+@Bean
+public FilterRegistrationBean<SaServletFilter> getSaServletFilter() {
+	FilterRegistrationBean<SaServletFilter> frBean = new FilterRegistrationBean<>();
+	frBean.setFilter(
+			new SaServletFilter()
+				.addInclude("/**")
+				.setAuth(obj -> {
+					// ....
+				})
+				// 等等，其它代码 ... 
+	);
+	frBean.setOrder(-101);  // 更改顺序为 -101
+	return frBean;
+}
+```
+
+在 SpringBoot 中， Order 值越小，执行时机越靠前。
 
 
 ### 在 WebFlux 中注册过滤器
@@ -117,5 +144,5 @@ public class SaTokenConfigure {
 
 <a class="case-btn" href="https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-case/src/main/java/com/pj/satoken/SaTokenConfigure.java"
 	target="_blank">
-	本章代码示例：Sa-Token 全局过滤器 —— [ com.pj.satoken.SaTokenConfigure.java ]
+	本章代码示例：Sa-Token 全局过滤器 —— [ SaTokenConfigure.java ]
 </a>

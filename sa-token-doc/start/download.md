@@ -190,6 +190,7 @@ Maven依赖一直无法加载成功？[参考解决方案](https://sa-token.cc/d
 		├── sa-token-redis-fastjson               // [插件] Sa-Token 整合 Redis (使用 fastjson 序列化方式)
 		├── sa-token-redis-fastjson2              // [插件] Sa-Token 整合 Redis (使用 fastjson2 序列化方式)
 		├── sa-token-redisson-jackson             // [插件] Sa-Token 整合 Redisson (使用 jackson 序列化方式)
+		├── sa-token-hutool-timed-cache           // [插件] Sa-Token 整合 集成 hutool 框架的 Timed-Cache 缓存方案（基于内存）
 		├── sa-token-alone-redis                  // [插件] Sa-Token 独立 Redis 插件，实现 [ 权限缓存与业务缓存分离 ]
 		├── sa-token-redisx                       // [插件] Sa-Token 整合 Redis (中立 redisx)
 		├── sa-token-dubbo                        // [插件] Sa-Token 整合 dubbo 状态传递、rpc 鉴权
@@ -219,6 +220,7 @@ Maven依赖一直无法加载成功？[参考解决方案](https://sa-token.cc/d
 		├── sa-token-demo-websocket               // [示例] Sa-Token 集成 Web-Socket 鉴权示例
 		├── sa-token-demo-websocket-spring        // [示例] Sa-Token 集成 Web-Socket（Spring封装版） 鉴权示例
 		├── sa-token-demo-thymeleaf               // [示例] Sa-Token 集成 Thymeleaf 标签方言
+		├── sa-token-demo-beetl                   // [示例] Sa-Token 集成 beetl 示例
 		├── sa-token-demo-sso                     // [示例] Sa-Token 集成 SSO 单点登录
 			├── sa-token-demo-sso-server              // [示例] Sa-Token 集成 SSO单点登录-Server认证中心
 			├── sa-token-demo-sso1-client             // [示例] Sa-Token 集成 SSO单点登录-模式一 应用端 (同域、同Redis)
@@ -237,13 +239,6 @@ Maven依赖一直无法加载成功？[参考解决方案](https://sa-token.cc/d
 		├── sa-token-demo-oauth2                  // [示例] Sa-Token 集成 OAuth2.0
 			├── sa-token-demo-oauth2-server           // [示例] Sa-Token 集成 OAuth2.0 (服务端)
 			├── sa-token-demo-oauth2-client           // [示例] Sa-Token 集成 OAuth2.0 (客户端)
-		├── sa-token-demo-cross                   // [示例] Sa-Token 跨域示例 
-			├── sa-token-demo-cross-header-server     // [示例] Sa-Token 跨域测试 - Header 参数版，后端接口
-			├── sa-token-demo-cross-header-h5         // [示例] Sa-Token 跨域测试 - Header 参数版，h5 页面（jquery请求）
-			├── sa-token-demo-cross-header-vue3       // [示例] Sa-Token 跨域测试 - Header 参数版，vue3 页面
-			├── sa-token-demo-cross-cookie-server     // [示例] Sa-Token 跨域测试 - 第三方 Cookie 版，后端接口
-			├── sa-token-demo-cross-cookie-h5         // [示例] Sa-Token 跨域测试 - 第三方 Cookie 版，h5 页面（jquery请求）
-			├── sa-token-demo-cross-cookie-vue3       // [示例] Sa-Token 跨域测试 - 第三方 Cookie 版，vue3 页面
 		├── sa-token-demo-dubbo                   // [示例] Sa-Token 集成 dubbo
 			├── sa-token-demo-dubbo-consumer          // [示例] Sa-Token 集成 dubbo 鉴权，消费端（调用端）
 			├── sa-token-demo-dubbo-provider          // [示例] Sa-Token 集成 dubbo 鉴权，生产端（被调用端）
@@ -261,6 +256,12 @@ Maven依赖一直无法加载成功？[参考解决方案](https://sa-token.cc/d
 	├── sa-token-doc                          // [文档] Sa-Token 开发文档 
 	├──pom.xml                                // [依赖] 顶级pom文件 
 ```
+
+其它：
+
+- [sa-token-demo-cross](https://gitee.com/sa-tokens/sa-token-demo-cross)：Sa-Token 处理跨域示例。
+- [sa-token-three-plugin](https://gitee.com/sa-tokens/sa-token-three-plugin)：Sa-Token 第三方插件合集。
+- [sa-token-study](https://gitee.com/sa-tokens/sa-token-study)：Sa-Token 涉及知识点学习。
 
 
 

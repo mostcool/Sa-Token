@@ -20,6 +20,7 @@ SysUser user = (SysUser) StpUtil.getSession().get("user");
 - `Token-Session`: 指的是框架为每个 token 分配的 Session  
 - `Custom-Session`: 指的是以一个 特定的值 作为SessionId，来分配的 Session 
 
+> [!TIP| style:callout] 
 > 有关 Account-Session 与 Token-Session 的详细区别，可参考：[Session模型详解](/fun/session-model)
 
 
@@ -175,7 +176,7 @@ StpUtil.getAnonTokenSession();
 
 <a class="case-btn" href="https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-case/src/main/java/com/pj/cases/use/SaSessionController.java"
 	target="_blank">
-	本章代码示例：Sa-Token Session 会话 —— [ com.pj.cases.use.SaSessionController.java ]
+	本章代码示例：Sa-Token Session 会话 —— [ SaSessionController.java ]
 </a>
 <a class="dt-btn" href="https://www.wenjuan.ltd/s/MNnUr2V/" target="_blank">本章小练习：Sa-Token 基础 - Session 会话，章节测试</a>
 

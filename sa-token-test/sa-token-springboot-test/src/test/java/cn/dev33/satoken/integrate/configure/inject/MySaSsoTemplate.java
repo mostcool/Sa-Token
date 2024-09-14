@@ -17,7 +17,7 @@ package cn.dev33.satoken.integrate.configure.inject;
 
 import org.springframework.stereotype.Component;
 
-import cn.dev33.satoken.sso.SaSsoTemplate;
+import cn.dev33.satoken.sso.template.SaSsoTemplate;
 
 /**
  * 自定义 Sa-SSO 模板方法 

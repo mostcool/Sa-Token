@@ -17,10 +17,12 @@ package cn.dev33.satoken.exception;
 
 /**
  * 一个异常：代表框架未能获取有效的上下文
+ * <h1>已过期：请更名为 SaTokenContextException 用法不变，未来版本将彻底删除此类</h1>
  * 
  * @author click33
  * @since 1.33.0
  */
+@Deprecated
 public class InvalidContextException extends SaTokenException {
 
 	/**
@@ -30,7 +32,7 @@ public class InvalidContextException extends SaTokenException {
 
 	/**
 	 * 一个异常：代表框架未能获取有效的上下文
-	 * @param message 异常描述 
+	 * @param message 异常描述
 	 */
 	public InvalidContextException(String message) {
 		super(message);

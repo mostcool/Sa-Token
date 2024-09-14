@@ -5,8 +5,8 @@
 ### 1、何时引导用户去登录？
 
 #### 方案一：前端按钮跳转 
-前端页面准备一个**`[登录]`**按钮，当用户点击按钮时，跳转到登录接口 
-``` js
+前端页面准备一个 **`[登录]`** 按钮，当用户点击按钮时，跳转到登录接口 
+``` html
 <a href="javascript:location.href='/sso/login?back=' + encodeURIComponent(location.href);">登录</a>
 ```
 
@@ -81,16 +81,16 @@ if(res.code == 401) {
 
 ``` java
 // 配置：未登录时返回的View 
-sso.setNotLoginView(() -> {
+sso.notLoginView = () -> {
 	return new ModelAndView("xxx.html");
-})
+}
 ```
 
 
 ### 3、如何自定义登录API的接口地址？
 根据需求点选择解决方案：
 
-#### 3.1、如果只是想在 setDoLoginHandle 函数里获取除 name、pwd 以外的参数？
+#### 3.1、如果只是想在 doLoginHandle 函数里获取除 name、pwd 以外的参数？
 ``` java
 // 在任意代码处获取前端提交的参数 
 String xxx = SaHolder.getRequest().getParam("xxx");
@@ -113,4 +113,58 @@ public SaResult ss(String name, String pwd) {
 #### 3.3、不想使用`/sso/doLogin`这个接口，想自定义一个API地址？
 
 答：直接在前端更改点击按钮时 Ajax 的请求地址即可 
+
+
+### 4、不同 client 不同登录页
+
+如果你的不同应用覆盖的用户群体差异极大，此时你可能想针对不同的应用跳转到不同的登录页，让每个应用的用户在登录时能够看到当前应用的专属信息，怎么做呢？
+
+首先，你需要在每个 sso-client 端配置上不同的 client 标识：
+
+
+<!---------------------------- tabs:start ---------------------------->
+<!------------- tab:yaml 风格  ------------->
+``` yaml
+sa-token:
+    sso-client:
+        # 当前 client 标识
+        client: sso-client-shop
+```
+<!------------- tab:properties 风格  ------------->
+``` properties
+# 当前 client 标识
+sa-token.sso-client.client=sso-client-shop
+```
+<!---------------------------- tabs:end ---------------------------->
+
+
+然后在 `sso-server` 里为每个系统开发不同的登录页，并在 `configSso` 方法里 `notLoginView` 函数中根据 client 值，返回不同的登录视图：
+
+``` java
+// 配置SSO相关参数 
+@Autowired
+private void configSso(SaSsoServerConfig ssoServer) {
+	
+	// 配置：未登录时返回的View 
+	ssoServer.notLoginView = () -> {
+
+		String client = SaHolder.getRequest().getParam("client");
+		if("sso-client-shop".equals(client)) {
+			return new ModelAndView("sa-shop-login.html");
+		}
+		if("sso-client-video".equals(client)) {
+			return new ModelAndView("sa-video-login.html");
+		}
+		// 更多 ... 
+		
+		// 都不匹配，返回一个默认的 
+		return new ModelAndView("sa-login.html");
+	};
+	
+	// ... 
+	
+}
+```
+
+
 

@@ -52,7 +52,7 @@ SaTempUtil.getTimeout(token);
 // 删除指定 token
 SaTempUtil.deleteToken(token);
 ```
-> 注意: SaTempUtil创建临时token后登陆的用户id与SaToken框架中StpUtil登陆的用户id并不关联,两者相互独立同时存在
+
 
 ### 集成jwt
 提到 [临时Token认证]，你是不是想到一个专门干这件事的框架？对，就是JWT！
@@ -76,7 +76,7 @@ implementation 'cn.dev33:sa-token-temp-jwt:${sa.top.version}'
 
 
 并在配置文件中配置上jwt秘钥 **`(必填!)`**
-``` java
+``` yml
 sa-token: 
 	# sa-token-temp-jwt 模块的秘钥 （随便乱摁几个字母就行了） 
 	jwt-secret-key: JfdDSgfCmPsDfmsAaQwnXk

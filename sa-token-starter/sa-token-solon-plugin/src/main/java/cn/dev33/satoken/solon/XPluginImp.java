@@ -16,23 +16,28 @@
 package cn.dev33.satoken.solon;
 
 import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.basic.SaBasicTemplate;
-import cn.dev33.satoken.basic.SaBasicUtil;
+import cn.dev33.satoken.annotation.handler.SaAnnotationHandlerInterface;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.context.second.SaTokenSecondContextCreator;
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.httpauth.basic.SaHttpBasicTemplate;
+import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
+import cn.dev33.satoken.httpauth.digest.SaHttpDigestTemplate;
+import cn.dev33.satoken.httpauth.digest.SaHttpDigestUtil;
 import cn.dev33.satoken.json.SaJsonTemplate;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.log.SaLog;
 import cn.dev33.satoken.same.SaSameTemplate;
 import cn.dev33.satoken.sign.SaSignTemplate;
+import cn.dev33.satoken.solon.json.SaJsonTemplateForSnack3;
 import cn.dev33.satoken.solon.model.SaContextForSolon;
 import cn.dev33.satoken.solon.oauth2.SaOAuth2AutoConfigure;
 import cn.dev33.satoken.solon.sso.SaSsoAutoConfigure;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import cn.dev33.satoken.temp.SaTempInterface;
 import org.noear.solon.Solon;
 import org.noear.solon.core.AppContext;
@@ -64,6 +69,9 @@ public class XPluginImp implements Plugin {
         // 注入上下文Bean
         SaManager.setSaTokenContext(new SaContextForSolon());
 
+        // 注入JSON解析器Bean
+        SaManager.setSaJsonTemplate(new SaJsonTemplateForSnack3());
+
         //注入配置Bean
         SaTokenConfig saTokenConfig = Solon.cfg().getBean("sa-token", SaTokenConfig.class);
         if (saTokenConfig != null) {
@@ -89,6 +97,10 @@ public class XPluginImp implements Plugin {
             SaTokenEventCenter.registerListener(sl);
         });
 
+        // 注入自定义注解处理器 Bean （可以有多个）
+        context.subBeansOfType(SaAnnotationHandlerInterface.class, sl -> {
+            SaAnnotationStrategy.instance.registerAnnotationHandler(sl);
+        });
 
         // 注入权限认证 Bean
         context.getBeanAsync(StpInterface.class, bean -> {
@@ -111,8 +123,13 @@ public class XPluginImp implements Plugin {
         });
 
         // Sa-Token Http Basic 认证模块 Bean
-        context.getBeanAsync(SaBasicTemplate.class, bean -> {
-            SaBasicUtil.saBasicTemplate = bean;
+        context.getBeanAsync(SaHttpBasicTemplate.class, bean -> {
+            SaHttpBasicUtil.saHttpBasicTemplate = bean;
+        });
+
+        // Sa-Token Http Digest 认证模块 Bean
+        context.getBeanAsync(SaHttpDigestTemplate.class, bean -> {
+            SaHttpDigestUtil.saHttpDigestTemplate = bean;
         });
 
         // Sa-Token JSON 转换器 Bean
@@ -129,5 +146,6 @@ public class XPluginImp implements Plugin {
         context.getBeanAsync(StpLogic.class, bean -> {
             StpUtil.setStpLogic(bean);
         });
+
     }
 }

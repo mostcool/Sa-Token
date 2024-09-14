@@ -48,7 +48,7 @@ public class SaTokenConfigure {
     /**
      * 重写 Sa-Token 框架内部算法策略 
      */
-    @Autowired
+    @PostConstruct
     public void rewriteSaStrategy() {
     	// 重写 Token 生成策略 
     	SaStrategy.instance.createToken = (loginId, loginType) -> {
@@ -63,5 +63,6 @@ public class SaTokenConfigure {
 gfuPSwZsnUhwgz08GTCH4wOgasWtc3odP4HLwXJ7NDGOximTvT4OlW19zeLH
 ```
 
-!> **更改了 token 生成策略但是不生效？**<br> 把 Redis 中的旧数据清除掉再试试
+> [!WARNING| label:更改了 token 生成策略但是不生效？] 
+> 把 Redis 中的旧数据清除掉再试试
 

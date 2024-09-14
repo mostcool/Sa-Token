@@ -15,30 +15,33 @@
  */
 package cn.dev33.satoken.spring;
 
-import java.util.List;
-
-import cn.dev33.satoken.spring.pathmatch.SaPathMatcherHolder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.util.PathMatcher;
-
 import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.basic.SaBasicTemplate;
-import cn.dev33.satoken.basic.SaBasicUtil;
+import cn.dev33.satoken.annotation.handler.SaAnnotationHandlerInterface;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.context.SaTokenContext;
 import cn.dev33.satoken.context.second.SaTokenSecondContextCreator;
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.httpauth.basic.SaHttpBasicTemplate;
+import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
+import cn.dev33.satoken.httpauth.digest.SaHttpDigestTemplate;
+import cn.dev33.satoken.httpauth.digest.SaHttpDigestUtil;
 import cn.dev33.satoken.json.SaJsonTemplate;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.log.SaLog;
 import cn.dev33.satoken.same.SaSameTemplate;
 import cn.dev33.satoken.sign.SaSignTemplate;
+import cn.dev33.satoken.spring.pathmatch.SaPathMatcherHolder;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import cn.dev33.satoken.temp.SaTempInterface;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.PathMatcher;
+
+import java.util.List;
 
 /**
  * 注入 Sa-Token 所需要的 Bean
@@ -118,6 +121,18 @@ public class SaBeanInject {
 	}
 
 	/**
+	 * 注入自定义注解处理器
+	 *
+	 * @param handlerList 自定义注解处理器集合
+	 */
+	@Autowired(required = false)
+	public void setSaAnnotationHandler(List<SaAnnotationHandlerInterface<?>> handlerList) {
+		for (SaAnnotationHandlerInterface<?> handler : handlerList) {
+			SaAnnotationStrategy.instance.registerAnnotationHandler(handler);
+		}
+	}
+
+	/**
 	 * 注入临时令牌验证模块 Bean
 	 * 
 	 * @param saTemp saTemp对象 
@@ -143,10 +158,20 @@ public class SaBeanInject {
 	 * @param saBasicTemplate saBasicTemplate对象 
 	 */
 	@Autowired(required = false)
-	public void setSaBasicTemplate(SaBasicTemplate saBasicTemplate) {
-		SaBasicUtil.saBasicTemplate = saBasicTemplate;
+	public void setSaHttpBasicTemplate(SaHttpBasicTemplate saBasicTemplate) {
+		SaHttpBasicUtil.saHttpBasicTemplate = saBasicTemplate;
 	}
-	
+
+	/**
+	 * 注入 Sa-Token Http Digest 认证模块
+	 *
+	 * @param saHttpDigestTemplate saHttpDigestTemplate 对象
+	 */
+	@Autowired(required = false)
+	public void setSaHttpDigestTemplate(SaHttpDigestTemplate saHttpDigestTemplate) {
+		SaHttpDigestUtil.saHttpDigestTemplate = saHttpDigestTemplate;
+	}
+
 	/**
 	 * 注入自定义的 JSON 转换器 Bean 
 	 * 

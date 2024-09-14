@@ -59,4 +59,13 @@ public interface SaSsoErrorCode {
 	/** 当前缺少配置 server-url 地址 */
 	int CODE_30012 = 30012;
 
+	/** 提供的 client 参数值无效 */
+	int CODE_30013 = 30013;
+
+	/** 在 /sso/auth 既没有指定 redirect 参数，也没有配置 homeRoute 路由 */
+	int CODE_30014 = 30014;
+
+	/** 无效的 allow-url 配置 */
+	int CODE_30015 = 30015;
+
 }

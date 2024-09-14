@@ -1,16 +1,18 @@
 # 端口
 server:
-    port: 9001
+    port: 9002
 
 # sa-token配置 
-sa-token: 
+sa-token:
     # SSO-相关配置
-    sso:
-        # SSO-Server端 统一认证地址 
-        auth-url: http://sa-sso-server.com:9000/sso/auth
+    sso-client:
+        # SSO-Server 端主机地址
+        server-url: http://sa-sso-server.com:9000
+        # 前后端分离时打开这个
         # auth-url: http://127.0.0.1:8848/sa-token-demo-sso-server-h5/sso-auth.html
-        # 是否打开单点注销接口
-        is-slo: true
+    sign:
+        # API 接口调用秘钥
+        secret-key: kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
     
     # 配置Sa-Token单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
     alone-redis: 
@@ -34,8 +36,7 @@ sa-token:
                 max-idle: 10
                 # 连接池中的最小空闲连接
                 min-idle: 0
-        
-        
-        
-        
-        
+
+forest:
+    # 关闭 forest 请求日志打印
+    log-enabled: false

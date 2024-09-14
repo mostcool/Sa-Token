@@ -1,12 +1,15 @@
 package com.pj.sso;
 
+import cn.dev33.satoken.sso.SaSsoManager;
+import cn.dev33.satoken.sso.config.SaSsoClientConfig;
+import cn.dev33.satoken.sso.processor.SaSsoClientProcessor;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
+import com.dtflys.forest.Forest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import cn.dev33.satoken.sso.SaSsoProcessor;
-import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
 
 /**
  * Sa-Token-SSO Client端 Controller 
@@ -18,10 +21,11 @@ public class SsoClientController {
 	// 首页 
 	@RequestMapping("/")
 	public String index() {
+		String solUrl = SaSsoManager.getClientConfig().splicingSloUrl();
 		String str = "<h2>Sa-Token SSO-Client 应用端</h2>" + 
 					"<p>当前会话是否登录：" + StpUtil.isLogin() + "</p>" + 
-					"<p><a href=\"javascript:location.href='/sso/login?back=' + encodeURIComponent(location.href);\">登录</a> " + 
-					"<a href='/sso/logout?back=self'>注销</a></p>"; 
+					"<p><a href=\"javascript:location.href='/sso/login?back=' + encodeURIComponent(location.href);\">登录</a> " +
+					"<a href=\"javascript:location.href='" + solUrl + "?back=' + encodeURIComponent(location.href);\">注销</a> </p>";
 		return str;
 	}
 
@@ -33,7 +37,19 @@ public class SsoClientController {
 	 */
 	@RequestMapping("/sso/*")
 	public Object ssoRequest() {
-		return SaSsoProcessor.instance.clientDister();
+		return SaSsoClientProcessor.instance.dister();
+	}
+
+	// 配置SSO相关参数
+	@Autowired
+	private void configSso(SaSsoClientConfig ssoClient) {
+		// 配置Http请求处理器
+		ssoClient.sendHttp = url -> {
+			System.out.println("------ 发起请求：" + url);
+			String resStr = Forest.get(url).executeAsString();
+			System.out.println("------ 请求结果：" + resStr);
+			return resStr;
+		};
 	}
 
 	// 全局异常拦截 

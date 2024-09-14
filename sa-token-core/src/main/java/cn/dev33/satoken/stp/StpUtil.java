@@ -224,7 +224,17 @@ public class StpUtil {
 	public static String createLoginSession(Object id, SaLoginModel loginModel) {
 		return stpLogic.createLoginSession(id, loginModel);
 	}
-	
+
+	/**
+	 * 获取指定账号 id 的登录会话数据，如果获取不到则创建并返回
+	 *
+	 * @param id 账号id，建议的类型：（long | int | String）
+	 * @return 返回会话令牌
+	 */
+	public static String getOrCreateLoginSession(Object id) {
+		return stpLogic.getOrCreateLoginSession(id);
+	}
+
 	// --- 注销 
 
 	/**
@@ -844,7 +854,27 @@ public class StpUtil {
 		return stpLogic.getLoginDevice(); 
 	}
 
-	
+	/**
+	 * 返回指定 token 会话的登录设备类型
+	 *
+	 * @param tokenValue 指定token
+	 * @return 当前令牌的登录设备类型
+	 */
+	public static String getLoginDeviceByToken(String tokenValue) {
+		return stpLogic.getLoginDeviceByToken(tokenValue);
+	}
+
+	/**
+	 * 获取当前 token 的最后活跃时间（13位时间戳），如果不存在则返回 -2
+	 *
+	 * @return /
+	 */
+	public static long getTokenLastActiveTime() {
+		return stpLogic.getTokenLastActiveTime();
+	}
+
+
+
 	// ------------------- 会话管理 -------------------  
 
 	/**

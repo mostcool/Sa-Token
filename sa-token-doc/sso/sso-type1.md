@@ -135,8 +135,8 @@ public class SsoClientController {
 	// SSO-Client端：首页 
 	@RequestMapping("/")
 	public String index() {
-		String authUrl = SaSsoManager.getConfig().splicingAuthUrl();
-		String solUrl = SaSsoManager.getConfig().splicingSloUrl();
+		String authUrl = SaSsoManager.getClientConfig().splicingAuthUrl();
+		String solUrl = SaSsoManager.getClientConfig().splicingSloUrl();
 		String str = "<h2>Sa-Token SSO-Client 应用端</h2>" + 
 					"<p>当前会话是否登录：" + StpUtil.isLogin() + "</p>" + 
 					"<p><a href=\"javascript:location.href='" + authUrl + "?mode=simple&redirect=' + encodeURIComponent(location.href);\">登录</a> " + 
@@ -166,11 +166,9 @@ server:
 # Sa-Token 配置 
 sa-token: 
     # SSO-相关配置
-    sso: 
-        # SSO-Server端-单点登录授权地址 
-        auth-url: http://sso.stp.com:9000/sso/auth
-        # SSO-Server端-单点注销地址
-        slo-url: http://sso.stp.com:9000/sso/signout
+    sso-client:
+        # SSO-Server端主机地址
+        server-url: http://sso.stp.com:9000
     
     # 配置 Sa-Token 单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
     alone-redis: 
@@ -192,10 +190,8 @@ server.port=9001
 
 ######### Sa-Token 配置 #########
 
-# SSO-Server端-单点登录授权地址 
-sa-token.sso.auth-url=http://sso.stp.com:9000/sso/auth
-# SSO-Server端-单点注销地址
-sa-token.sso.slo-url=http://sso.stp.com:9000/sso/signout
+# SSO-Server端主机地址
+sa-token.sso-client.server-url=http://sso.stp.com:9000
 
 # 配置 Sa-Token 单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
 # Redis数据库索引
@@ -222,7 +218,15 @@ sa-token.alone-redis.timeout=10s
 public class SaSso1ClientApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SaSso1ClientApplication.class, args);
-		System.out.println("\nSa-Token SSO模式一 Client端启动成功");
+		
+		System.out.println();
+		System.out.println("---------------------- Sa-Token SSO 模式一 Client 端启动成功 ----------------------");
+		System.out.println("配置信息：" + SaSsoManager.getClientConfig());
+		System.out.println("测试访问应用端一: http://s1.stp.com:9001");
+		System.out.println("测试访问应用端二: http://s2.stp.com:9001");
+		System.out.println("测试访问应用端三: http://s3.stp.com:9001");
+		System.out.println("测试前需要根据官网文档修改hosts文件，测试账号密码：sa / 123456");
+		System.out.println();
 	}
 }
 ```
@@ -257,8 +261,9 @@ public class SaSso1ClientApplication {
 
 ### 6、跨域模式下的解决方案 
 
-如上，我们使用简单的步骤实现了同域下的单点登录，聪明如你??，马上想到了这种模式有着一个不小的限制：
+如上，我们使用简单的步骤实现了同域下的单点登录，聪明如你😏，马上想到了这种模式有着一个不小的限制：
 
+> [!TIP| style:callout] 
 > 所有子系统的域名，必须同属一个父级域名
 
 如果我们的子系统在完全不同的域名下，我们又该怎么完成单点登录功能呢？

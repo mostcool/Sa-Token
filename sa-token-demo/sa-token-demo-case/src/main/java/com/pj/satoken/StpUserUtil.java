@@ -4,18 +4,21 @@ import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.fun.SaFunction;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.session.TokenSign;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpLogic;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * Sa-Token 权限认证工具类 (User 版)
+ * Sa-Token 权限认证工具类（User版）
  *
  * @author click33
  * @since 1.0.0
  */
+@Component
 public class StpUserUtil {
 
 	private StpUserUtil() {}
@@ -212,6 +215,16 @@ public class StpUserUtil {
 		return stpLogic.createLoginSession(id, loginModel);
 	}
 
+	/**
+	 * 获取指定账号 id 的登录会话数据，如果获取不到则创建并返回
+	 *
+	 * @param id 账号id，建议的类型：（long | int | String）
+	 * @return 返回会话令牌
+	 */
+	public static String getOrCreateLoginSession(Object id) {
+		return stpLogic.getOrCreateLoginSession(id);
+	}
+
 	// --- 注销
 
 	/**
@@ -300,6 +313,15 @@ public class StpUserUtil {
 	 */
 	public static boolean isLogin() {
 		return stpLogic.isLogin();
+	}
+
+	/**
+	 * 判断指定账号是否已经登录
+	 *
+	 * @return 已登录返回 true，未登录返回 false
+	 */
+	public static boolean isLogin(Object loginId) {
+		return stpLogic.isLogin(loginId);
 	}
 
 	/**
@@ -803,6 +825,17 @@ public class StpUserUtil {
 	}
 
 	/**
+	 * 获取指定账号 id 指定设备类型端的 tokenSign 集合
+	 *
+	 * @param loginId 账号id
+	 * @param device 设备类型，填 null 代表不限设备类型
+	 * @return 此 loginId 的所有登录 tokenSign
+	 */
+	public static List<TokenSign> getTokenSignListByLoginId(Object loginId, String device) {
+		return stpLogic.getTokenSignListByLoginId(loginId, device);
+	}
+
+	/**
 	 * 返回当前会话的登录设备类型
 	 *
 	 * @return 当前令牌的登录设备类型
@@ -810,6 +843,26 @@ public class StpUserUtil {
 	public static String getLoginDevice() {
 		return stpLogic.getLoginDevice();
 	}
+
+	/**
+	 * 返回指定 token 会话的登录设备类型
+	 *
+	 * @param tokenValue 指定token
+	 * @return 当前令牌的登录设备类型
+	 */
+	public static String getLoginDeviceByToken(String tokenValue) {
+		return stpLogic.getLoginDeviceByToken(tokenValue);
+	}
+
+	/**
+	 * 获取当前 token 的最后活跃时间（13位时间戳），如果不存在则返回 -2
+	 *
+	 * @return /
+	 */
+	public static long getTokenLastActiveTime() {
+		return stpLogic.getTokenLastActiveTime();
+	}
+
 
 
 	// ------------------- 会话管理 -------------------

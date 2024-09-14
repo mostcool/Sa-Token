@@ -44,19 +44,9 @@ public class SaTokenDaoOfRedisJson implements SaTokenDao {
         redisBucket = redisClient.getBucket();
 
         // 重写 SaSession 生成策略
-        SaStrategy.instance.createSession = (sessionId) -> new SaSessionForJson(sessionId);
+        //SaStrategy.instance.createSession = (sessionId) -> new SaSessionForJson(sessionId);
 
     }
-
-    @Override
-    public SaSession getSession(String sessionId) {
-        Object obj = getObject(sessionId);
-        if (obj == null) {
-            return null;
-        }
-        return ONode.deserialize(obj.toString(), SaSessionForJson.class);
-    }
-
 
     /**
      * 获取Value，如无返空
@@ -117,7 +107,8 @@ public class SaTokenDaoOfRedisJson implements SaTokenDao {
      */
     @Override
     public Object getObject(String key) {
-        return get(key);
+        String value = get(key);
+        return ONode.deserialize(value);
     }
 
     /**

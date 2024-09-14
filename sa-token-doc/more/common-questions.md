@@ -481,7 +481,7 @@ class MyConfiguration {
 2. 在写路由匹配规则时，避免使 `**` 之后再出现内容。
 3. 将项目的路由匹配机制改为 `ant_path_matcher`。
 
-先改项目的：
+步骤1：先改项目的：
 ``` yml
 spring:
     mvc:
@@ -489,7 +489,7 @@ spring:
             matching-strategy: ant_path_matcher
 ```
 
-再改 Sa-Token 的：
+步骤2：再改 Sa-Token 的：
 ``` java
 /**
  * 自定义 SaTokenContext 实现类，重写 matchPath 方法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
@@ -506,12 +506,63 @@ public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForS
 }
 ```
 
+**注意点：**
+
+SpringBoot2.x 的 `WebFlux`或 `SC Gateway` 项目，按照上述步骤改造，可能会报错 
+
+``` html
+java.lang.NoClassDefFoundError: org/springframework/web/servlet/mvc/condition/PatternsRequestCondition
+```
+
+只需要将“步骤2”中的代码 `return SaPatternsRequestConditionHolder.match(pattern, path);` 
+更换为 `return SaPathMatcherHolder.getPathMatcher().match(pattern, path);` 即可，例如：
+
+``` java
+/**
+ * 自定义 SaTokenContext 实现类，重写 matchPath 方法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
+ */
+@Primary
+@Component
+public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringReactor {
+
+    @Override
+    public boolean matchPath(String pattern, String path) {
+        return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
+    }
+
+}
+```
 
 
+### Q：Webflux 环境集成，或者 SpringCloud Gateway 环境集成后，过滤器里路由拦截鉴权报错：`java.lang.NoSuchFieldError: defaultInstance`
 
+``` java
+java.lang.NoSuchFieldError: defaultInstance
+	at cn.dev33.satoken.spring.pathmatch.SaPathPatternParserUtil.match(SaPathPatternParserUtil.java:40)
+	at cn.dev33.satoken.reactor.spring.SaTokenContextForSpringReactor.matchPath(SaTokenContextForSpringReactor.java:34)
+	at cn.dev33.satoken.router.SaRouter.isMatch(SaRouter.java:58)
+	at cn.dev33.satoken.router.SaRouter.isMatch(SaRouter.java:72)
+	... 
+```
 
+原因：SpringBoot 版本用的太低了，导致一些类不存在。
 
+- 方案一：升级项目的 SpringBoot 版本至 `2.3.x` 以上
+- 方案二：像上面的问题解决方案一样，重写一下相关类：
 
+``` java
+/**
+ * 自定义 SaTokenContext 实现类，重写 matchPath 方法，将 PathPatternParser.defaultInstance 改为 SaPathMatcherHolder.getPathMatcher()
+ */
+@Primary
+@Component
+public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringReactor {
+    @Override
+    public boolean matchPath(String pattern, String path) {
+        return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
+    }
+}
+```
 
 
 

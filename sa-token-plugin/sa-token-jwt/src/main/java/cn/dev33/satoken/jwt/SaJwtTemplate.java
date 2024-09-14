@@ -19,6 +19,7 @@ import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.jwt.error.SaJwtErrorCode;
 import cn.dev33.satoken.jwt.exception.SaJwtException;
 import cn.dev33.satoken.util.SaFoxUtil;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTException;
@@ -141,7 +142,7 @@ public class SaJwtTemplate {
 	 * @return 根据 JWT 对象和 keyt 秘钥，生成的 token 字符串
 	 */
 	public String generateToken (JWT jwt, String keyt) {
-		return jwt.setKey(keyt.getBytes()).setSigner(createSigner(keyt)).sign();
+		return jwt.setSigner(createSigner(keyt)).sign();
 	}
 
 	/**
@@ -181,13 +182,13 @@ public class SaJwtTemplate {
     	JWT jwt;
     	try {
     		jwt = JWT.of(token);
-		} catch (JWTException e) {
+		} catch (JWTException | JSONException e) {
     		throw new SaJwtException("jwt 解析失败：" + token, e).setCode(SaJwtErrorCode.CODE_30201);
 		}
     	JSONObject payloads = jwt.getPayloads();
     	
     	// 校验 Token 签名
-		boolean verify = jwt.setKey(keyt.getBytes()).setSigner(createSigner(keyt)).verify();
+		boolean verify = jwt.setSigner(createSigner(keyt)).verify();
     	if( ! verify) {
     		throw new SaJwtException("jwt 签名无效：" + token).setCode(SaJwtErrorCode.CODE_30202);
     	}
@@ -284,7 +285,7 @@ public class SaJwtTemplate {
     	JSONObject payloads = jwt.getPayloads();
     	
     	// 如果签名无效 
-    	boolean verify = jwt.setKey(keyt.getBytes()).verify();
+    	boolean verify = jwt.setSigner(createSigner(keyt)).verify();
     	if( ! verify) {
     		return NOT_VALUE_EXPIRE;
     	}
@@ -307,5 +308,25 @@ public class SaJwtTemplate {
         // 计算timeout (转化为以秒为单位的有效时间)
         return (effTime - System.currentTimeMillis()) / 1000;
     }
+
+
+
+	// -------------- 其它方法
+
+	/**
+	 * 创建 jwt （Map 参数方式）
+	 *
+	 * @param map 扩展数据
+	 * @param keyt 秘钥
+	 * @return jwt-token
+	 */
+	public String createToken(Map<String, Object> map, String keyt) {
+		// 创建
+		JWT jwt = JWT.create().addPayloads(map);
+
+		// 返回
+		return generateToken(jwt, keyt);
+	}
+
 
 }

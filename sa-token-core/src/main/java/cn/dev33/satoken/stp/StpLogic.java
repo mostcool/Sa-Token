@@ -36,7 +36,7 @@ import cn.dev33.satoken.util.SaFoxUtil;
 import cn.dev33.satoken.util.SaTokenConsts;
 import cn.dev33.satoken.util.SaValue2Box;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -334,15 +334,15 @@ public class StpLogic {
 			tokenValue = String.valueOf(storage.get(splicingKeyJustCreatedSave()));
 		}
 		// 2. 再尝试从 请求体 里面读取
-		if(tokenValue == null && config.getIsReadBody()){
+		if(SaFoxUtil.isEmpty(tokenValue) && config.getIsReadBody()){
 			tokenValue = request.getParam(keyTokenName);
 		}
 		// 3. 再尝试从 header 头里读取
-		if(tokenValue == null && config.getIsReadHeader()){
+		if(SaFoxUtil.isEmpty(tokenValue) && config.getIsReadHeader()){
 			tokenValue = request.getHeader(keyTokenName);
 		}
 		// 4. 最后尝试从 cookie 里读取
-		if(tokenValue == null && config.getIsReadCookie()){
+		if(SaFoxUtil.isEmpty(tokenValue) && config.getIsReadCookie()){
 			tokenValue = request.getCookieValue(keyTokenName);
 		}
 		
@@ -471,7 +471,7 @@ public class StpLogic {
 		String tokenValue = distUsableToken(id, loginModel);
 		
 		// 4、获取此账号的 Account-Session , 续期
-		SaSession session = getSessionByLoginId(id, true);
+		SaSession session = getSessionByLoginId(id, true, loginModel.getTimeoutOrGlobalConfig());
 		session.updateMinTimeout(loginModel.getTimeout());
 		
 		// 5、在 Account-Session 上记录本次登录的 token 签名
@@ -588,6 +588,20 @@ public class StpLogic {
 			SaManager.log.warn("当前全局配置未开启动态 activeTimeout 功能，传入的 activeTimeout 参数将被忽略");
 		}
 
+	}
+
+	/**
+	 * 获取指定账号 id 的登录会话数据，如果获取不到则创建并返回
+	 *
+	 * @param id 账号id，建议的类型：（long | int | String）
+	 * @return 返回会话令牌
+	 */
+	public String getOrCreateLoginSession(Object id) {
+		String tokenValue = getTokenValueByLoginId(id);
+		if(tokenValue == null) {
+			tokenValue = createLoginSession(id, new SaLoginModel());
+		}
+		return tokenValue;
 	}
 
 	// --- 注销 
@@ -994,12 +1008,12 @@ public class StpLogic {
 		if(loginId == null) {
 			return defaultValue;
 		}
-        // 3、loginId 不为 null，则开始尝试类型转换
-        if (defaultValue == null) {
-			return null;
-        }
+		// 3、loginId 不为 null，则开始尝试类型转换
+		if(defaultValue == null) {
+			return (T) loginId;
+		}
 		return (T) SaFoxUtil.getValueByType(loginId, defaultValue.getClass());
- 	}
+	}
  	
  	/** 
 	 * 获取当前会话账号id, 如果未登录，则返回null
@@ -1147,7 +1161,7 @@ public class StpLogic {
 	 */
 	public void updateTokenToIdMapping(String tokenValue, Object loginId) {
 		// 先判断一下，是否传入了空值
-		SaTokenException.throwBy(SaFoxUtil.isEmpty(loginId), "loginId 不能为空", SaErrorCode.CODE_11003);
+		SaTokenException.notTrue(SaFoxUtil.isEmpty(loginId), "loginId 不能为空", SaErrorCode.CODE_11003);
 
 		// 更新缓存中的 token 指向
 		getSaTokenDao().update(splicingKeyTokenValue(tokenValue), loginId.toString());
@@ -1170,14 +1184,15 @@ public class StpLogic {
 	 *
 	 * @param sessionId SessionId
 	 * @param isCreate 是否新建
-	 * @param appendOperation 如果这个 SaSession 是新建的，则要追加执行的动作
+	 * @param timeout 如果这个 SaSession 是新建的，则使用此值作为过期值（单位：秒），可填 null，代表使用全局 timeout 值
+	 * @param appendOperation 如果这个 SaSession 是新建的，则要追加执行的动作，可填 null，代表无追加动作
 	 * @return Session对象 
 	 */
-	public SaSession getSessionBySessionId(String sessionId, boolean isCreate, Consumer<SaSession> appendOperation) {
+	public SaSession getSessionBySessionId(String sessionId, boolean isCreate, Long timeout, Consumer<SaSession> appendOperation) {
 
 		// 如果提供的 sessionId 为 null，则直接返回 null
 		if(SaFoxUtil.isEmpty(sessionId)) {
-			return null;
+			throw new SaTokenException("SessionId 不能为空").setCode(SaErrorCode.CODE_11072);
 		}
 
 		// 先检查这个 SaSession 是否已经存在，如果不存在且 isCreate=true，则新建并返回
@@ -1192,8 +1207,22 @@ public class StpLogic {
 				appendOperation.accept(session);
 			}
 
+			// 如果未提供 timeout，则根据相应规则设定默认的 timeout
+			if(timeout == null) {
+				// 如果是 Token-Session，则使用对用 token 的有效期，使 token 和 token-session 保持相同ttl，同步失效
+				if(SaTokenConsts.SESSION_TYPE__TOKEN.equals(session.getType())) {
+					timeout = getTokenTimeout(session.getToken());
+					if(timeout == SaTokenDao.NOT_VALUE_EXPIRE) {
+						timeout = getConfigOrGlobal().getTimeout();
+					}
+				} else {
+					// 否则使用全局配置的 timeout
+					timeout = getConfigOrGlobal().getTimeout();
+				}
+			}
+
 			// 将这个 SaSession 入库
-			getSaTokenDao().setSession(session, getConfigOrGlobal().getTimeout());
+			getSaTokenDao().setSession(session, timeout);
 		}
 		return session;
 	}
@@ -1205,7 +1234,28 @@ public class StpLogic {
 	 * @return Session对象 
 	 */
 	public SaSession getSessionBySessionId(String sessionId) {
-		return getSessionBySessionId(sessionId, false, null);
+		return getSessionBySessionId(sessionId, false, null, null);
+	}
+
+	/**
+	 * 获取指定账号 id 的 Account-Session, 如果该 SaSession 尚未创建，isCreate=是否新建并返回
+	 *
+	 * @param loginId 账号id
+	 * @param isCreate 是否新建
+	 * @param timeout 如果这个 SaSession 是新建的，则使用此值作为过期值（单位：秒），可填 null，代表使用全局 timeout 值
+	 * @return SaSession 对象
+	 */
+	public SaSession getSessionByLoginId(Object loginId, boolean isCreate, Long timeout) {
+		if(SaFoxUtil.isEmpty(loginId)) {
+			throw new SaTokenException("Account-Session 获取失败：loginId 不能为空");
+		}
+		return getSessionBySessionId(splicingKeySession(loginId), isCreate, timeout, session -> {
+			// 这里是该 Account-Session 首次创建时才会被执行的方法：
+			// 		设定这个 SaSession 的各种基础信息：类型、账号体系、账号id
+			session.setType(SaTokenConsts.SESSION_TYPE__ACCOUNT);
+			session.setLoginType(getLoginType());
+			session.setLoginId(loginId);
+		});
 	}
 
 	/** 
@@ -1216,13 +1266,7 @@ public class StpLogic {
 	 * @return SaSession 对象
 	 */
 	public SaSession getSessionByLoginId(Object loginId, boolean isCreate) {
-		return getSessionBySessionId(splicingKeySession(loginId), isCreate, session -> {
-			// 这里是该 Account-Session 首次创建时才会被执行的方法：
-			// 		设定这个 SaSession 的各种基础信息：类型、账号体系、账号id
-			session.setType(SaTokenConsts.SESSION_TYPE__ACCOUNT);
-			session.setLoginType(getLoginType());
-			session.setLoginId(loginId);
-		});
+		return getSessionByLoginId(loginId, isCreate, null);
 	}
 
 	/** 
@@ -1232,7 +1276,7 @@ public class StpLogic {
 	 * @return SaSession 对象
 	 */
 	public SaSession getSessionByLoginId(Object loginId) {
-		return getSessionByLoginId(loginId, true);
+		return getSessionByLoginId(loginId, true, null);
 	}
 
 	/** 
@@ -1265,7 +1309,10 @@ public class StpLogic {
 	 * @return session对象
 	 */
 	public SaSession getTokenSessionByToken(String tokenValue, boolean isCreate) {
-		return getSessionBySessionId(splicingKeyTokenSession(tokenValue), isCreate, session -> {
+		if(SaFoxUtil.isEmpty(tokenValue)) {
+			throw new SaTokenException("Token-Session 获取失败：token 为空").setCode(SaErrorCode.CODE_11073);
+		}
+		return getSessionBySessionId(splicingKeyTokenSession(tokenValue), isCreate, null, session -> {
 			// 这里是该 Token-Session 首次创建时才会被执行的方法：
 			// 		设定这个 SaSession 的各种基础信息：类型、账号体系、Token 值
 			session.setType(SaTokenConsts.SESSION_TYPE__TOKEN);
@@ -1300,7 +1347,7 @@ public class StpLogic {
 		// 2、如果前端根本没有提供 Token ，则直接返回 null
 		String tokenValue = getTokenValue();
 		if(SaFoxUtil.isEmpty(tokenValue)) {
-			return null;
+			throw new SaTokenException("Token-Session 获取失败：token 为空").setCode(SaErrorCode.CODE_11073);
 		}
 
 		// 3、代码至此：tokenSessionCheckLogin 校验通过、且 Token 有值
@@ -1377,7 +1424,14 @@ public class StpLogic {
 			setTokenValue(tokenValue);
 
 			// 返回其 Token-Session 对象
-			return getTokenSessionByToken(tokenValue, isCreate);
+			final String finalTokenValue = tokenValue;
+			return getSessionBySessionId(splicingKeyTokenSession(tokenValue), isCreate, getConfigOrGlobal().getTimeout(), session -> {
+				// 这里是该 Anon-Token-Session 首次创建时才会被执行的方法：
+				// 		设定这个 SaSession 的各种基础信息：类型、账号体系、Token 值
+				session.setType(SaTokenConsts.SESSION_TYPE__TOKEN);
+				session.setLoginType(getLoginType());
+				session.setToken(finalTokenValue);
+			});
 		}
 		else {
 			return null;
@@ -1532,6 +1586,40 @@ public class StpLogic {
 		return activeTimeout;
 	}
 
+	/**
+	 * 获取指定 token 的最后活跃时间（13位时间戳），如果不存在则返回 -2
+	 *
+	 * @param tokenValue 指定token
+	 * @return /
+	 */
+	public long getTokenLastActiveTime(String tokenValue) {
+		// 1、如果提供的 token 为 null，则返回 -2
+		if(SaFoxUtil.isEmpty(tokenValue)) {
+			return SaTokenDao.NOT_VALUE_EXPIRE;
+		}
+
+		// 2、获取这个 token 的最后活跃时间，13位时间戳
+		String key = splicingKeyLastActiveTime(tokenValue);
+		String lastActiveTimeString = getSaTokenDao().get(key);
+
+		// 3、查不到，返回-2
+		if(lastActiveTimeString == null) {
+			return SaTokenDao.NOT_VALUE_EXPIRE;
+		}
+
+		// 4、根据逗号切割字符串
+		return new SaValue2Box(lastActiveTimeString).getValue1AsLong();
+	}
+
+	/**
+	 * 获取当前 token 的最后活跃时间（13位时间戳），如果不存在则返回 -2
+	 *
+	 * @return /
+	 */
+	public long getTokenLastActiveTime() {
+		return getTokenLastActiveTime(getTokenValue());
+	}
+
 
 	// ------------------- 过期时间相关 -------------------
 
@@ -1624,26 +1712,14 @@ public class StpLogic {
 			return SaTokenDao.NEVER_EXPIRE;
 		}
 
- 		// 如果提供的 token 为 null，则返回 -2
- 		if(SaFoxUtil.isEmpty(tokenValue)) {
- 			return SaTokenDao.NOT_VALUE_EXPIRE;
- 		}
-
  		// ------ 开始查询
 
- 		// 1、先获取这个 token 的最后活跃时间，13位时间戳
- 		String key = splicingKeyLastActiveTime(tokenValue);
- 		String lastActiveTimeString = getSaTokenDao().get(key);
+ 		// 先获取这个 token 的最后活跃时间，13位时间戳
+ 		long lastActiveTime = getTokenLastActiveTime(tokenValue);
+		if(lastActiveTime == SaTokenDao.NOT_VALUE_EXPIRE) {
+			return SaTokenDao.NOT_VALUE_EXPIRE;
+		}
 
- 		// 2、如果查不到，返回-2
- 		if(lastActiveTimeString == null) {
- 			return SaTokenDao.NOT_VALUE_EXPIRE;
- 		}
-
-		// 3、计算最后活跃时间 距离 此时此刻 的时间差
-		//    计算公式为: (当前时间 - 最后活跃时间) / 1000
-		SaValue2Box box = new SaValue2Box(lastActiveTimeString);
- 		long lastActiveTime = box.getValue1AsLong();
 		// 实际时间差
  		long timeDiff = (System.currentTimeMillis() - lastActiveTime) / 1000;
 		// 该 token 允许的时间差
@@ -1653,7 +1729,7 @@ public class StpLogic {
 			return SaTokenDao.NEVER_EXPIRE;
 		}
 
- 		// 4、校验这个时间差是否超过了允许的值
+ 		// 校验这个时间差是否超过了允许的值
 		//    计算公式为: 允许的最大时间差 - 实际时间差，判断是否 < 0， 如果是则代表已经被冻结 ，返回-2
 		long activeTimeout = allowTimeDiff - timeDiff;
  		if(activeTimeout < 0) {
@@ -1750,7 +1826,11 @@ public class StpLogic {
  	 * @return / 
  	 */
  	public boolean hasRole(String role) {
- 		return hasElement(getRoleList(), role);
+		try {
+			return hasRole(getLoginId(), role);
+		} catch (NotLoginException e) {
+			return false;
+		}
  	}
 
  	/** 
@@ -1774,7 +1854,7 @@ public class StpLogic {
  		try {
 			checkRoleAnd(roleArray);
 			return true;
-		} catch (NotRoleException e) {
+		} catch (NotLoginException | NotRoleException e) {
 			return false;
 		}
  	}
@@ -1789,7 +1869,7 @@ public class StpLogic {
  		try {
 			checkRoleOr(roleArray);
 			return true;
-		} catch (NotRoleException e) {
+		} catch (NotLoginException | NotRoleException e) {
 			return false;
 		}
  	}
@@ -1800,7 +1880,7 @@ public class StpLogic {
  	 * @param role 角色标识
  	 */
  	public void checkRole(String role) {
- 		if( ! hasRole(role)) {
+ 		if( ! hasRole(getLoginId(), role)) {
 			throw new NotRoleException(role, this.loginType).setCode(SaErrorCode.CODE_11041);
 		}
  	}
@@ -1884,7 +1964,11 @@ public class StpLogic {
  	 * @return 是否含有指定权限
  	 */
  	public boolean hasPermission(String permission) {
- 		return hasElement(getPermissionList(), permission);
+		try {
+			return hasPermission(getLoginId(), permission);
+		} catch (NotLoginException e) {
+			return false;
+		}
  	}
 
  	/** 
@@ -1908,7 +1992,7 @@ public class StpLogic {
  		try {
 			checkPermissionAnd(permissionArray);
 			return true;
-		} catch (NotPermissionException e) {
+		} catch (NotLoginException | NotPermissionException e) {
 			return false;
 		}
  	}
@@ -1923,7 +2007,7 @@ public class StpLogic {
  		try {
 			checkPermissionOr(permissionArray);
 			return true;
-		} catch (NotPermissionException e) {
+		} catch (NotLoginException | NotPermissionException e) {
 			return false;
 		}
  	}
@@ -1934,7 +2018,7 @@ public class StpLogic {
  	 * @param permission 权限码
  	 */
  	public void checkPermission(String permission) {
- 		if( ! hasPermission(permission)) {
+ 		if( ! hasPermission(getLoginId(), permission)) {
 			throw new NotPermissionException(permission, this.loginType).setCode(SaErrorCode.CODE_11051);
 		}
  	}
@@ -2044,7 +2128,7 @@ public class StpLogic {
 		// 如果该账号的 Account-Session 为 null，说明此账号尚没有客户端在登录，此时返回空集合
 		SaSession session = getSessionByLoginId(loginId, false);
 		if(session == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		// 按照设备类型进行筛选
@@ -2062,7 +2146,7 @@ public class StpLogic {
 		// 如果该账号的 Account-Session 为 null，说明此账号尚没有客户端在登录，此时返回空集合
 		SaSession session = getSessionByLoginId(loginId, false);
 		if(session == null) {
-			return Collections.emptyList();
+			return new ArrayList<>();
 		}
 
 		// 按照设备类型进行筛选
@@ -2075,19 +2159,32 @@ public class StpLogic {
 	 * @return 当前令牌的登录设备类型
 	 */
 	public String getLoginDevice() {
-		// 1、如果前端没有提交 token，直接返回 null
-		String tokenValue = getTokenValue();
-		if(tokenValue == null) {
+		return getLoginDeviceByToken(getTokenValue());
+	}
+
+	/**
+	 * 返回指定 token 会话的登录设备类型
+	 *
+	 * @param tokenValue 指定token
+	 * @return 当前令牌的登录设备类型
+	 */
+	public String getLoginDeviceByToken(String tokenValue) {
+		// 1、如果 token 为 null，直接提前返回
+		if(SaFoxUtil.isEmpty(tokenValue)) {
 			return null;
 		}
 
-		// 2、如果当前会话还未登录，直接返回 null
-		if(!isLogin()) {
+		// 2、获取此 token 对应的 loginId，如果为null，或者此token已被冻结，直接返回null
+		Object loginId = getLoginIdNotHandle(tokenValue);
+		if( ! isValidLoginId(loginId)) {
+			return null;
+		}
+		if(getTokenActiveTimeoutByToken(tokenValue) == SaTokenDao.NOT_VALUE_EXPIRE ) {
 			return null;
 		}
 
-		// 3、获取当前账号的 Account-Session
-		SaSession session = getSessionByLoginId(getLoginIdDefaultNull(), false);
+		// 3、获取这个账号的 Account-Session
+		SaSession session = getSessionByLoginId(loginId, false);
 
 		// 4、为 null 说明尚未登录，当然也就不存在什么设备类型，直接返回 null
 		if(session == null) {
@@ -2105,7 +2202,7 @@ public class StpLogic {
 		// 6、没有找到，还是返回 null
 		return null;
 	}
-	
+
 
 	// ------------------- 会话管理 -------------------  
 
@@ -2149,79 +2246,6 @@ public class StpLogic {
 	 */
 	public List<String> searchTokenSessionId(String keyword, int start, int size, boolean sortType) {
 		return getSaTokenDao().searchData(splicingKeyTokenSession(""), keyword, start, size, sortType);
-	}
-	
-
-	// ------------------- 注解鉴权 -------------------  
-
-	/**
-	 * 根据注解 ( @SaCheckLogin ) 鉴权
-	 *
-	 * @param at 注解对象 
-	 */
-	public void checkByAnnotation(SaCheckLogin at) {
-		this.checkLogin();
-	}
-
-	/**
-	 * 根据注解 ( @SaCheckRole ) 鉴权
-	 *
-	 * @param at 注解对象 
-	 */
-	public void checkByAnnotation(SaCheckRole at) {
-		String[] roleArray = at.value();
-		if(at.mode() == SaMode.AND) {
-			this.checkRoleAnd(roleArray);	
-		} else {
-			this.checkRoleOr(roleArray);	
-		}
-	}
-	
-	/**
-	 * 根据注解 ( @SaCheckPermission ) 鉴权
-	 *
-	 * @param at 注解对象 
-	 */
-	public void checkByAnnotation(SaCheckPermission at) {
-		String[] permissionArray = at.value();
-		try {
-			if(at.mode() == SaMode.AND) {
-				this.checkPermissionAnd(permissionArray);	
-			} else {
-				this.checkPermissionOr(permissionArray);	
-			}
-		} catch (NotPermissionException e) {
-			// 权限认证校验未通过，再开始角色认证校验
-			for (String role : at.orRole()) {
-				String[] rArr = SaFoxUtil.convertStringToArray(role);
-				// 某一项 role 认证通过，则可以提前退出了，代表通过
-				if (hasRoleAnd(rArr)) {
-					return;
-				}
-			}
-			throw e;
-		}
-	}
-
-	/**
-	 * 根据注解 ( @SaCheckSafe ) 鉴权
-	 *
-	 * @param at 注解对象 
-	 */
-	public void checkByAnnotation(SaCheckSafe at) {
-		this.checkSafe(at.value());
-	}
-
-	/**
-	 * 根据注解 ( @SaCheckDisable ) 鉴权
-	 *
-	 * @param at 注解对象
-	 */
-	public void checkByAnnotation(SaCheckDisable at) {
-		Object loginId = getLoginId();
-		for (String service : at.value()) {
-			this.checkDisableLevel(loginId, service, at.level());
-		}
 	}
 
 
@@ -2598,7 +2622,13 @@ public class StpLogic {
 			return false;
 		}
 		
-		// 2、如果缓存中可以查询出指定的键值，则代表已认证，否则视为未认证
+		// 2、如果此 token 不处于登录状态，也将其视为未认证
+		Object loginId = getLoginIdNotHandle(tokenValue);
+		if( ! isValidLoginId(loginId) ) {
+			return false;
+		}
+
+		// 3、如果缓存中可以查询出指定的键值，则代表已认证，否则视为未认证
 		String value = getSaTokenDao().get(splicingKeySafe(tokenValue, service));
 		return !(SaFoxUtil.isEmpty(value));
 	}
@@ -2616,8 +2646,14 @@ public class StpLogic {
 	 * @param service 业务标识  
 	 */
 	public void checkSafe(String service) {
+		// 1、必须先通过登录校验
+		checkLogin();
+
+		// 2、再进行二级认证校验
+		// 		如果缓存中可以查询出指定的键值，则代表已认证，否则视为未认证
 		String tokenValue = getTokenValue();
-		if ( ! isSafe(tokenValue, service)) {
+		String value = getSaTokenDao().get(splicingKeySafe(tokenValue, service));
+		if(SaFoxUtil.isEmpty(value)) {
 			throw new NotSafeException(loginType, tokenValue, service).setCode(SaErrorCode.CODE_11071);
 		}
 	}
@@ -2841,5 +2877,85 @@ public class StpLogic {
 	public boolean isSupportExtra() {
 		return false;
 	}
+
+
+
+	// ------------------- 过期方法 -------------------
+
+	/**
+	 * 根据注解 ( @SaCheckLogin ) 鉴权
+	 *
+	 * @param at 注解对象
+	 */
+	@Deprecated
+	public void checkByAnnotation(SaCheckLogin at) {
+		this.checkLogin();
+	}
+
+	/**
+	 * 根据注解 ( @SaCheckRole ) 鉴权
+	 *
+	 * @param at 注解对象
+	 */
+	@Deprecated
+	public void checkByAnnotation(SaCheckRole at) {
+		String[] roleArray = at.value();
+		if(at.mode() == SaMode.AND) {
+			this.checkRoleAnd(roleArray);
+		} else {
+			this.checkRoleOr(roleArray);
+		}
+	}
+
+	/**
+	 * 根据注解 ( @SaCheckPermission ) 鉴权
+	 *
+	 * @param at 注解对象
+	 */
+	@Deprecated
+	public void checkByAnnotation(SaCheckPermission at) {
+		String[] permissionArray = at.value();
+		try {
+			if(at.mode() == SaMode.AND) {
+				this.checkPermissionAnd(permissionArray);
+			} else {
+				this.checkPermissionOr(permissionArray);
+			}
+		} catch (NotPermissionException e) {
+			// 权限认证校验未通过，再开始角色认证校验
+			for (String role : at.orRole()) {
+				String[] rArr = SaFoxUtil.convertStringToArray(role);
+				// 某一项 role 认证通过，则可以提前退出了，代表通过
+				if (hasRoleAnd(rArr)) {
+					return;
+				}
+			}
+			throw e;
+		}
+	}
+
+	/**
+	 * 根据注解 ( @SaCheckSafe ) 鉴权
+	 *
+	 * @param at 注解对象
+	 */
+	@Deprecated
+	public void checkByAnnotation(SaCheckSafe at) {
+		this.checkSafe(at.value());
+	}
+
+	/**
+	 * 根据注解 ( @SaCheckDisable ) 鉴权
+	 *
+	 * @param at 注解对象
+	 */
+	@Deprecated
+	public void checkByAnnotation(SaCheckDisable at) {
+		Object loginId = getLoginId();
+		for (String service : at.value()) {
+			this.checkDisableLevel(loginId, service, at.level());
+		}
+	}
+
 
 }

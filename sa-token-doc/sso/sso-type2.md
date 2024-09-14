@@ -45,6 +45,7 @@
 
 ### 3、搭建 Client 端项目 
 
+> [!TIP| label:demo | style:callout] 
 > 搭建示例在官方仓库的 `/sa-token-demo/sa-token-demo-sso/sa-token-demo-sso2-client/`，如遇到难点可结合源码进行测试学习
 
 #### 3.1、去除 SSO-Server 的 Cookie 作用域配置 
@@ -64,7 +65,7 @@ sa-token.cookie.domain=stp.com
 ```
 <!---------------------------- tabs:end ---------------------------->
 
-此为模式一专属配置，现在我们将其注释掉
+此为模式一专属配置，现在我们将其注释掉**（一定要注释掉！）**
 
 
 #### 3.2、创建 SSO-Client 端项目
@@ -136,10 +137,11 @@ public class SsoClientController {
 	// 首页 
 	@RequestMapping("/")
 	public String index() {
+		String solUrl = SaSsoManager.getClientConfig().splicingSloUrl();
 		String str = "<h2>Sa-Token SSO-Client 应用端</h2>" + 
 					"<p>当前会话是否登录：" + StpUtil.isLogin() + "</p>" + 
-					"<p><a href=\"javascript:location.href='/sso/login?back=' + encodeURIComponent(location.href);\">登录</a> " + 
-					"<a href='/sso/logout?back=self'>注销</a></p>";
+					"<p><a href=\"javascript:location.href='/sso/login?back=' + encodeURIComponent(location.href);\">登录</a> " +
+					"<a href=\"javascript:location.href='" + solUrl + "?back=' + encodeURIComponent(location.href);\">注销</a> </p>";
 		return str;
 	}
 	
@@ -151,7 +153,7 @@ public class SsoClientController {
 	 */
 	@RequestMapping("/sso/*")
 	public Object ssoRequest() {
-		return SaSsoProcessor.instance.clientDister();
+		return SaSsoClientProcessor.instance.dister();
 	}
 
 }
@@ -170,9 +172,9 @@ server:
 # sa-token配置 
 sa-token: 
     # SSO-相关配置
-    sso: 
-        # SSO-Server端 统一认证地址 
-        auth-url: http://sa-sso-server.com:9000/sso/auth
+    sso-client: 
+        # SSO-Server 端主机地址
+        server-url: http://sa-sso-server.com:9000
 
     # 配置Sa-Token单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
     alone-redis: 
@@ -194,7 +196,7 @@ server.port=9001
 
 ######### Sa-Token 配置 #########
 # SSO-Server端 统一认证地址 
-sa-token.sso.auth-url=http://sa-sso-server.com:9000/sso/auth
+sa-token.sso-client.server-url=http://sa-sso-server.com:9000
 
 # 配置 Sa-Token 单独使用的Redis连接 （此处需要和SSO-Server端连接同一个Redis）
 # Redis数据库索引
@@ -211,7 +213,7 @@ sa-token.alone-redis.timeout=10s
 <!---------------------------- tabs:end ---------------------------->
 
 
-注意点：`sa-token.alone-redis` 的配置需要和SSO-Server端连接同一个Redis（database也要一样）
+注意点：`sa-token.alone-redis` 的配置需要和SSO-Server端连接同一个Redis**（database 值也要一样！database 值也要一样！database 值也要一样！重说三！）**
 
 #### 3.5、写启动类
 ``` java
@@ -219,7 +221,15 @@ sa-token.alone-redis.timeout=10s
 public class SaSso2ClientApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SaSso2ClientApplication.class, args);
-		System.out.println("\nSa-Token-SSO Client端启动成功");
+		
+		System.out.println();
+		System.out.println("---------------------- Sa-Token SSO 模式二 Client 端启动成功 ----------------------");
+		System.out.println("配置信息：" + SaSsoManager.getClientConfig());
+		System.out.println("测试访问应用端一: http://sa-sso-client1.com:9001");
+		System.out.println("测试访问应用端二: http://sa-sso-client2.com:9001");
+		System.out.println("测试访问应用端三: http://sa-sso-client3.com:9001");
+		System.out.println("测试前需要根据官网文档修改hosts文件，测试账号密码：sa / 123456");
+		System.out.println();
 	}
 }
 ```
@@ -230,13 +240,15 @@ public class SaSso2ClientApplication {
 
 (1) 依次启动 `SSO-Server` 与 `SSO-Client`，然后从浏览器访问：[http://sa-sso-client1.com:9001/](http://sa-sso-client1.com:9001/)
 
+<!-- （注：先前版本文档测试demo端口号为9001，后为了方便区分三种模式改为了9002，因此出现文字描述与截图端口号不一致情况，请注意甄别，后不再赘述） -->
+
 ![sso-client-index.png](https://oss.dev33.cn/sa-token/doc/sso/sso-client-index.png 's-w-sh')
 
-(2) 首次打开，提示当前未登录，我们点击**`登录`** 按钮，页面会被重定向到登录中心
+(2) 首次打开，提示当前未登录，我们点击 **`登录`** 按钮，页面会被重定向到登录中心
 
 ![sso-server-auth.png](https://oss.dev33.cn/sa-token/doc/sso/sso-server-auth.png 's-w-sh')
 
-(3) SSO-Server提示我们在认证中心尚未登录，我们点击 **`doLogin登录`**按钮进行模拟登录
+(3) SSO-Server提示我们在认证中心尚未登录，我们点击 **`doLogin登录`** 按钮进行模拟登录
 
 ![sso-server-dologin.png](https://oss.dev33.cn/sa-token/doc/sso/sso-server-dologin.png 's-w-sh')
 
@@ -250,7 +262,7 @@ public class SaSso2ClientApplication {
 
 ![sso-client2-index.png](https://oss.dev33.cn/sa-token/doc/sso/sso-client2-index.png 's-w-sh')
 
-(7) 提示未登录，我们点击**`登录`**按钮，会直接提示登录成功
+(7) 提示未登录，我们点击 **`登录`** 按钮，会直接提示登录成功
 
 ![sso-client2-index-ok.png](https://oss.dev33.cn/sa-token/doc/sso/sso-client2-index-ok.png 's-w-sh')
 
@@ -282,8 +294,8 @@ public class SaSso2ClientApplication {
 
 默认测试密码：`sa / 123456`，其余流程保持不变 
  -->
-
-
+ 
+ 
 
 ### 5、跨 Redis 的单点登录
 以上流程解决了跨域模式下的单点登录，但是后端仍然采用了共享Redis来同步会话，如果我们的架构设计中Client端与Server端无法共享Redis，又该怎么完成单点登录？

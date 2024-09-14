@@ -25,6 +25,7 @@ import org.noear.snack.ONode;
  * @author noear
  * @since 1.34.0
  */
+@Deprecated
 public class SaSessionForJson extends SaSession {
 
 	private static final long serialVersionUID = -7600983549653130681L;

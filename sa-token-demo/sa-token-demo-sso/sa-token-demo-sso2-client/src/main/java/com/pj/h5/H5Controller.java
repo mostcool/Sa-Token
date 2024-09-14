@@ -1,13 +1,13 @@
 package com.pj.h5;
 
+import cn.dev33.satoken.sso.model.SaCheckTicketResult;
+import cn.dev33.satoken.sso.processor.SaSsoClientProcessor;
+import cn.dev33.satoken.sso.template.SaSsoUtil;
+import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import cn.dev33.satoken.sso.SaSsoProcessor;
-import cn.dev33.satoken.sso.SaSsoUtil;
-import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
 
 /**
  * 前后台分离架构下集成SSO所需的代码 （SSO-Client端）
@@ -31,15 +31,12 @@ public class H5Controller {
 		return SaResult.data(serverAuthUrl);
 	}
 	
-	// 根据ticket进行登录 
+	// 根据ticket进行登录
 	@RequestMapping("/sso/doLoginByTicket")
 	public SaResult doLoginByTicket(String ticket) {
-		Object loginId = SaSsoProcessor.instance.checkTicket(ticket, "/sso/doLoginByTicket");
-		if(loginId != null) {
-			StpUtil.login(loginId);
-			return SaResult.data(StpUtil.getTokenValue());
-		}
-		return SaResult.error("无效ticket：" + ticket); 
+		SaCheckTicketResult ctr = SaSsoClientProcessor.instance.checkTicket(ticket, "/sso/doLoginByTicket");
+		StpUtil.login(ctr.loginId, ctr.remainSessionTimeout);
+		return SaResult.data(StpUtil.getTokenValue());
 	}
 
 	// 全局异常拦截 

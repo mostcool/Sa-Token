@@ -27,15 +27,12 @@ public class H5Controller {
 		return SaResult.data(serverAuthUrl);
 	}
 	
-	// 根据ticket进行登录 
+	// 根据ticket进行登录
 	@RequestMapping("/sso/doLoginByTicket")
 	public SaResult doLoginByTicket(String ticket) {
-		Object loginId = SaSsoProcessor.instance.checkTicket(ticket, "/sso/doLoginByTicket");
-		if(loginId != null) {
-			StpUtil.login(loginId);
-			return SaResult.data(StpUtil.getTokenValue());
-		}
-		return SaResult.error("无效ticket：" + ticket); 
+		SaCheckTicketResult ctr = SaSsoClientProcessor.instance.checkTicket(ticket, "/sso/doLoginByTicket");
+		StpUtil.login(ctr.loginId, ctr.remainSessionTimeout);
+		return SaResult.data(StpUtil.getTokenValue());
 	}
 
 	// 全局异常拦截 
@@ -122,14 +119,14 @@ public class H5Controller {
 <!------------- tab:yaml 风格  ------------->
 ``` yaml
 sa-token: 
-	sso: 
+	sso-client: 
 		# SSO-Server端 统一认证地址 
 	    auth-url: http://127.0.0.1:8848/sa-token-demo-sso-server-h5/sso-auth.html
 ```
 <!------------- tab:properties 风格  ------------->
 ``` properties
 # SSO-Server端 统一认证地址 
-sa-token.sso.auth-url=http://127.0.0.1:8848/sa-token-demo-sso-server-h5/sso-auth.html
+sa-token.sso-client.auth-url=http://127.0.0.1:8848/sa-token-demo-sso-server-h5/sso-auth.html
 ```
 <!---------------------------- tabs:end ---------------------------->
 

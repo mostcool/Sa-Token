@@ -1,8 +1,8 @@
 package com.pj.sso;
 
-import cn.dev33.satoken.config.SaSsoConfig;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.dao.SaTokenDaoOfRedis;
+import cn.dev33.satoken.sso.config.SaSsoServerConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.dtflys.forest.Forest;
@@ -21,39 +21,40 @@ public class SsoConfig {
      * 构建建 SaToken redis dao（如果不需要 redis；可以注释掉）
      * */
     @Bean
-    public SaTokenDao saTokenDaoInit(@Inject("${sa-token.redis}") SaTokenDaoOfRedis saTokenDao) {
+    public SaTokenDao saTokenDaoInit(@Inject("${sa-token.dao.redis}") SaTokenDaoOfRedis saTokenDao) {
         return saTokenDao;
     }
 
     // 配置SSO相关参数
     @Bean
-    public void configSso(SaSsoConfig sso) { //SaSsoConfig 已自动构建
+    public void configSso(SaSsoServerConfig ssoServer) { //SaSsoConfig 已自动构建
 
         // 配置：未登录时返回的View
-        sso.setNotLoginView(() -> {
+        ssoServer.notLoginView = () -> {
             return new ModelAndView("sa-login.html");
-        });
+        };
 
         // 配置：登录处理函数
-        sso.setDoLoginHandle((name, pwd) -> {
+        ssoServer.doLoginHandle = (name, pwd) -> {
             // 此处仅做模拟登录，真实环境应该查询数据进行登录
             if("sa".equals(name) && "123456".equals(pwd)) {
                 StpUtil.login(10001);
                 return SaResult.ok("登录成功！").setData(StpUtil.getTokenValue());
             }
             return SaResult.error("登录失败！");
-        });
+        };
 
-        // 配置 Http 请求处理器 （在模式三的单点注销功能下用到，如不需要可以注释掉）
-        sso.setSendHttp(url -> {
+        // 配置 Http 请求处理器
+        ssoServer.sendHttp = url -> {
             try {
-                // 发起 http 请求
                 System.out.println("------ 发起请求：" + url);
-                return Forest.get(url).executeAsString();
+                String resStr = Forest.get(url).executeAsString();
+                System.out.println("------ 请求结果：" + resStr);
+                return resStr;
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
-        });
+        };
     }
 }

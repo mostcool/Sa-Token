@@ -6,6 +6,7 @@ SSO 集成常见问题整理
 
 --- 
 
+
 ### 问：在模式一与模式二中，Client端 必须通过 Alone-Redis 插件来访问 Redis 吗？
 答：不必须，只是推荐，权限缓存与业务缓存分离后会减少 `SSO-Redis` 的访问压力，且可以避免多个 `Client端` 的缓存读写冲突。
 
@@ -24,7 +25,7 @@ SSO 集成常见问题整理
 - sso-server 端的单点注销地址：`http://{host}:{port}/sso/signout`；
 - sso-client 端的注销地址：`http://{host}:{port}/sso/logout`；
 
-都需要在配置文件配置：`sa-token.sso.is-slo=true`后，才会打开。
+都需要在配置文件配置：`sa-token.sso-server.is-slo=true`(client端为 `sa-token.sso-client.is-slo=true` )后，才会打开。
 
 
 ### 问：我参照文档搭建SSO-Client，一直提示：Ticket无效，请问怎么回事？
@@ -57,8 +58,34 @@ public class SaSsoServerApplication {
 解决方案：在 sso-client 也新建上这个类，而且包名需要与 sso-server 端的一致（直接从 sso-server 把实体类复制过来就好了）
 
 
+
+### 在测试模式一时，出现一些难以理解的现象 
+
+测试模式一时，三种异常现象：
+
+1、在 sso-client 端点击登录，可以成功跳转到 sso-server 端，登录后可以跳回 sso-client 端，但显示 sso-client 端未登录	
+- 原因：sso-server 后端没有配置 sa-token.cookie.domain 值。
+
+2、在 sso-client 端点击登录，可以成功跳转到 sso-server 端，登录页面刷新一下，并没有跳转回 sso-client 端，依然提示让你登录
+- 可能1：sso-server 后端配置了错误的 sa-token.cookie.domain 值。	
+- 可能2：sso-server 后端没有打开 sa-token.is-read-cookie 值。（测试模式二三时发生这种现象，有时候也是因为这个）
+
+3、在 sso-client 端点击登录，页面只是闪了一下，肉眼没有观察到页面跳转，页面也没有显示登录上。
+
+原因：sso-server 的页面存储了不带 . 的有效 Cookie，为什么会这样：常常是因为测试模式二三后，没有清除redis记录或者浏览器记录，直接再开始测试模式一，
+模式二三登录成功后遗留的有效cookie，影响了模式一的行为逻辑。
+
+解决方案：
+- 1、手动清空 redis里的所有数据，
+- 2、或者手动清空 sso-server 域名下的所有 Cookie 
+- 3、换一个新的干净浏览器来测试。
+	
+	
+
+
+
 ### 问：模式三配置一堆 xxx-url ，有办法简化一下吗？
-可以使用 `sa-token.sso.server-url` 来简化：
+可以使用 `sa-token.sso-client.server-url` 来简化：
 
 配置含义：配置 Server 端主机总地址，拼接在 authUrl、checkTicketUrl、getDataUrl、sloUrl 属性前面，用以简化各种 url 配置。
 
@@ -66,7 +93,7 @@ public class SaSsoServerApplication {
 
 ``` yaml
 sa-token: 
-    sso: 
+    sso-client: 
         # SSO-Server端 统一认证地址 
         auth-url: http://sa-sso-server.com:9000/sso/auth
         # SSO-Server端 ticket校验地址 
@@ -80,7 +107,7 @@ sa-token:
 一堆 xxx-url 配置比较繁琐，且含有大量重复字符，现在我们可以将其简化为：
 ``` yaml
 sa-token: 
-    sso: 
+    sso-client: 
         server-url: http://sa-sso-server.com:9000
 ```
 
@@ -108,22 +135,22 @@ sa-token:
 **方法二，根据配置项来分析，例如：**
 
 - 先看配置项 `sa-token.cookie.domain`，如果此配置项有值，一般是在使用模式一开发，否则就是模式二或者模式三。
-- 再看配置项 `sa-token.sso.is-http` ，如果有值且为 true，一般是在使用模式三，否则就是模式二。
+- 再看配置项 `sa-token.sso-client.is-http` ，如果有值且为 true，一般是在使用模式三，否则就是模式二。
 
-**方法三，根据配置项 `sa-token.sso.mode` 的提示来判断**
+**方法三，根据配置项 `sa-token.sso-client.mode` 的提示来判断**
 
-`sa-token.sso.mode` 是框架预留的约定型配置项，此配置项不对代码逻辑产生任何影响，只为系统做一个标记，标注此系统用到了SSO的哪个模式。
+`sa-token.sso-client.mode` 是框架预留的约定型配置项，此配置项不对代码逻辑产生任何影响，只为系统做一个标记，标注此系统用到了SSO的哪个模式。
 
-例如你可以将其配置为 `sa-token.sso.mode=client-2`，代表当前系统为 sso-client 端，使用 SSO 模式二来对接。
+例如你可以将其配置为 `sa-token.sso-client.mode=client-2`，代表当前系统为 sso-client 端，使用 SSO 模式二来对接。
 
 需要注意，这个配置项不是必须的，你不写也不会对代码造成任何影响，只有在你需要为系统做一个明确的标记时才需要去配置它，方便后人阅读代码时快速分析使用的模式。
 
 例如我们可以使用以下约定：
 
-- `sa-token.sso.mode=client-2`：代表当前系统为 sso-client 端，使用 SSO 模式二来对接。
-- `sa-token.sso.mode=client-2,h5`：代表当前系统为 sso-client 端，使用 SSO 模式二来对接，并且是前后端分离模式。
-- `sa-token.sso.mode=server-123`：代表当前系统为 sso-server 端，同时开放了 SSO 模式一、模式二、模式三。
-- `sa-token.sso.mode=server-2,client-2`：代表当前系统既是 sso-server 端，又是 sso-clent 端，使用模式二来对接。
+- `sa-token.sso-client.mode=client-2`：代表当前系统为 sso-client 端，使用 SSO 模式二来对接。
+- `sa-token.sso-client.mode=client-2,h5`：代表当前系统为 sso-client 端，使用 SSO 模式二来对接，并且是前后端分离模式。
+- `sa-token.sso-server.mode=server-123`：代表当前系统为 sso-server 端，同时开放了 SSO 模式一、模式二、模式三。
+- `sa-token.sso-server.mode=server-2,client-2`：代表当前系统既是 sso-server 端，又是 sso-clent 端，使用模式二来对接。
 - 等等等等...
 
 此配置项可以是任意字符串，你也可以自己整理一套合适的表达规则。
@@ -186,6 +213,27 @@ public class SaTokenConfigure implements WebMvcConfigurer {
 更多登录姿势可以参考 [[何时引导用户去登录]](/sso/sso-custom-login) 给出的建议进行设计。
 
 
+
+### 问：sa-token.sso-server.allow-url 配置项可以做成从数据库读取的吗？
+可以，自定义 `SaSsoServerTemplate` 实现类，重写 `getAllowUrl` 方法即可：
+``` java
+/**
+ * 重写 SaSsoServerTemplate 部分方法，增强功能 
+ */
+@Component
+public class CustomSaSsoServerTemplate extends SaSsoServerTemplate {
+	
+	// 重写 [获取授权回调地址] 方法，改为从数据库中读取 
+	@Override
+	public String getAllowUrl() {
+		String allowUrl = ""; // 改为从数据库读取 
+		return allowUrl;
+	}
+
+}
+```
+
+
 ### 问：如果 sso-client 端我没有集成 sa-token-sso，如何对接？
 需要手动调用 http 请求来对接 sso-server 开放的接口，参考示例：
 [sa-token-demo-sso3-client-nosdk](https://gitee.com/dromara/sa-token/tree/master/sa-token-demo/sa-token-demo-sso/sa-token-demo-sso3-client-nosdk)
@@ -212,19 +260,23 @@ public class SsoController {
 	// 处理 SSO-Server 端所有请求 
 	@RequestMapping({"/sso/auth", "/sso/doLogin", "/sso/checkTicket", "/sso/signout"})
 	public Object ssoServerRequest() {
-		return SaSsoProcessor.instance.serverDister();
+		return SaSsoServerProcessor.instance.dister();
 	}
 	
 	// 处理 SSO-Client 端所有请求 
 	@RequestMapping({"/sso/login", "/sso/logout", "/sso/logoutCall"})
 	public Object ssoClientRequest() {
-		return SaSsoProcessor.instance.clientDister();
+		return SaSsoClientProcessor.instance.dister();
 	}
 	
 	// 配置SSO相关参数 
 	@Autowired
-	private void configSso(SaSsoConfig sso) {
-		// SSO配置代码，参考文档前几章 ... 
+	private void configSsoServer(SaSsoServerConfig ssoServer) {
+		// SSO Server 配置代码，参考文档前几章 ... 
+	}
+	@Autowired
+	private void configSsoClient(SaSsoClientConfig ssoClient) {
+		// SSO Client 配置代码，参考文档前几章 ... 
 	}
 	
 }
@@ -248,58 +300,58 @@ public class SsoController {
 @RestController
 public class SsoUserServerController {
 
-	/**
-	 * 新建一个 SaSsoProcessor 请求处理器 
-	 */
-	public static SaSsoProcessor ssoUserProcessor = new SaSsoProcessor();
-	static {
-		// 自定义一个 SaSsoTemplate 对象
-		SaSsoTemplate ssoUserTemplate = new SaSsoTemplate() {
-			// 使用的会话对象 是自定义的 StpUserUtil 
-			@Override
-			public StpLogic getStpLogic() {
-				return StpUserUtil.stpLogic;
-			}
+    /**
+     * 新建一个 SaSsoServerProcessor 请求处理器
+     */
+    public static SaSsoServerProcessor ssoUserServerProcessor = new SaSsoServerProcessor();
+    static {
+        // 自定义一个 SaSsoTemplate 对象
+        SaSsoServerTemplate ssoUserTemplate = new SaSsoServerTemplate() {
+            // 使用的会话对象 是自定义的 StpUserUtil
+            @Override
+            public StpLogic getStpLogic() {
+                return StpUserUtil.stpLogic;
+            }
             // 使用自定义的签名秘钥
             SaSignConfig signConfig =  new SaSignConfig().setSecretKey("xxxx-新的秘钥-xxxx");
             SaSignTemplate userSignTemplate = new SaSignTemplate().setSignConfig(signConfig);
             @Override
-            public SaSignTemplate getSignTemplate() {
+            public SaSignTemplate getSignTemplate(String client) {
                 return userSignTemplate;
             }
-		};
-		// 让这个SSO请求处理器，使用的路由前缀是 /sso-user，而不是原先的 /sso 
-		ssoUserTemplate.apiName.replacePrefix("/sso-user");
-		
-		// 给这个 SSO 请求处理器使用自定义的 SaSsoTemplate 对象 
-		ssoUserProcessor.ssoTemplate = ssoUserTemplate;
-	}
+        };
+        // 让这个SSO请求处理器，使用的路由前缀是 /sso-user，而不是原先的 /sso
+        ssoUserTemplate.apiName.replacePrefix("/sso-user");
 
-	/*
-	 * 第二套 sso-server 服务：处理所有SSO相关请求 
-	 * 		http://{host}:{port}/sso-user/auth			-- 单点登录授权地址，接受参数：redirect=授权重定向地址 
-	 * 		http://{host}:{port}/sso-user/doLogin		-- 账号密码登录接口，接受参数：name、pwd 
-	 * 		http://{host}:{port}/sso-user/checkTicket	-- Ticket校验接口（isHttp=true时打开），接受参数：ticket=ticket码、ssoLogoutCall=单点注销回调地址 [可选] 
-	 * 		http://{host}:{port}/sso-user/signout		-- 单点注销地址（isSlo=true时打开），接受参数：loginId=账号id、secretkey=接口调用秘钥 
-	 */
-	@RequestMapping("/sso-user/*")
-	public Object ssoUserRequest() {
-		return ssoUserProcessor.serverDister();
-	}
+        // 给这个 SSO 请求处理器使用自定义的 SaSsoTemplate 对象
+        ssoUserServerProcessor.ssoServerTemplate = ssoUserTemplate;
+    }
 
-	// 自定义 doLogin 方法 */
-	// 注意点：
-	// 		1、第2套 sso-server 对应的 RestApi 登录接口也应该更换为 /sso-user/doLogin，而不是原先的 /sso/doLogin 
-	// 		2、在这里，登录函数要使用自定义的 StpUserUtil.login()，而不是原先的 StpUtil.login() 
-	@RequestMapping("/sso-user/doLogin")
-	public Object ssoUserRequest(String name, String pwd) {
-		if("sa".equals(name) && "123456".equals(pwd)) {
-			StpUserUtil.login(10001);
-			return SaResult.ok("登录成功！").setData(StpUserUtil.getTokenValue());
-		}
-		return SaResult.error("登录失败！");
-	}
-	
+    /*
+     * 第二套 sso-server 服务：处理所有SSO相关请求
+     * 		http://{host}:{port}/sso-user/auth			-- 单点登录授权地址，接受参数：redirect=授权重定向地址
+     * 		http://{host}:{port}/sso-user/doLogin		-- 账号密码登录接口，接受参数：name、pwd
+     * 		http://{host}:{port}/sso-user/checkTicket	-- Ticket校验接口（isHttp=true时打开），接受参数：ticket=ticket码、ssoLogoutCall=单点注销回调地址 [可选]
+     * 		http://{host}:{port}/sso-user/signout		-- 单点注销地址（isSlo=true时打开），接受参数：loginId=账号id、secretkey=接口调用秘钥
+     */
+    @RequestMapping("/sso-user/*")
+    public Object ssoUserRequest() {
+        return ssoUserServerProcessor.dister();
+    }
+
+    // 自定义 doLogin 方法 */
+    // 注意点：
+    // 		1、第2套 sso-server 对应的 RestApi 登录接口也应该更换为 /sso-user/doLogin，而不是原先的 /sso/doLogin
+    // 		2、在这里，登录函数要使用自定义的 StpUserUtil.login()，而不是原先的 StpUtil.login()
+    @RequestMapping("/sso-user/doLogin")
+    public Object ssoUserRequest(String name, String pwd) {
+        if("sa".equals(name) && "123456".equals(pwd)) {
+            StpUserUtil.login(10001);
+            return SaResult.ok("登录成功！").setData(StpUserUtil.getTokenValue());
+        }
+        return SaResult.error("登录失败！");
+    }
+
 }
 ```
 
@@ -311,8 +363,9 @@ public class SsoUserServerController {
 
 <details>
 <summary>还有其它问题？</summary>
-	
+<p>
 可以加群反馈一下，比较典型的问题我们解决之后都会提交到此页面方便大家快速排查
+</p>
 </details>
 
 

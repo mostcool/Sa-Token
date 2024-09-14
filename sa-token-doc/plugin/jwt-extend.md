@@ -25,6 +25,7 @@ implementation 'cn.dev33:sa-token-jwt:${sa.top.version}'
 <!---------------------------- tabs:end ---------------------------->
 
 
+> [!WARNING| label:版本兼容性] 
 > 1. 注意: sa-token-jwt 显式依赖 hutool-jwt 5.7.14 版本，保险起见：你的项目中要么不引入 hutool，要么引入版本 >= 5.7.14 的 hutool 版本。
 > 2. hutool 5.8.13 和 5.8.14 版本下会出现类型转换问题，[关联issue](https://gitee.com/dromara/sa-token/issues/I6L429)。
 
@@ -191,7 +192,7 @@ sa-token-jwt 插件默认只为 `StpUtil` 注入 `StpLogicJwtFoxXxx` 实现，�
 /**
  * 为 StpUserUtil 注入 StpLogicJwt 实现 
  */
-@Autowired
+@PostConstruct
 public void setUserStpLogic() {
 	StpUserUtil.setStpLogic(new StpLogicJwtForSimple(StpUserUtil.TYPE));
 }
@@ -207,7 +208,7 @@ public void setUserStpLogic() {
 /**
  * 自定义 SaJwtUtil 生成 token 的算法 
  */
-@Autowired
+@PostConstruct
 public void setSaJwtTemplate() {
 	SaJwtUtil.setSaJwtTemplate(new SaJwtTemplate() {
 		@Override

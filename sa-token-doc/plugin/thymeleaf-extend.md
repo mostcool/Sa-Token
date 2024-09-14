@@ -104,6 +104,7 @@ public class SaTokenConfigure {
 首先在 SaTokenConfigure 配置类中为 Thymeleaf 配置全局对象：
 
 ``` java
+@Configuration
 public class SaTokenConfigure{
 	// ... 其它代码
 	
@@ -114,6 +115,10 @@ public class SaTokenConfigure{
 	}
 }
 ```
+
+> [!WARNING| label:注意] 
+> 如果`SaTokenConfigure`继承了`WebMvcConfigurer`等类，可能会造成循环依赖，如果遇到，请新建一个其他配置类完成此项配置
+
 
 然后我们就可以在页面上调用 StpLogic 的 API 了，例如：
  

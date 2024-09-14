@@ -38,6 +38,8 @@ StpUtil.login(10001, new SaLoginModel()
             .setToken("xxxx-xxxx-xxxx-xxxx") // 预定此次登录生成的Token 
 	        .setExtra("name", "zhangsan")    // Token挂载的扩展参数 （此方法只有在集成jwt插件时才会生效）
             .setIsWriteHeader(false)         // 是否在登录后将 Token 写入到响应头
+			.setActiveTimeout(300)           // 指定此次登录token的最低活跃频率, 单位:秒，设置此参数需要在配置文件打开dynamicActiveTimeout=true
+			.setTokenSignTag("xxx")          // 指定此次登录挂载在 TokenSign 上的 tag 值, 任意值
             );
 ```
 
@@ -92,6 +94,7 @@ StpUtil.getSessionBySessionId("xxxx-xxxx-xxxx");   // 获取指定key的Session,
 ``` java
 // Token 最低活跃频率
 StpUtil.getTokenActiveTimeout();   // 获取当前 token 距离被冻结还剩多少时间 (单位: 秒)
+StpUtil.getTokenLastActiveTime();  // 获取当前 token 最后活跃时间
 StpUtil.checkActiveTimeout();   // 检查当前token 是否已经被冻结，如果是则抛出异常  
 StpUtil.updateLastActiveToNow();   // 续签当前token：(将 [最后操作时间] 更新为当前时间戳)   
 
@@ -139,6 +142,7 @@ StpUtil.getTokenValueByLoginId(10001, "PC");   // 获取指定账号id指定设�
 StpUtil.getTokenValueListByLoginId(10001);   // 获取指定账号id的tokenValue集合 
 StpUtil.getTokenValueListByLoginId(10001, "APP");   // 获取指定账号id指定设备类型端的tokenValue 集合 
 StpUtil.getLoginDevice();   // 返回当前会话的登录设备类型
+StpUtil.getLoginDeviceByToken(xxx);   // // 返回任意 token 的登录设备类型
 ```
 
 

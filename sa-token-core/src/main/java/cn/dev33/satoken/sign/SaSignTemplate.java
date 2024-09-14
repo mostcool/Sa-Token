@@ -26,6 +26,8 @@ import cn.dev33.satoken.util.SaFoxUtil;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static cn.dev33.satoken.SaManager.log;
+
 /**
  * API 参数签名算法，在跨系统接口调用时防参数篡改、防重放攻击。
  *
@@ -41,6 +43,17 @@ import java.util.TreeMap;
  * @since 1.30.0
  */
 public class SaSignTemplate {
+
+	public SaSignTemplate() {
+	}
+
+	/**
+	 * 构造函数
+	 * @param signConfig 签名参数配置对象
+	 */
+	public SaSignTemplate(SaSignConfig signConfig) {
+		this.signConfig = signConfig;
+	}
 
 	// ----------- 签名配置
 
@@ -148,7 +161,7 @@ public class SaSignTemplate {
 	 */
 	public String createSign(Map<String, ?> paramsMap) {
 		String secretKey = getSecretKey();
-		SaSignException.throwByNull(secretKey, "参与参数签名的秘钥不可为空", SaErrorCode.CODE_12201);
+		SaSignException.notEmpty(secretKey, "参与参数签名的秘钥不可为空", SaErrorCode.CODE_12201);
 
 		// 如果调用者不小心传入了 sign 参数，则此处需要将 sign 参数排除在外
 		if(paramsMap.containsKey(sign)) {
@@ -160,7 +173,14 @@ public class SaSignTemplate {
 		// 计算签名
 		String paramsStr = joinParamsDictSort(paramsMap);
 		String fullStr = paramsStr + "&" + key + "=" + secretKey;
-		return abstractStr(fullStr);
+		String signStr = abstractStr(fullStr);
+
+		// 输入日志，方便调试
+		log.debug("fullStr：{}", fullStr);
+		log.debug("signStr：{}", signStr);
+
+		// 返回
+		return signStr;
 	}
 
 	/**
@@ -295,13 +315,14 @@ public class SaSignTemplate {
 		String signValue = paramMap.get(sign);
 
 		// 参数非空校验
-		SaSignException.throwByNull(timestampValue, "缺少 timestamp 字段");
-		// SaSignException.throwByNull(nonceValue, "缺少 nonce 字段"); // 配置isCheckNonce=false时，可以不传 nonce
-		SaSignException.throwByNull(signValue, "缺少 sign 字段");
+		// 配置isCheckNonce=false时，可以不传 nonce
+		if(SaFoxUtil.isEmpty(timestampValue) || SaFoxUtil.isEmpty(signValue)) {
+			return false;
+		}
 
 		// 三个值的校验必须全部通过
 		return isValidTimestamp(Long.parseLong(timestampValue))
-				&& (getSignConfigOrGlobal().getIsCheckNonce() ? isValidNonce(nonceValue) : true)
+				&& isValidNonce(nonceValue)
 				&& isValidSign(paramMap, signValue);
 	}
 
@@ -316,15 +337,13 @@ public class SaSignTemplate {
 		String signValue = paramMap.get(sign);
 
 		// 参数非空校验
-		SaSignException.throwByNull(timestampValue, "缺少 timestamp 字段");
-		// SaSignException.throwByNull(nonceValue, "缺少 nonce 字段"); // 配置isCheckNonce=false时，可以不传 nonce
-		SaSignException.throwByNull(signValue, "缺少 sign 字段");
+		SaSignException.notEmpty(timestampValue, "缺少 timestamp 字段");
+		SaSignException.notEmpty(nonceValue, "缺少 nonce 字段");
+		SaSignException.notEmpty(signValue, "缺少 sign 字段");
 
 		// 依次校验三个参数
 		checkTimestamp(Long.parseLong(timestampValue));
-		if(getSignConfigOrGlobal().getIsCheckNonce()) {
-			checkNonce(nonceValue);
-		}
+		checkNonce(nonceValue);
 		checkSign(paramMap, signValue);
 
 		// 通过 √
@@ -333,20 +352,52 @@ public class SaSignTemplate {
 	/**
 	 * 判断：一个请求中的 nonce、timestamp、sign 是否均为合法的
 	 * @param request 待校验的请求对象
+	 * @param paramNames 指定参与签名的参数有哪些，如果不填写则默认为全部参数
 	 * @return 是否合法
 	 */
-	public boolean isValidRequest(SaRequest request) {
-		return isValidParamMap(request.getParamMap());
+	public boolean isValidRequest(SaRequest request, String... paramNames) {
+		if(paramNames.length == 0) {
+			return isValidParamMap(request.getParamMap());
+		} else {
+			return isValidParamMap(takeRequestParam(request, paramNames));
+		}
 	}
 
 	/**
 	 * 校验：一个请求的 nonce、timestamp、sign 是否均为合法的，如果不合法，则抛出对应的异常
+	 * @param paramNames 指定参与签名的参数有哪些，如果不填写则默认为全部参数
 	 * @param request 待校验的请求对象
 	 */
-	public void checkRequest(SaRequest request) {
-		checkParamMap(request.getParamMap());
+	public void checkRequest(SaRequest request, String... paramNames) {
+		if (paramNames.length == 0) {
+			checkParamMap(request.getParamMap());
+		} else {
+			checkParamMap(takeRequestParam(request, paramNames));
+		}
 	}
 
+	/**
+	 * 从请求中提取指定的参数
+	 * @param request 请求对象
+	 * @param paramNames 指定的参数名称，不可为空，如果传入空数组则代表只拿 timestamp、nonce、sign 三个参数
+	 * @return 提取出的参数
+	 */
+	public Map<String, String> takeRequestParam(SaRequest request, String [] paramNames) {
+		Map<String, String> paramMap = new TreeMap<>();
+
+		// 此三个参数是必须获取的
+		paramMap.put(timestamp, request.getParam(timestamp));
+		paramMap.put(nonce, request.getParam(nonce));
+		paramMap.put(sign, request.getParam(sign));
+
+		// 获取指定的参数
+		for (String paramName : paramNames) {
+			paramMap.put(paramName, request.getParam(paramName));
+		}
+
+		// 返回
+		return paramMap;
+    }
 
 	// ------------------- 返回相应key -------------------
 

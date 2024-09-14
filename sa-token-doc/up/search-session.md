@@ -83,6 +83,7 @@ for (String sessionId : sessionIdList) {
 请根据业务实际水平合理调用API。
 
 
+> [!WARNING| label:注意] 
 > 基于活动 Token 的统计方式会比实际情况略有延迟，如果需要精确统计实时在线用户信息建议采用 WebSocket。
 
 
@@ -90,7 +91,7 @@ for (String sessionId : sessionIdList) {
 
 <a class="case-btn" href="https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-case/src/main/java/com/pj/cases/up/SearchSessionController.java"
 	target="_blank">
-	本章代码示例：Sa-Token 会话查询  —— [ com.pj.cases.up.SearchSessionController.java ]
+	本章代码示例：Sa-Token 会话查询  —— [ SearchSessionController.java ]
 </a>
 
 

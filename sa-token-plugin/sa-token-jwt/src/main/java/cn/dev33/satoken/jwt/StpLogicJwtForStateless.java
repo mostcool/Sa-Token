@@ -18,6 +18,7 @@ package cn.dev33.satoken.jwt;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.exception.ApiDisabledException;
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.jwt.error.SaJwtErrorCode;
 import cn.dev33.satoken.jwt.exception.SaJwtException;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
@@ -132,6 +133,10 @@ public class StpLogicJwtForStateless extends StpLogic {
 			Object loginId = SaJwtUtil.getLoginId(tokenValue, loginType, jwtSecretKey());
 			return String.valueOf(loginId);
 		} catch (SaJwtException e) {
+			// CODE == 30204 时，代表token已过期，此时返回-3，以便外层更精确的显示异常信息
+			if(e.getCode() == SaJwtErrorCode.CODE_30204) {
+				return NotLoginException.TOKEN_TIMEOUT;
+			}
 			return null;
 		}
 	}
@@ -176,10 +181,10 @@ public class StpLogicJwtForStateless extends StpLogic {
  	// ------------------- 过期时间相关 -------------------  
 
  	/**
- 	 * 获取当前登录者的 token 剩余有效时间 (单位: 秒)
+ 	 * 获取指定 token 剩余有效时间 (单位: 秒)
  	 */
 	@Override
- 	public long getTokenTimeout() {
+ 	public long getTokenTimeout(String tokenValue) {
  		return SaJwtUtil.getTimeout(getTokenValue(), loginType, jwtSecretKey());
  	}
  	
