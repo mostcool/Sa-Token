@@ -22,7 +22,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.jwt.error.SaJwtErrorCode;
 import cn.dev33.satoken.jwt.exception.SaJwtException;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
-import cn.dev33.satoken.stp.SaLoginModel;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
@@ -73,8 +73,8 @@ public class StpLogicJwtForStateless extends StpLogic {
 	 * 创建一个TokenValue 
 	 */
 	@Override
-	public String createTokenValue(Object loginId, String device, long timeout, Map<String, Object> extraData) {
-		return SaJwtUtil.createToken(loginType, loginId, device, timeout, extraData, jwtSecretKey());
+	public String createTokenValue(Object loginId, String deviceType, long timeout, Map<String, Object> extraData) {
+		return SaJwtUtil.createToken(loginType, loginId, deviceType, timeout, extraData, jwtSecretKey());
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class StpLogicJwtForStateless extends StpLogic {
 		info.sessionTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
 		info.tokenSessionTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
 		info.tokenActiveTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
-		info.loginDevice = getLoginDevice();
+		info.loginDeviceType = getLoginDeviceType();
 		return info;
 	}
 	
@@ -102,23 +102,20 @@ public class StpLogicJwtForStateless extends StpLogic {
 	/**
 	 * 创建指定账号id的登录会话
 	 * @param id 登录id，建议的类型：（long | int | String）
-	 * @param loginModel 此次登录的参数Model 
+	 * @param loginParameter 此次登录的参数Model 
 	 * @return 返回会话令牌 
 	 */
 	@Override
-	public String createLoginSession(Object id, SaLoginModel loginModel) {
+	public String createLoginSession(Object id, SaLoginParameter loginParameter) {
 
 		// 1、先检查一下，传入的参数是否有效
-		checkLoginArgs(id, loginModel);
+		checkLoginArgs(id, loginParameter);
 
-		// 2、初始化 loginModel ，给一些参数补上默认值
-		loginModel.build(getConfigOrGlobal());
-		
 		// 3、生成一个token
-		String tokenValue = createTokenValue(id, loginModel.getDeviceOrDefault(), loginModel.getTimeout(), loginModel.getExtraData());
+		String tokenValue = createTokenValue(id, loginParameter.getDeviceType(), loginParameter.getTimeout(), loginParameter.getExtraData());
 		
 		// 4、$$ 发布事件：账号xxx 登录成功
-		SaTokenEventCenter.doLogin(loginType, id, tokenValue, loginModel);
+		SaTokenEventCenter.doLogin(loginType, id, tokenValue, loginParameter);
 
 		// 5、返回
 		return tokenValue;
@@ -196,7 +193,7 @@ public class StpLogicJwtForStateless extends StpLogic {
 	 * @return 当前令牌的登录设备类型
 	 */
 	@Override
-	public String getLoginDevice() {
+	public String getLoginDeviceType() {
 		// 如果没有token，直接返回 null 
 		String tokenValue = getTokenValue();
 		if(tokenValue == null) {
@@ -207,7 +204,7 @@ public class StpLogicJwtForStateless extends StpLogic {
 			return null;
 		}
 		// 获取
-		return SaJwtUtil.getPayloadsNotCheck(tokenValue, loginType, jwtSecretKey()).getStr(SaJwtUtil.DEVICE); 
+		return SaJwtUtil.getPayloadsNotCheck(tokenValue, loginType, jwtSecretKey()).getStr(SaJwtUtil.DEVICE_TYPE);
 	}
 
 	

@@ -13,7 +13,7 @@
     <url>https://github.com/dromara/sa-token</url>
 
     <properties>
-        <revision>1.39.0</revision>
+        <revision>1.42.0</revision>
     </properties>
 
     <dependencyManagement>
@@ -111,17 +111,27 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis</artifactId>
+                <artifactId>sa-token-redis-template</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-fastjson</artifactId>
+                <artifactId>sa-token-jackson</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-fastjson2</artifactId>
+                <artifactId>sa-token-fastjson</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-fastjson2</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-snack3</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -131,12 +141,12 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redisson-jackson</artifactId>
+                <artifactId>sa-token-redisson-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redisson-jackson2</artifactId>
+                <artifactId>sa-token-redisson</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -151,7 +161,12 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-dialect-thymeleaf</artifactId>
+                <artifactId>sa-token-thymeleaf</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-freemarker</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -176,12 +191,27 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-el</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-sso</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-temp-jwt</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-template-jdk-serializer</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-serializer-features</artifactId>
                 <version>${revision}</version>
             </dependency>
             <!-- endregion-->

@@ -1,15 +1,16 @@
 <p align="center">
 	<img alt="logo" src="https://sa-token.cc/logo.png" width="150" height="150">
 </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.39.0</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.42.0</h1>
 <h4 align="center">一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！</h4>
 <p align="center">
 	<a href="https://gitee.com/dromara/sa-token/stargazers"><img src="https://gitee.com/dromara/sa-token/badge/star.svg?theme=gvp"></a>
 	<a href="https://gitee.com/dromara/sa-token/members"><img src="https://gitee.com/dromara/sa-token/badge/fork.svg?theme=gvp"></a>
+	<a href="https://gitcode.com/dromara/sa-token/stargazers"><img src="https://gitcode.com/dromara/Sa-Token/star/badge.svg"></a>
 	<a href="https://github.com/dromara/sa-token/stargazers"><img src="https://img.shields.io/github/stars/dromara/sa-token?style=flat-square&logo=GitHub"></a>
 	<a href="https://github.com/dromara/sa-token/network/members"><img src="https://img.shields.io/github/forks/dromara/sa-token?style=flat-square&logo=GitHub"></a>
 	<a href="https://github.com/dromara/sa-token/watchers"><img src="https://img.shields.io/github/watchers/dromara/sa-token?style=flat-square&logo=GitHub"></a>
-	<a href="https://github.com/dromara/sa-token/issues"><img src="https://img.shields.io/github/issues/dromara/sa-token.svg?style=flat-square&logo=GitHub"></a>
+	<!-- <a href="https://github.com/dromara/sa-token/issues"><img src="https://img.shields.io/github/issues/dromara/sa-token.svg?style=flat-square&logo=GitHub"></a> -->
 	<a href="https://github.com/dromara/sa-token/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dromara/sa-token.svg?style=flat-square"></a>
 </p>
 <!-- <p align="center">学习测试请拉取 master 分支，dev 是在开发分支 (在根目录执行 `git checkout master`)</p> -->
@@ -20,12 +21,26 @@
 
 ### Sa-Token 介绍
 
-Sa-Token 是一个轻量级 Java 权限认证框架，目前拥有五大核心模块：登录认证、权限认证、单点登录、OAuth2.0、微服务鉴权。
+Sa-Token 是一个免费、开源的 轻量级 Java 权限认证框架，目前拥有五大核心模块：登录认证、权限认证、单点登录、OAuth2.0、微服务鉴权。
 
+![sa-token-jss](https://oss.dev33.cn/sa-token/doc/home/sa-token-jss--tran.png)
+
+要在 SpringBoot 项目中使用 Sa-Token，你只需要在 pom.xml 中引入依赖：
+
+``` xml
+<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc -->
+<dependency>
+	<groupId>cn.dev33</groupId>
+	<artifactId>sa-token-spring-boot-starter</artifactId>
+	<version>1.42.0</version>
+</dependency>
+```
+
+除了 SpringBoot2、Sa-Token 还为 SpringBoot3、Solon、JFinal 等常见 Web 框架提供集成包，做到真正的开箱即用。
 
 
 <details>
-<summary><b>简单示例展示：（点击展开 / 折叠）</b></summary>
+<summary><b>简单示例展示：</b>（点击展开 / 折叠）</summary>
 
 Sa-Token 旨在以简单、优雅的方式完成系统的权限认证部分，以登录认证为例，你只需要：
 
@@ -77,13 +92,15 @@ registry.addInterceptor(new SaInterceptor(handler -> {
 })).addPathPatterns("/**");
 ```
 
-当你受够 Shiro、SpringSecurity 等框架的三拜九叩之后，你就会明白，相对于这些传统老牌框架，Sa-Token 的 API 设计是多么的简单、优雅！
+**如果您曾经使用过 Shiro、SpringSecurity，在切换到 Sa-Token 后，您将体会到质的飞跃。**
+
+<!-- 当你受够 Shiro、SpringSecurity 等框架的三拜九叩之后，你就会明白，相对于这些传统老牌框架，Sa-Token 的 API 设计是多么的简单、优雅！ -->
 
 </details>
 
 
 <details>
-<summary> <b>核心模块一览：（点击展开 / 折叠）</b> </summary>
+<summary> <b>核心模块一览：</b>（点击展开 / 折叠） </summary>
 
 - **登录认证** —— 单端登录、多端登录、同端互斥登录、七天内免登录。
 - **权限认证** —— 权限认证、角色认证、会话二级认证。
@@ -125,8 +142,6 @@ registry.addInterceptor(new SaInterceptor(handler -> {
 
 </details>
 
-
-![sa-token-js](https://color-test.oss-cn-qingdao.aliyuncs.com/sa-token/x/sa-token-js4.png)
 
 
 ### SSO 单点登录
@@ -180,6 +195,7 @@ Sa-Token-OAuth2 模块分为四种授权模式，解决不同场景下的授权�
 
 ### 友情链接
 - [[ OkHttps ]](https://gitee.com/ejlchina-zhxu/okhttps)：轻量级 http 通信框架，API无比优雅，支持 WebSocket、Stomp 协议
+- [[ Forest ]](https://gitee.com/dromara/forest)：声明式与编程式双修，让天下没有难以发送的 HTTP 请求
 - [[ Bean Searcher ]](https://github.com/ejlchina/bean-searcher)：专注高级查询的只读 ORM，使一行代码实现复杂列表检索！
 - [[ Jpom ]](https://gitee.com/dromara/Jpom)：简而轻的低侵入式在线构建、自动部署、日常运维、项目监控软件。
 - [[ TLog ]](https://gitee.com/dromara/TLog)：一个轻量级的分布式日志标记追踪神器。
@@ -193,7 +209,7 @@ Sa-Token-OAuth2 模块分为四种授权模式，解决不同场景下的授权�
 ### 代码托管
 - Gitee：[https://gitee.com/dromara/sa-token](https://gitee.com/dromara/sa-token)
 - GitHub：[https://github.com/dromara/sa-token](https://github.com/dromara/sa-token)
-- GitCode：[https://gitcode.com/click33/sa-token](https://gitcode.com/click33/sa-token)
+- GitCode：[https://gitcode.com/dromara/sa-token](https://gitcode.com/dromara/sa-token)
 
 
 

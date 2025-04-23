@@ -12,30 +12,34 @@
     <description>Sa-Token Dependencies</description>
 
     <properties>
-        <revision>1.39.0</revision>
+        <revision>1.42.0</revision>
 		
 		<!-- 统一定义依赖版本号 -->
-		<springboot.version>2.5.15</springboot.version>
-		<springboot3.version>3.0.1</springboot3.version>
-		<reactor-core.version>3.1.4.RELEASE</reactor-core.version>
+		<springboot.version>2.7.18</springboot.version>
+		<springboot3.version>3.4.3</springboot3.version>
+		<spring-web.low.version>5.3.39</spring-web.low.version>
+		<reactor-core.version>3.7.4</reactor-core.version>
 		<jackson-databind.version>2.13.4.1</jackson-databind.version>	
 		<jackson-datatype-jsr310.version>2.11.2</jackson-datatype-jsr310.version>
 		<servlet-api.version>3.1.0</servlet-api.version>
 		<jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
 		<thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
-		<solon.version>2.7.0</solon.version>
-		<noear-redisx.version>1.6.2</noear-redisx.version>
-		<noear-snack3.version>3.2.88</noear-snack3.version>
+		<freemarker.version>2.3.34</freemarker.version>
+		<solon.version>3.0.1</solon.version>
+		<noear-redisx.version>1.6.9</noear-redisx.version>
+		<noear-snack3.version>3.2.127</noear-snack3.version>
 		<jfinal.version>4.9.17</jfinal.version>
 		<jboot.version>3.14.4</jboot.version>
 		<commons-pool2.version>2.5.0</commons-pool2.version>
 		<dubbo.version>2.7.21</dubbo.version>
 		<grpc-spring-boot-starter.version>2.10.1.RELEASE</grpc-spring-boot-starter.version>
-		<hutool-jwt.version>5.8.20</hutool-jwt.version>
-		<jjwt.version>0.9.1</jjwt.version>
+		<hutool-jwt.version>5.8.36</hutool-jwt.version>
+		<jjwt.version>0.12.6</jjwt.version>
 		<fastjson.version>1.2.83</fastjson.version>
 		<fastjson2.version>2.0.15</fastjson2.version>
-		<redisson.version>3.19.0</redisson.version>
+		<redisson.version>3.45.0</redisson.version>
+		<hutool-cache.version>5.8.36</hutool-cache.version>
+		<caffeine.version>3.2.0</caffeine.version>
     </properties>
 
     <dependencyManagement>
@@ -200,8 +204,15 @@
 				<artifactId>thymeleaf</artifactId>
 				<version>${thymeleaf.version}</version>
 		    </dependency>
-		    
-			<!-- 视图引擎 -->
+
+			<!-- freemarker -->
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${freemarker.version}</version>
+			</dependency>
+
+			<!-- spring-boot-starter-thymeleaf -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -242,12 +253,26 @@
 	            <artifactId>grpc-spring-boot-starter</artifactId>
 	            <version>${grpc-spring-boot-starter.version}</version>
 	        </dependency>
-        
-	        <dependency>
+
+			<dependency>
 				<groupId>io.jsonwebtoken</groupId>
 				<artifactId>jjwt</artifactId>
 				<version>${jjwt.version}</version>
-	        </dependency>
+			</dependency>
+
+			<!-- Hutool Cache  -->
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-cache</artifactId>
+				<version>${hutool-cache.version}</version>
+			</dependency>
+
+			<!-- Caffeine -->
+			<dependency>
+				<groupId>com.github.ben-manes.caffeine</groupId>
+				<artifactId>caffeine</artifactId>
+				<version>${caffeine.version}</version>
+			</dependency>
 
 			<!-- sa-token 自身依赖 -->
 			<dependency>

@@ -18,6 +18,7 @@ package cn.dev33.satoken.oauth2.template;
 import cn.dev33.satoken.oauth2.SaOAuth2Manager;
 import cn.dev33.satoken.oauth2.data.model.AccessTokenModel;
 import cn.dev33.satoken.oauth2.data.model.ClientTokenModel;
+import cn.dev33.satoken.oauth2.data.model.CodeModel;
 import cn.dev33.satoken.oauth2.data.model.RefreshTokenModel;
 import cn.dev33.satoken.oauth2.data.model.loader.SaClientModel;
 
@@ -125,6 +126,37 @@ public class SaOAuth2Util {
 	 */
 	public static boolean isGrantScope(Object loginId, String clientId, List<String> scopes) {
 		return SaOAuth2Manager.getTemplate().isGrantScope(loginId, clientId, scopes);
+	}
+
+
+	// ----------------- Code 相关 -----------------
+
+	/**
+	 * 获取 CodeModel，无效的 code 会返回 null
+	 * @param code /
+	 * @return /
+	 */
+	public static CodeModel getCode(String code) {
+		return SaOAuth2Manager.getTemplate().getCode(code);
+	}
+
+	/**
+	 * 校验 Code，成功返回 CodeModel，失败则抛出异常
+	 * @param code /
+	 * @return /
+	 */
+	public static CodeModel checkCode(String code) {
+		return SaOAuth2Manager.getTemplate().checkCode(code);
+	}
+
+	/**
+	 * 获取 Code，根据索引： clientId、loginId
+	 * @param clientId /
+	 * @param loginId /
+	 * @return /
+	 */
+	public static String getCodeValue(String clientId, Object loginId) {
+		return SaOAuth2Manager.getTemplate().getCodeValue(clientId, loginId);
 	}
 
 
@@ -240,6 +272,23 @@ public class SaOAuth2Util {
 	 */
 	public static String getRefreshTokenValue(String clientId, Object loginId) {
 		return SaOAuth2Manager.getTemplate().getRefreshTokenValue(clientId, loginId);
+	}
+
+	/**
+	 * 回收 Refresh-Token
+	 * @param refreshToken Refresh-Token 值
+	 */
+	public static void revokeRefreshToken(String refreshToken) {
+		SaOAuth2Manager.getTemplate().revokeRefreshToken(refreshToken);
+	}
+
+	/**
+	 * 回收 Refresh-Token，根据索引： clientId、loginId
+	 * @param clientId /
+	 * @param loginId /
+	 */
+	public static void revokeRefreshTokenByIndex(String clientId, Object loginId) {
+		SaOAuth2Manager.getTemplate().revokeRefreshTokenByIndex(clientId, loginId);
 	}
 
 	/**

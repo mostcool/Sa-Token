@@ -17,10 +17,12 @@ package cn.dev33.satoken.spring;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.handler.SaAnnotationHandlerInterface;
+import cn.dev33.satoken.apikey.SaApiKeyTemplate;
+import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoader;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.context.SaTokenContext;
-import cn.dev33.satoken.context.second.SaTokenSecondContextCreator;
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.fun.strategy.SaCorsHandleFunction;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicTemplate;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.httpauth.digest.SaHttpDigestTemplate;
@@ -29,14 +31,21 @@ import cn.dev33.satoken.json.SaJsonTemplate;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.log.SaLog;
+import cn.dev33.satoken.plugin.SaTokenPlugin;
+import cn.dev33.satoken.plugin.SaTokenPluginHolder;
 import cn.dev33.satoken.same.SaSameTemplate;
+import cn.dev33.satoken.secure.totp.SaTotpTemplate;
+import cn.dev33.satoken.serializer.SaSerializerTemplate;
 import cn.dev33.satoken.sign.SaSignTemplate;
 import cn.dev33.satoken.spring.pathmatch.SaPathMatcherHolder;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
-import cn.dev33.satoken.temp.SaTempInterface;
+import cn.dev33.satoken.strategy.SaFirewallStrategy;
+import cn.dev33.satoken.strategy.SaStrategy;
+import cn.dev33.satoken.strategy.hooks.SaFirewallCheckHook;
+import cn.dev33.satoken.temp.SaTempTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.PathMatcher;
@@ -59,8 +68,9 @@ public class SaBeanInject {
 	 * @param saTokenConfig 配置对象
 	 */
 	public SaBeanInject(
-			@Autowired(required = false) SaLog log, 
-			@Autowired(required = false) SaTokenConfig saTokenConfig
+			@Autowired(required = false) SaLog log,
+			@Autowired(required = false) SaTokenConfig saTokenConfig,
+			@Autowired(required = false) SaTokenPluginHolder pluginHolder
 			){
 		if(log != null) {
 			SaManager.setLog(log);
@@ -68,6 +78,12 @@ public class SaBeanInject {
 		if(saTokenConfig != null) {
 			SaManager.setConfig(saTokenConfig);
 		}
+		// 初始化 Sa-Token SPI 插件
+		if (pluginHolder == null) {
+			pluginHolder = SaTokenPluginHolder.instance;
+		}
+		pluginHolder.init();
+		SaTokenPluginHolder.instance = pluginHolder;
 	}
 	
 	/**
@@ -101,16 +117,6 @@ public class SaBeanInject {
 	}
 
 	/**
-	 * 注入二级上下文Bean
-	 * 
-	 * @param saTokenSecondContextCreator 二级上下文创建器 
-	 */
-	@Autowired(required = false)
-	public void setSaTokenContext(SaTokenSecondContextCreator saTokenSecondContextCreator) {
-		SaManager.setSaTokenSecondContext(saTokenSecondContextCreator.create());
-	}
-
-	/**
 	 * 注入侦听器Bean
 	 * 
 	 * @param listenerList 侦听器集合 
@@ -135,11 +141,11 @@ public class SaBeanInject {
 	/**
 	 * 注入临时令牌验证模块 Bean
 	 * 
-	 * @param saTemp saTemp对象 
+	 * @param saTempTemplate /
 	 */
 	@Autowired(required = false)
-	public void setSaTemp(SaTempInterface saTemp) {
-		SaManager.setSaTemp(saTemp);
+	public void setSaTempTemplate(SaTempTemplate saTempTemplate) {
+		SaManager.setSaTempTemplate(saTempTemplate);
 	}
 
 	/**
@@ -183,6 +189,16 @@ public class SaBeanInject {
 	}
 
 	/**
+	 * 注入自定义的序列化器 Bean
+	 *
+	 * @param saSerializerTemplate 序列化器
+	 */
+	@Autowired(required = false)
+	public void setSaSerializerTemplate(SaSerializerTemplate saSerializerTemplate) {
+		SaManager.setSaSerializerTemplate(saSerializerTemplate);
+	}
+
+	/**
 	 * 注入自定义的 参数签名 Bean 
 	 * 
 	 * @param saSignTemplate 参数签名 Bean 
@@ -190,6 +206,36 @@ public class SaBeanInject {
 	@Autowired(required = false)
 	public void setSaSignTemplate(SaSignTemplate saSignTemplate) {
 		SaManager.setSaSignTemplate(saSignTemplate);
+	}
+
+	/**
+	 * 注入自定义的 ApiKey 模块 Bean
+	 *
+	 * @param apiKeyTemplate /
+	 */
+	@Autowired(required = false)
+	public void setSaApiKeyTemplate(SaApiKeyTemplate apiKeyTemplate) {
+		SaManager.setSaApiKeyTemplate(apiKeyTemplate);
+	}
+
+	/**
+	 * 注入自定义的 ApiKey 数据加载器 Bean
+	 *
+	 * @param apiKeyDataLoader /
+	 */
+	@Autowired(required = false)
+	public void setSaApiKeyDataLoader(SaApiKeyDataLoader apiKeyDataLoader) {
+		SaManager.setSaApiKeyDataLoader(apiKeyDataLoader);
+	}
+
+	/**
+	 * 注入自定义的 TOTP 算法 Bean
+	 *
+	 * @param totpTemplate TOTP 算法类
+	 */
+	@Autowired(required = false)
+	public void setSaTotpTemplate(SaTotpTemplate totpTemplate) {
+		SaManager.setSaTotpTemplate(totpTemplate);
 	}
 
 	/**
@@ -210,6 +256,40 @@ public class SaBeanInject {
 	@Qualifier("mvcPathMatcher")
 	public void setPathMatcher(PathMatcher pathMatcher) {
 		SaPathMatcherHolder.setPathMatcher(pathMatcher);
+	}
+
+	/**
+	 * 注入自定义防火墙校验 hook 集合
+	 *
+	 * @param hooks /
+	 */
+	@Autowired(required = false)
+	public void setSaFirewallCheckHooks(List<SaFirewallCheckHook> hooks) {
+		for (SaFirewallCheckHook hook : hooks) {
+			SaFirewallStrategy.instance.registerHook(hook);
+		}
+	}
+
+	/**
+	 * 注入CORS 策略处理函数
+	 *
+	 * @param corsHandle /
+	 */
+	@Autowired(required = false)
+	public void setCorsHandle(SaCorsHandleFunction corsHandle) {
+		SaStrategy.instance.corsHandle = corsHandle;
+	}
+
+	/**
+	 * 注入自定义插件集合
+	 *
+	 * @param plugins /
+	 */
+	@Autowired(required = false)
+	public void setSaTokenPluginList(List<SaTokenPlugin> plugins) {
+		for (SaTokenPlugin plugin : plugins) {
+			SaTokenPluginHolder.instance.installPlugin(plugin);
+		}
 	}
 
 }

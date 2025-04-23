@@ -36,7 +36,7 @@ public class SaTokenConsts {
 	/**
 	 * Sa-Token 当前版本号 
 	 */
-	public static final String VERSION_NO = "v1.39.0";
+	public static final String VERSION_NO = "v1.42.0";
 
 	/**
 	 * Sa-Token 开源地址 Gitee 
@@ -74,7 +74,7 @@ public class SaTokenConsts {
 	/**
 	 * 常量 key 标记: 在登录时，默认使用的设备类型 
 	 */
-	public static final String DEFAULT_LOGIN_DEVICE = "default-device"; 
+	public static final String DEFAULT_LOGIN_DEVICE_TYPE = "DEF";
 
 	/**
 	 * 常量 key 标记: 在封禁账号时，默认封禁的服务类型 
@@ -120,6 +120,7 @@ public class SaTokenConsts {
 	/**
 	 * 常量 key 标记: 临时 Token 认证模块，默认的业务类型 
 	 */
+	@Deprecated
 	public static final String DEFAULT_TEMP_TOKEN_SERVICE = "record"; 
 
 
@@ -169,6 +170,11 @@ public class SaTokenConsts {
 	public static final String SESSION_TYPE__TOKEN = "Token-Session";
 
 	/**
+	 * SaSession 的类型: Anon-Token-Session
+	 */
+	public static final String SESSION_TYPE__ANON = "Anon-Token-Session";
+
+	/**
 	 * SaSession 的类型: Custom-Session
 	 */
 	public static final String SESSION_TYPE__CUSTOM = "Custom-Session";
@@ -187,9 +193,29 @@ public class SaTokenConsts {
 	public static final int ASSEMBLY_ORDER = -100;
 
 	/**
-	 * 请求 path 校验过滤器的注册顺序
+	 * 防火墙校验过滤器的注册顺序
 	 */
-	public static final int PATH_CHECK_FILTER_ORDER = -1000;
+	public static final int FIREWALL_CHECK_FILTER_ORDER = -102;
+
+	/**
+	 * 跨域处理过滤器的注册顺序
+	 */
+	public static final int CORS_FILTER_ORDER = -103;
+
+	/**
+	 * 上下文过滤器的注册顺序
+	 */
+	public static final int SA_TOKEN_CONTEXT_FILTER_ORDER = -104;
+
+	/**
+	 * RPC 框架权限过滤器的注册顺序
+	 */
+	public static final int RPC_PERMISSION_FILTER_ORDER = -30000;
+
+	/**
+	 * RPC 框架上下文过滤器的注册顺序
+	 */
+	public static final int RPC_CONTEXT_FILTER_ORDER = -30005;
 
 	/**
 	 * Content-Type  key

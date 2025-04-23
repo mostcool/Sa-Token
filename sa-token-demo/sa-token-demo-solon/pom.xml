@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.noear</groupId>
 		<artifactId>solon-parent</artifactId>
-		<version>2.9.1</version>
+		<version>3.0.4</version>
 		<relativePath/>
 	</parent>
 
@@ -19,7 +19,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.traget>17</maven.compiler.traget>
-		<sa-token.version>1.39.0</sa-token.version>
+		<sa-token.version>1.42.0</sa-token.version>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>

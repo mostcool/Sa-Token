@@ -18,20 +18,40 @@ package cn.dev33.satoken.solon.json;
 import cn.dev33.satoken.json.SaJsonTemplate;
 import org.noear.snack.ONode;
 
-import java.util.Map;
-
 /**
  * @author noear
  * @since 2.0
  */
 public class SaJsonTemplateForSnack3 implements SaJsonTemplate {
+
+    /**
+     * 序列化：对象 -> json 字符串
+     *
+     * @param obj /
+     * @return /
+     */
     @Override
-    public String toJsonString(Object o) {
-        return ONode.stringify(o);
+    public String objectToJson(Object obj) {
+        return ONode.stringify(obj);
     }
 
+    /**
+     * 反序列化：json 字符串 → 对象
+     */
     @Override
-    public Map<String, Object> parseJsonToMap(String s) {
-        return ONode.deserialize(s, Map.class);
+    public <T> T jsonToObject(String jsonStr, Class<T> type) {
+        return ONode.deserialize(jsonStr, type);
     }
+
+    /**
+     * 反序列化：json 字符串 → 对象
+     *
+     * @param jsonStr /
+     * @return /
+     */
+    @Override
+    public Object jsonToObject(String jsonStr) {
+        return ONode.deserialize(jsonStr);
+    }
+
 }

@@ -383,6 +383,12 @@ body {
 	background-size: 18px 18px;
 	background-image: url(icon/code.svg);
 }
+#main .case-btn.case-btn-video{ 
+	background-color: #ECF5FF; 
+	color: #1979DA; 
+	border: 1px #49A9DA solid !important;
+	background-image: url(icon/video.svg);
+}
 #main .dt-btn{display: none;}
 
 
@@ -442,19 +448,24 @@ body {
 .ad-close:hover{cursor: pointer; text-decoration: underline; color: red;}
 
 .main-box .top-ad-box{font-size: 12px;}
-.main-box .top-ad-box a{border-bottom: 0px;}
+.main-box .top-ad-box a{border-bottom: 0px; text-decoration: none;}
 .main-box .top-ad-box a:hover{border-bottom: 0px;}
-.main-box .top-ad-box a img{border: 0px #ddd solid; width: 100%; /* max-height: 80px; */ border-radius: 2px; transition: all 0.2s;}
+.main-box .top-ad-box a img{border: 1px #eee solid; width: 100%; /* max-height: 80px; */ border-radius: 2px; transition: all 0.1s !important;}
 .main-box .top-ad-box a img:hover{box-shadow: 0 0 20px #ddd;}
+
+.main-box .top-ad-box2 a img{ width: 48.5%; margin-bottom: 2px; }
+.main-box .top-ad-box2 a:nth-child(2n+1) img{margin-right: 2px; }
 
 
 /* 帮助按钮 */
 .help-btn{transition: all 0.5s; text-align: center; border: 1px #42b983 solid; background-color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 13px; color: #42b983; line-height: 40px;}
 .help-btn:hover{box-shadow: 0 0 20px #D1EEE1 !important;}
-.xiaozhushou-intro p{line-height: 16px;}
+.xiaozhushou-intro p{line-height: 14px;}
 
 /* ew-wa */
 .ew-wa{ margin-top: 14px; line-height: 18px; color: #aaa; }
+.ew-wa a{ margin-right: 5px; text-decoration: none; color: #8693A7; }
+.ew-wa a:hover{text-decoration: underline; color: #44f; }
 
 /* 按钮发光动画 */
 /* .help-btn{animation: helpbtnanimation 3s infinite;}
@@ -478,6 +489,10 @@ body {
 
 .syzz-show-btn{border: 1px #ccc solid; padding: 5px 10px; background-color: #FFF; color: #666; cursor: pointer;}
 .syzz-show-btn:hover{box-shadow: 0 0 10px #ddd;}
+
+/* ********** 团队成员名单 ******** */
+.markdown-section .team-table{ display: table; text-align: left; }
+.team-table img{ width: 45px; height: 45px; }
 
 /* ajax加载时的转圈圈样式 */
 .ajax-layer-load.layui-layer-dialog{min-width: 0px !important; background-color: rgba(0,0,0,0.85);}

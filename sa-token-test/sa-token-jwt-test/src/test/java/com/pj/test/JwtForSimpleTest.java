@@ -1,9 +1,8 @@
 package com.pj.test;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import cn.dev33.satoken.servlet.util.SaTokenContextServletUtil;
+import cn.dev33.satoken.spring.SpringMVCUtil;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import cn.dev33.satoken.SaManager;
@@ -43,6 +42,16 @@ public class JwtForSimpleTest {
     	System.out.println("\n\n------------------------ JwtForSimpleTest end ... \n");
     }
 
+	@BeforeEach
+	public void beforeEach() {
+		SaTokenContextServletUtil.setContext(SpringMVCUtil.getRequest(), SpringMVCUtil.getResponse());
+	}
+
+	@AfterEach
+	public void afterEach() {
+		SaTokenContextServletUtil.clearContext();
+	}
+
     // 测试：登录 
     @Test
     public void doLogin() {
@@ -54,7 +63,7 @@ public class JwtForSimpleTest {
     	Assertions.assertTrue(StpUtil.isLogin());	
     	Assertions.assertNotNull(token);	// token不为null
     	Assertions.assertEquals(StpUtil.getLoginIdAsLong(), 10001);	// loginId=10001 
-    	Assertions.assertEquals(StpUtil.getLoginDevice(), SaTokenConsts.DEFAULT_LOGIN_DEVICE);	// 登录设备类型
+    	Assertions.assertEquals(StpUtil.getLoginDevice(), SaTokenConsts.DEFAULT_LOGIN_DEVICE_TYPE);	// 登录设备类型
 
     	// token 验证 
     	JWT jwt = JWT.of(token);
@@ -68,7 +77,7 @@ public class JwtForSimpleTest {
     	SaSession session = dao.getSession("satoken:login:session:" + 10001);
     	Assertions.assertNotNull(session);
     	Assertions.assertEquals(session.getId(), "satoken:login:session:" + 10001);
-    	Assertions.assertTrue(session.getTokenSignList().size() >= 1);
+    	Assertions.assertTrue(session.getTerminalList().size() >= 1);
     }
 
     // 测试：getExtra 

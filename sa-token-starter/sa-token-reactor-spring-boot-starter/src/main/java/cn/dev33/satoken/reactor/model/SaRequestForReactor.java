@@ -27,10 +27,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 对 SaRequest 包装类的实现（Reactor 响应式编程版）
@@ -74,9 +72,8 @@ public class SaRequestForReactor implements SaRequest {
 	 * @return 参数名称列表
 	 */
 	@Override
-	public List<String> getParamNames(){
-		Set<String> names = request.getQueryParams().keySet();
-		return new ArrayList<>(names);
+	public Collection<String> getParamNames(){
+		return request.getQueryParams().keySet();
 	}
 
 	/**
@@ -175,11 +172,19 @@ public class SaRequestForReactor implements SaRequest {
 	}
 
 	/**
+	 * 查询请求 host
+	 */
+	@Override
+	public String getHost() {
+		return request.getURI().getHost();
+	}
+
+	/**
 	 * 转发请求 
 	 */
 	@Override
 	public Object forward(String path) {
-		ServerWebExchange exchange = SaReactorSyncHolder.getContext();
+		ServerWebExchange exchange = SaReactorSyncHolder.getExchange();
 		WebFilterChain chain = exchange.getAttribute(SaReactorHolder.CHAIN_KEY);
 		
 		ServerHttpRequest newRequest = request.mutate().path(path).build();

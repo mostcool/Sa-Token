@@ -52,12 +52,22 @@ public class CodeModel implements Serializable {
 	 * 重定向的地址 
 	 */
 	public String redirectUri;
+
+	/**
+	 * 随机数
+	 */
+	public String nonce;
+
+	/**
+	 * 创建时间，13位时间戳
+	 */
+	public long createTime;
 	
 	/**
 	 * 构建一个 
 	 */
 	public CodeModel() {
-		
+		this.createTime = System.currentTimeMillis();
 	}
 	/**
 	 * 构建一个 
@@ -67,13 +77,14 @@ public class CodeModel implements Serializable {
 	 * @param loginId 对应的账号id 
 	 * @param redirectUri 重定向地址 
 	 */
-	public CodeModel(String code, String clientId, List<String> scopes, Object loginId, String redirectUri) {
-		super();
+	public CodeModel(String code, String clientId, List<String> scopes, Object loginId, String redirectUri, String nonce) {
+		this();
 		this.code = code;
 		this.clientId = clientId;
 		this.scopes = scopes;
 		this.loginId = loginId;
 		this.redirectUri = redirectUri;
+		this.nonce = nonce;
 	}
 
 	public String getCode() {
@@ -121,10 +132,35 @@ public class CodeModel implements Serializable {
 		return this;
 	}
 
+	public String getNonce() {
+		return nonce;
+	}
+
+	public CodeModel setNonce(String nonce) {
+		this.nonce = nonce;
+		return this;
+	}
+
+	public long getCreateTime() {
+		return createTime;
+	}
+
+	public CodeModel setCreateTime(long createTime) {
+		this.createTime = createTime;
+		return this;
+	}
+
 	@Override
 	public String toString() {
-		return "CodeModel [code=" + code + ", clientId=" + clientId + ", scopes=" + scopes + ", loginId=" + loginId
-				+ ", redirectUri=" + redirectUri + "]";
+		return "CodeModel{" +
+				"code='" + code + '\'' +
+				", clientId='" + clientId + '\'' +
+				", scopes=" + scopes +
+				", loginId=" + loginId +
+				", redirectUri='" + redirectUri + '\'' +
+				", nonce='" + nonce + '\'' +
+				", createTime=" + createTime +
+				'}';
 	}
-	
+
 }

@@ -76,6 +76,45 @@ String text2 = SaBase64Util.decode(base64Text);
 System.out.println("Base64解码后：" + text2); 
 ```
 
+
+### Base32编码与解码
+``` java
+// 文本
+String text = "Sa-Token 一个轻量级java权限认证框架";
+
+// 使用Base32编码
+String base32Text = SaBase32Util.encode(text);
+System.out.println("Base32编码后：" + base32Text);
+
+// 使用Base32解码
+String text2 = SaBase32Util.decode(base32Text);
+System.out.println("Base32解码后：" + text2); 
+```
+
+
+### TOTP 验证器
+
+``` java
+// 1、生成密钥
+String secretKey = SaTotpUtil.generateSecretKey();
+System.out.println("TOTP 秘钥: " + secretKey);
+
+// 2、生成扫码字符串
+String qeString = SaTotpUtil.generateGoogleSecretKey("zhangsan", secretKey);
+System.out.println("扫码字符串: " + qeString);
+
+// 3、计算当前 TOTP 码
+String code = SaTotpUtil.generateTOTP(secretKey);
+System.out.println("当前时间戳对应的 TOTP 码: " + code);
+
+// 4、验证用户输入
+boolean isValid = SaTotpUtil.validateTOTP(secretKey, code, 1);
+System.out.println("验证结果: " + isValid);
+```
+
+在线 TOTP 管理器推荐： [TOTP 密码生成管理 - 工具哇](https://toolwa.com/totp/)
+
+
 ### BCrypt加密
 由它加密的文件可在所有支持的操作系统和处理器上进行转移
 

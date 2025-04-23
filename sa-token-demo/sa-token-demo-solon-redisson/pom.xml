@@ -10,13 +10,13 @@
 	<parent>
 		<groupId>org.noear</groupId>
 		<artifactId>solon-parent</artifactId>
-		<version>2.7.0</version>
+		<version>3.0.1</version>
 		<relativePath/>
 	</parent>
 
 	<!-- 定义 Sa-Token 版本号 -->
 	<properties>
-		<sa-token.version>1.39.0</sa-token.version>
+		<sa-token.version>1.42.0</sa-token.version>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -49,7 +49,7 @@
 		<!-- sa-token整合redis (使用jdk默认序列化方式) -->
 		<dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-redisson-jackson2</artifactId>
+            <artifactId>sa-token-redisson</artifactId>
             <version>${sa-token.version}</version>
         </dependency>
 

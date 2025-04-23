@@ -16,7 +16,8 @@
 package cn.dev33.satoken.strategy;
 
 import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.exception.RequestPathInvalidException;
+import cn.dev33.satoken.error.SaErrorCode;
+import cn.dev33.satoken.exception.NotImplException;
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.fun.strategy.*;
 import cn.dev33.satoken.session.SaSession;
@@ -103,6 +104,11 @@ public final class SaStrategy {
 	};
 
 	/**
+	 * 反序列化 SaSession 时默认指定的类型
+	 */
+	public volatile Class<? extends SaSession> sessionClassType = SaSession.class;
+
+	/**
 	 * 判断：集合中是否包含指定元素（模糊匹配）
 	 */
 	public SaHasElementFunction hasElement = (list, element) -> {
@@ -158,6 +164,13 @@ public final class SaStrategy {
 	};
 
 	/**
+     * 是否自动续期 active-timeout
+     */
+    public SaAutoRenewFunction autoRenew = (stpLogic) -> {
+        return stpLogic.getConfigOrGlobal().getAutoRenew();
+    };
+
+	/**
 	 * 创建 StpLogic 的算法
 	 */
 	public SaCreateStpLogicFunction createStpLogic = (loginType) -> {
@@ -165,47 +178,18 @@ public final class SaStrategy {
 	};
 
 	/**
-	 * 请求 path 不允许出现的字符
+	 * 路由匹配策略
 	 */
-	public static String[] INVALID_CHARACTER = {
-			"//", "\\",
-			"%2e", "%2E",	// .
-			"%2f", "%2F",	// /
-			"%5c", "%5C",	// \
-			"%25"	// 空格
+	public SaRouteMatchFunction routeMatcher = (pattern, path) -> {
+		throw new NotImplException("未实现具体路由匹配策略").setCode(SaErrorCode.CODE_12401);
 	};
 
 	/**
-	 * 校验请求 path 的算法
+	 * CORS 策略处理函数
 	 */
-	public SaCheckRequestPathFunction checkRequestPath = (requestPath, extArg1, extArg2) -> {
+	public SaCorsHandleFunction corsHandle = (req, res, sto) -> {
 
-		// 不允许为null
-		if(requestPath == null) {
-			throw new RequestPathInvalidException("非法请求：null", null);
-		}
-		// 不允许包含非法字符
-		for (String item : INVALID_CHARACTER) {
-			if (requestPath.contains(item)) {
-				throw new RequestPathInvalidException("非法请求：" + requestPath, requestPath);
-			}
-		}
-		// 不允许出现跨目录
-		if(requestPath.contains("/.") || requestPath.contains("\\.")) {
-			throw new RequestPathInvalidException("非法请求：" + requestPath, requestPath);
-		}
 	};
-
-
-	/**
-	 * 当请求 path 校验不通过时处理方案的算法，自定义示例：
-	 * <pre>
-	 * 		SaStrategy.instance.requestPathInvalidHandle = (e, extArg1, extArg2) -> {
-	 * 			// 自定义处理逻辑 ...
-	 *      };
-	 * </pre>
-	 */
-	public SaRequestPathInvalidHandleFunction requestPathInvalidHandle = null;
 
 
 	// ----------------------- 重写策略 set连缀风格
@@ -264,6 +248,17 @@ public final class SaStrategy {
 		this.createStpLogic = createStpLogic;
 		return this;
 	}
+
+	/**
+     * 是否自动续期
+     *
+     * @param autoRenew /
+     * @return /
+     */
+    public SaStrategy setAutoRenew(SaAutoRenewFunction autoRenew) {
+        this.autoRenew = autoRenew;
+        return this;
+    }
 
 	//
 

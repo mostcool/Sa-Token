@@ -27,7 +27,11 @@ public class SaResponseForSolon implements SaResponse {
 	protected Context ctx;
 
 	public SaResponseForSolon() {
-		ctx = Context.current();
+		this(Context.current());
+	}
+
+	public SaResponseForSolon(Context ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -48,9 +52,10 @@ public class SaResponseForSolon implements SaResponse {
 	}
 
 	/**
-	 * 在响应头里添加一个值 
-	 * @param name 名字
-	 * @param value 值 
+	 * 在响应头里添加一个值
+	 *
+	 * @param name  名字
+	 * @param value 值
 	 * @return 对象自身
 	 */
 	public SaResponse addHeader(String name, String value) {

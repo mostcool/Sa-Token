@@ -31,7 +31,7 @@ package cn.dev33.satoken.stp;
  *         "sessionTimeout": 2591977,        // Account-Session剩余有效时间 (单位: 秒)
  *         "tokenSessionTimeout": -2,        // Token-Session剩余有效时间 (单位: 秒) (-2表示系统中不存在这个缓存)
  *         "tokenActiveTimeout": -1,       // Token 距离被冻结还剩多少时间 (单位: 秒)
- *         "loginDevice": "default-device"   // 登录设备类型
+ *         "loginDevice": "DEF"   // 登录设备类型
  *     }
  *     </pre>
  * </p>
@@ -69,7 +69,7 @@ public class SaTokenInfo {
 	public long tokenActiveTimeout;
 
 	/** 登录设备类型 */
-	public String loginDevice;
+	public String loginDeviceType;
 
 	/** 自定义数据（暂无意义，留作扩展） */
 	public String tag;
@@ -205,15 +205,15 @@ public class SaTokenInfo {
 	/**
 	 * @return 登录设备类型
 	 */
-	public String getLoginDevice() {
-		return loginDevice;
+	public String getLoginDeviceType() {
+		return loginDeviceType;
 	}
 
 	/**
-	 * @param loginDevice 登录设备类型
+	 * @param loginDeviceType 登录设备类型
 	 */
-	public void setLoginDevice(String loginDevice) {
-		this.loginDevice = loginDevice;
+	public void setLoginDeviceType(String loginDeviceType) {
+		this.loginDeviceType = loginDeviceType;
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class SaTokenInfo {
 		return "SaTokenInfo [tokenName=" + tokenName + ", tokenValue=" + tokenValue + ", isLogin=" + isLogin
 				+ ", loginId=" + loginId + ", loginType=" + loginType + ", tokenTimeout=" + tokenTimeout
 				+ ", sessionTimeout=" + sessionTimeout + ", tokenSessionTimeout=" + tokenSessionTimeout
-				+ ", tokenActiveTimeout=" + tokenActiveTimeout + ", loginDevice=" + loginDevice + ", tag=" + tag
+				+ ", tokenActiveTimeout=" + tokenActiveTimeout + ", loginDeviceType=" + loginDeviceType + ", tag=" + tag
 				+ "]";
 	}
 

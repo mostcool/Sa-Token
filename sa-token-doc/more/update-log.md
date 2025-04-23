@@ -1,5 +1,159 @@
 # 更新日志 
 
+
+### v1.42.0 @2025-4-11
+
+- core: 
+	- 新增: 新增 `API Key` 模块。   **[重要]**
+	- 新增: 新增 `TOTP` 实现。   **[重要]**
+	- 重构：重构 `TempToken` 模块，新增 value 反查 token 机制。   **[重要]**
+	- 升级: 重构升级 `SaTokenContext` 上下文读写策略。   **[重要]**
+	- 新增: 新增 Mock 上下文模块。   **[重要]**
+	- 删除: 删除二级上下文模块。
+	- 新增: 新增异步场景使用 demo。   **[重要]**
+	- 新增: 新增 `Base32` 编码工具类。
+	- 新增：新增 `CORS` 跨域策略处理函数，提供不同架构下统一的跨域处理方案。
+	- 新增：`renewTimeout` 续期方法增加 token 终端信息有效性校验。
+	- 新增: 全局配置项 `cookieAutoFillPrefix`：cookie 模式是否自动填充 token 前缀。
+	- 新增: 全局配置项 `rightNowCreateTokenSession`：在登录时，是否立即创建对应的 `Token-Session`。
+	- 优化：优化 `Token-Session` 获取算法，减少缓存读取次数。
+	- 新增：`SaLoginParameter` 支持配置 `SaCookieConfig`，以配置 Cookie 相关参数。
+	- 修改：防火墙校验过滤器的注册顺序 修改为 -102。
+	- 新增：防火墙 `hook` 注册新增 `registerHookToFirst`、`registerHookToSecond` 方法，以便更灵活的控制 hook 顺序。
+- 插件：
+	- 新增: `sa-token-quick-login` 插件支持 `Http Basic` 方式通过认证。
+- 单元测试：
+	- 补全：补全 `Temp Token` 模块单元测试。
+- 文档：
+	- 补全：补全赞助者名单。
+	- 修复：修复 `Thymeleaf` 集成文档不正确的依赖示例说明。
+	- 修复：修复 `unionid` 章节错误描述。
+	- 优化：采用更细致的描述优化SSO模式三单点注销步骤。
+	- 新增：登录认证文档添加 Cookie 查看步骤演示图。
+	- 新增：多账号模式新增注意点：运行时不可更改 `LoginType`。
+	- 新增: 多账号模式QA：在一个接口里获取是哪个体系的账号正在登录。
+	- 新增：新增QA：解决低版本 `SpringBoot (<2.2.0)` 引入 Sa-Token 报错的问题。
+	- 新增：新增QA：前后端一体项目下，在拦截未登录进入登录页面时，如何登录完成后原路返回？
+	- 新增：新增QA：Sa-Token 集成 Redis 如何集群？
+	- 新增：新增QA：如何自定义框架读取 token 的方式？
+	- 新增：新增QA：修改 `hosts` 文件无效可能原因排查。
+	- 新增：新增QA：如何防止 CSRF 攻击。
+	- 新增: “异步 & Mock 上下文” 章节。
+	- 升级：升级“自定义 SaTokenContext 指南”章节文档。
+
+
+
+
+
+
+
+### v1.41.0 @2025-3-21
+更新导读：[视频](https://www.bilibili.com/video/BV1aNo4YCEM1/)、[文字版](https://juejin.cn/post/7484191942358499368)
+
+- core: 
+	- 修复：修复 `StpUtil.setTokenValue("xxx")`、`loginParameter.getIsWriteHeader()` 空指针的问题。 fix: [#IBKSM0](https://gitee.com/dromara/sa-token/issues/IBKSM0)
+	- 修复：将 `SaDisableWrapperInfo.createNotDisabled()` 默认返回值封禁等级改为 -2，以保证向之前版本兼容。
+	- 新增：新增基于 SPI 的插件体系。   **[重要]** 
+	- 重构：JSON 转换器模块。   **[重要]** 
+	- 新增：新增 serializer 序列化模块，控制 `Object` 与 `String` 的序列化方式。   **[重要]** 
+	- 重构：重构防火墙模块，增加 hooks 机制。   **[重要]** 
+	- 新增：防火墙新增：请求 path 禁止字符校验、Host 检测、请求 Method 检测、请求头检测、请求参数检测。重构目录遍历符检测算法。
+	- 重构：重构 `SaTokenDao` 模块，将序列化与存储操作分离。   **[重要]**
+	- 重构：重构 `SaTokenDao` 默认实现类，优化底层设计。
+	- 新增：`isLastingCookie` 配置项支持在全局配置中定义了。
+	- 重构：`SaLoginModel` -> `SaLoginParameter`。    **[不向下兼容]** 
+	- 重构：`TokenSign` -> `SaTerminalInfo`。    **[不向下兼容]** 
+	- 新增：`SaTerminalInfo` 新增 `extraData` 自定义扩展数据设置。
+	- 新增：`SaLoginParameter` 支持配置 `isConcurrent`、`isShare`、`maxLoginCount`、`maxTryTimes`。
+	- 新增：新增 `SaLogoutParameter`，用于控制注销会话时的各种细节。  **[重要]**
+	- 新增：新增 `StpLogic#isTrustDeviceId` 方法，用于判断指定设备是否为可信任设备。
+	- 新增：新增 `StpUtil.getTerminalListByLoginId(loginId)`、`StpUtil.forEachTerminalList(loginId)` 方法，以更方便的实现单账号会话管理。
+	- 升级：API 参数签名配置支持自定义摘要算法。
+	- 新增：新增 `@SaCheckSign` 注解鉴权，用于 API 签名参数校验。
+	- 新增：API 参数签名模块新增多应用模式。 fix: [#IAK2BI](https://gitee.com/dromara/sa-token/issues/IAK2BI), [#I9SPI1](https://gitee.com/dromara/sa-token/issues/I9SPI1), [#IAC0P9](https://gitee.com/dromara/sa-token/issues/IAC0P9)   **[重要]**
+	- 重构：全局配置 `is-share` 默认值改为 false。    **[不向下兼容]** 
+	- 重构：踢人下线、顶人下线默认将删除对应的 token-session 对象。
+	- 优化：优化注销会话相关 API。
+	- 重构：登录默认设备类型值改为 DEF。   **[不向下兼容]** 
+	- 重构：`BCrypt` 标注为 `@Deprecated`。
+	- 新增：`sa-token-quick-login` 支持 `SpringBoot3` 项目。 fix: [#IAFQNE](https://gitee.com/dromara/sa-token/issues/IAFQNE)、[#673](https://github.com/dromara/Sa-Token/issues/673)
+	- 新增：`SaTokenConfig` 新增 `replacedRange`、`overflowLogoutMode`、`logoutRange`、`isLogoutKeepFreezeOps`、``isLogoutKeepTokenSession`` 配置项。
+- OAuth2：
+	- 重构：重构 sa-token-oauth2 插件，使注解鉴权处理器的注册过程改为 SPI 插件加载。
+- 插件：
+	- 新增：`sa-token-serializer-features` 插件，用于实现各种形式的自定义字符集序列化方案。
+	- 新增：`sa-token-fastjson` 插件。
+	- 新增：`sa-token-fastjson2` 插件。
+	- 新增：`sa-token-snack3` 插件。
+	- 新增：`sa-token-caffeine` 插件。
+- 单元测试：
+	- 新增：`sa-token-json-test` json 模块单元测试。
+	- 新增：`sa-token-serializer-test` 序列化模块单元测试。
+- 文档：
+	- 新增：QA “多个项目共用同一个 redis，怎么防止冲突？” 
+	- 优化：补全 OAuth2 模块遗漏的相关配置项。
+	- 优化：优化 OAuth2 简述章节描述文档。
+	- 优化：完善 “SSO 用户数据同步 / 迁移” 章节文档。
+	- 修正：补全项目目录结构介绍文档。
+	- 新增：文档新增 “登录参数 & 注销参数” 章节。
+	- 优化：优化“技术求助”按钮的提示文字。
+	- 新增：新增 `preview-doc.bat` 文件，一键启动文档预览。
+	- 完善：完善 Redis 集成文档。
+	- 新增：新增单账号会话查询的操作示例。
+	- 新增：新增顶人下线 API 介绍。
+	- 新增：新增 自定义序列化插件 章节。
+- 其它：
+	- 新增：新增 `sa-token-demo/pom.xml` 以便在 idea 中一键导入所有 demo 项目。
+	- 删除：删除不必要的 `.gitignore` 文件
+	- 重构：重构 `sa-token-solon-plugin` 插件。
+	- 新增：新增设备锁登录示例。
+
+
+### v1.40.0 @2025-2-1
+更新导读：[视频](https://www.bilibili.com/video/BV1uNATeeEvg/)、[文字版](https://juejin.cn/post/7467969744307306505)
+
+- core: 
+	- 新增：新增 `Cookie` 自定义属性支持。  fix: [#693](https://github.com/dromara/Sa-Token/issues/693)   **[重要]** 
+	- 新增：`SaFirewallStrategy` 防火墙策略：请求 path 黑名单校验、非法字符校验、白名单放行。  **[重要]** 
+	- 修复：新增对分号字符的 path 路径校验。   参考：[Sa-Token对url过滤不全存在的风险点](https://mp.weixin.qq.com/s/77CIDZbgBwRunJeluofPTA)   **[漏洞修复]** 
+	- 修复: 修复部分场景下登录后已存在的 `token-session` 没有被续期的问题。  fix: [#IA8U1O](https://gitee.com/dromara/sa-token/issues/IA8U1O)
+	- 优化：优化 `active-timeout` 的检查与续期操作，同一请求内只会检查与续期一次。
+	- 修复：`SaFoxUtil.joinSharpParam` 方法中不正确的注释。
+	- 新增：封禁模块新增支持实时从数据库查询数据。
+- SSO：
+	- 优化：SSO 示例代码的跨域处理由原生方式改为 Sa-Token 过滤器模式。
+	- 新增：文档新增 “SSO整合 - NoSdk 模式与非 java 项目” 章节。
+	- 新增：“不同 SSO Client 配置不同秘钥” 章节增加部分异常的处理方案提示，fix: [#IAFZXL](https://gitee.com/dromara/sa-token/issues/IAFZXL)
+	- 删除：sso demo 示例中部分不必要的代码内容。
+- OAuth2：
+	- 新增：OAuth2 Client 前端测试页。   **[重要]**
+	- 新增：`UnionId` 联合id 实现。   **[重要]** 
+	- 新增：`oauth2-server` 端前后台分离示例与文档。 fix: [#I9DQGA](https://gitee.com/dromara/sa-token/issues/I9DQGA)、[#I9W2RU](https://gitee.com/dromara/sa-token/issues/I9W2RU)    **[重要]**
+	- 新增：`OIDC` 模式 `nonce` 随机数响应校验。 merge: [pr311](https://gitee.com/dromara/sa-token/pulls/311)
+	- 修复：错误方法名 `deleteGrantScope(String state)` -> `deleteState(String state)`。
+	- 修复：全局配置项 `sa-token.oauth2-server.oidc.iss` 无效的问题。
+	- 新增：回收 Refresh-Token 方法: `revokeRefreshToken`、`revokeRefreshTokenByIndex`。
+	- 新增：为 `CodeModel`、`AccessTokenModel`、`RefreshTokenModel`、`ClientTokenModel` 添加 `createTime` 字段，以记录该数据的创建时间。
+	- 新增：为 Access-Token、Client-Token 添加 `grantType` 字段，以记录该数据的授权类型。
+	- 新增：`SaOAuth2Util.getCode` 等方法，以更方便的获取、校验授权码。
+- 插件：
+	- 新增：新增 `sa-token-freemarker` 插件，整合 `Freemarker` 视图引擎。 fix: [#651](https://github.com/dromara/sa-token/issues/651)   **[重要]**
+	- 新增：新增 `sa-token-spring-el` 插件，用于支持 SpEL 表达式注解鉴权。 fix: [#IB3GBB](https://gitee.com/dromara/sa-token/issues/IB3GBB)、fix: [#IAIXSL](https://gitee.com/dromara/sa-token/issues/IAIXSL)、fix: [#I9P24F](https://gitee.com/dromara/sa-token/issues/I9P24F)   **[重要]**
+- 文档：
+	- 新增：新增 `MongoDB` 集成示例。 感谢 `@lilihao` 提供的示例。 merge: [pr322](https://gitee.com/dromara/sa-token/pulls/322)、[pr667](https://github.com/dromara/Sa-Token/pull/667)   **[重要]**
+	- 新增：“fox说技术” 视频教程链接。
+	- 新增：“API接口参数签名”章节 视频讲解链接（B站抓蛙师）。
+	- 优化：文档首页首屏增加需求提交按钮。
+	- 其它：补全赞助者名单、`Dromara` 项目链接等信息。
+	- 新增：`SpringBoot3.x` 版本配置 Redis 注意事项。fix: [#688](https://github.com/dromara/Sa-Token/issues/688)
+	- 新增：`gitcode` g-star badge 展示。
+	- 修复：`OAuth2` 滞后的配置信息示例。
+	- 新增：新增视频账号链接。
+	- 新增：新增团队成员展示。
+
+
+
+
 ### v1.39.0 @2024-8-28
 - 核心：
 	- 升级：重构注解鉴权底层，支持自定义鉴权注解了。  **[重要]**
@@ -42,6 +196,7 @@
 	- 新增：新增不同 `client` 不同登录页说明。
 	- 优化：优化文档 [将权限数据放在缓存里] 示例。
 	- 新增：新增 从 Shiro、SpringSecurity、JWT 迁移 示例。  **[重要]**
+
 
 
 ### v1.38.0 @2024-5-12

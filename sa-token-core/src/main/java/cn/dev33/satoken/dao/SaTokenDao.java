@@ -90,15 +90,25 @@ public interface SaTokenDao {
 
 	/**
 	 * 获取 Object，如无返空
-	 * @param key 键名称 
+	 *
+	 * @param key 键名称
 	 * @return object
 	 */
 	Object getObject(String key);
 
 	/**
+	 * 获取 Object (指定反序列化类型)，如无返空
+	 *
+	 * @param key 键名称
+	 * @return object
+	 */
+	<T> T getObject(String key, Class<T> classType);
+
+	/**
 	 * 写入 Object，并设定存活时间 （单位: 秒）
-	 * @param key 键名称 
-	 * @param object 值 
+	 *
+	 * @param key     键名称
+	 * @param object  值
 	 * @param timeout 存活时间（值大于0时限时存储，值=-1时永久存储，值=0或小于-2时不存储）
 	 */
 	void setObject(String key, Object object, long timeout);
@@ -138,52 +148,40 @@ public interface SaTokenDao {
 	 * @param sessionId sessionId
 	 * @return SaSession
 	 */
-	default SaSession getSession(String sessionId) {
-		return (SaSession)getObject(sessionId);
-	}
+	SaSession getSession(String sessionId);
 
 	/**
 	 * 写入 SaSession，并设定存活时间（单位: 秒）
 	 * @param session 要保存的 SaSession 对象
 	 * @param timeout 过期时间（单位: 秒）
 	 */
-	default void setSession(SaSession session, long timeout) {
-		setObject(session.getId(), session, timeout);
-	}
+	void setSession(SaSession session, long timeout);
 
 	/**
 	 * 更新 SaSession
 	 * @param session 要更新的 SaSession 对象
 	 */
-	default void updateSession(SaSession session) {
-		updateObject(session.getId(), session);
-	}
+	void updateSession(SaSession session);
 	
 	/**
 	 * 删除 SaSession
 	 * @param sessionId sessionId
 	 */
-	default void deleteSession(String sessionId) {
-		deleteObject(sessionId);
-	}
+	void deleteSession(String sessionId);
 
 	/**
 	 * 获取 SaSession 剩余存活时间（单位: 秒）
 	 * @param sessionId 指定 SaSession
 	 * @return 这个 SaSession 的剩余存活时间
 	 */
-	default long getSessionTimeout(String sessionId) {
-		return getObjectTimeout(sessionId);
-	}
+	long getSessionTimeout(String sessionId);
 	
 	/**
 	 * 修改 SaSession 剩余存活时间（单位: 秒）
 	 * @param sessionId 指定 SaSession
 	 * @param timeout 剩余存活时间
 	 */
-	default void updateSessionTimeout(String sessionId, long timeout) {
-		updateObjectTimeout(sessionId, timeout);
-	}
+	void updateSessionTimeout(String sessionId, long timeout);
 	
 	
 	// --------------------- 会话管理 ---------------------

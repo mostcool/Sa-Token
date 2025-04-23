@@ -17,6 +17,7 @@ package cn.dev33.satoken.dao;
 
 
 import cn.dev33.satoken.SaManager;
+import cn.dev33.satoken.dao.auto.SaTokenDaoByStringFollowObject;
 import cn.dev33.satoken.util.SaFoxUtil;
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.CacheObj;
@@ -31,7 +32,7 @@ import java.util.List;
  * @author click33
  * @since 1.38.0
  */
-public class SaTokenDaoForHutoolTimedCache implements SaTokenDao {
+public class SaTokenDaoForHutoolTimedCache implements SaTokenDaoByStringFollowObject {
 
 	//
 	/**
@@ -41,39 +42,6 @@ public class SaTokenDaoForHutoolTimedCache implements SaTokenDao {
 	public TimedCache<String, Object> timedCache = CacheUtil.newTimedCache(1000);
 
 
-	// ------------------------ String 读写操作
-
-	@Override
-	public String get(String key) {
-		return (String) getObject(key);
-	}
-
-	@Override
-	public void set(String key, String value, long timeout) {
-		setObject(key, value, timeout);
-	}
-
-	@Override
-	public void update(String key, String value) {
-		updateObject(key, value);
-	}
-
-	@Override
-	public void delete(String key) {
-		deleteObject(key);
-	}
-
-	@Override
-	public long getTimeout(String key) {
-		return getObjectTimeout(key);
-	}
-
-	@Override
-	public void updateTimeout(String key, long timeout) {
-		updateObjectTimeout(key, timeout);
-	}
-
-
 	// ------------------------ Object 读写操作
 
 	@Override
@@ -81,6 +49,11 @@ public class SaTokenDaoForHutoolTimedCache implements SaTokenDao {
 		// 第二个参数代表：是否刷新最后访问时间
 		// 设置为false，因为我们不需要刷新最后访问时间，只需要取值即可
 		return timedCache.get(key, false);
+	}
+
+	@Override
+	public <T> T getObject(String key, Class<T> classType) {
+		return (T) getObject(key);
 	}
 
 	@Override

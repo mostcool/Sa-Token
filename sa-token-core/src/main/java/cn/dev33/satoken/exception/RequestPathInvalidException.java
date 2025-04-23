@@ -21,7 +21,7 @@ package cn.dev33.satoken.exception;
  * @author click33
  * @since 1.37.0
  */
-public class RequestPathInvalidException extends SaTokenException {
+public class RequestPathInvalidException extends FirewallCheckException {
 
 	/**
 	 * 序列化版本号

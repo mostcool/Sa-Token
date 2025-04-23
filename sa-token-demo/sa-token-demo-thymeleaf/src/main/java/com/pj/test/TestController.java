@@ -9,9 +9,9 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 
 /**
- * Sa-Token-SSO Server端 Controller 
- * @author click33
+ * 测试 Controller
  *
+ * @author click33
  */
 @RestController
 public class TestController {

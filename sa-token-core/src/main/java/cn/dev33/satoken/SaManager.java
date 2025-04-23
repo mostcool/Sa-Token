@@ -15,11 +15,13 @@
  */
 package cn.dev33.satoken;
 
+import cn.dev33.satoken.apikey.SaApiKeyTemplate;
+import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoader;
+import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoaderDefaultImpl;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.config.SaTokenConfigFactory;
 import cn.dev33.satoken.context.SaTokenContext;
-import cn.dev33.satoken.context.SaTokenContextDefaultImpl;
-import cn.dev33.satoken.context.second.SaTokenSecondContext;
+import cn.dev33.satoken.context.SaTokenContextForThreadLocal;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.dao.SaTokenDaoDefaultImpl;
 import cn.dev33.satoken.error.SaErrorCode;
@@ -30,14 +32,16 @@ import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.log.SaLog;
 import cn.dev33.satoken.log.SaLogForConsole;
 import cn.dev33.satoken.same.SaSameTemplate;
+import cn.dev33.satoken.secure.totp.SaTotpTemplate;
+import cn.dev33.satoken.serializer.SaSerializerTemplate;
+import cn.dev33.satoken.serializer.impl.SaSerializerTemplateForJson;
 import cn.dev33.satoken.sign.SaSignTemplate;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpInterfaceDefaultImpl;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaStrategy;
-import cn.dev33.satoken.temp.SaTempDefaultImpl;
-import cn.dev33.satoken.temp.SaTempInterface;
+import cn.dev33.satoken.temp.SaTempTemplate;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 import java.util.LinkedHashMap;
@@ -141,7 +145,7 @@ public class SaManager {
 	}
 	
 	/**
-	 * 一级上下文 SaTokenContextContext
+	 * 上下文 SaTokenContext
 	 */
 	private volatile static SaTokenContext saTokenContext;
 	public static void setSaTokenContext(SaTokenContext saTokenContext) {
@@ -149,62 +153,33 @@ public class SaManager {
 		SaTokenEventCenter.doRegisterComponent("SaTokenContext", saTokenContext);
 	}
 	public static SaTokenContext getSaTokenContext() {
-		return saTokenContext;
-	}
-	
-	/**
-	 * 二级上下文 SaTokenSecondContext
-	 */
-	private volatile static SaTokenSecondContext saTokenSecondContext;
-	public static void setSaTokenSecondContext(SaTokenSecondContext saTokenSecondContext) {
-		SaManager.saTokenSecondContext = saTokenSecondContext;
-		SaTokenEventCenter.doRegisterComponent("SaTokenSecondContext", saTokenSecondContext);
-	}
-	public static SaTokenSecondContext getSaTokenSecondContext() {
-		return saTokenSecondContext;
-	}
-	
-	/**
-	 * 获取一个可用的 SaTokenContext （按照一级上下文、二级上下文、默认上下文的顺序来判断）
-	 * @return / 
-	 */
-	public static SaTokenContext getSaTokenContextOrSecond() {
-		
-		// s1. 一级Context可用时返回一级Context
-		if(saTokenContext != null) {
-			if(saTokenSecondContext == null || saTokenContext.isValid()) {
-				// 因为 isValid 是一个耗时操作，所以此处假定：二级Context为null的情况下无需验证一级Context有效性 
-				// 这样可以提升6倍左右的上下文获取速度 
-				return saTokenContext;
+		if (saTokenContext == null) {
+			synchronized (SaManager.class) {
+				if (saTokenContext == null) {
+					SaManager.saTokenContext = new SaTokenContextForThreadLocal();
+				}
 			}
 		}
-		
-		// s2. 一级Context不可用时判断二级Context是否可用 
-		if(saTokenSecondContext != null && saTokenSecondContext.isValid()) {
-			return saTokenSecondContext;
-		}
-		
-		// s3. 都不行，就返回默认的 Context 
-		return SaTokenContextDefaultImpl.defaultContext; 
+		return saTokenContext;
 	}
 
 	/**
 	 * 临时 token 认证模块
 	 */
-	private volatile static SaTempInterface saTemp;
-	public static void setSaTemp(SaTempInterface saTemp) {
-		SaManager.saTemp = saTemp;
-		SaTokenEventCenter.doRegisterComponent("SaTempInterface", saTemp);
+	private volatile static SaTempTemplate saTempTemplate;
+	public static void setSaTempTemplate(SaTempTemplate saTempTemplate) {
+		SaManager.saTempTemplate = saTempTemplate;
+		SaTokenEventCenter.doRegisterComponent("SaTempTemplate", saTempTemplate);
 	}
-	public static SaTempInterface getSaTemp() {
-		if (saTemp == null) {
+	public static SaTempTemplate getSaTempTemplate() {
+		if (saTempTemplate == null) {
 			synchronized (SaManager.class) {
-				if (saTemp == null) {
-					SaManager.saTemp = new SaTempDefaultImpl();
+				if (saTempTemplate == null) {
+					SaManager.saTempTemplate = new SaTempTemplate();
 				}
 			}
 		}
-		return saTemp;
+		return saTempTemplate;
 	}
 
 	/**
@@ -224,6 +199,25 @@ public class SaManager {
 			}
 		}
 		return saJsonTemplate;
+	}
+
+	/**
+	 * 序列化器
+	 */
+	private volatile static SaSerializerTemplate saSerializerTemplate;
+	public static void setSaSerializerTemplate(SaSerializerTemplate saSerializerTemplate) {
+		SaManager.saSerializerTemplate = saSerializerTemplate;
+		SaTokenEventCenter.doRegisterComponent("SaSerializerTemplate", saSerializerTemplate);
+	}
+	public static SaSerializerTemplate getSaSerializerTemplate() {
+		if (saSerializerTemplate == null) {
+			synchronized (SaManager.class) {
+				if (saSerializerTemplate == null) {
+					SaManager.saSerializerTemplate = new SaSerializerTemplateForJson();
+				}
+			}
+		}
+		return saSerializerTemplate;
 	}
 
 	/**
@@ -275,7 +269,67 @@ public class SaManager {
 	public static SaLog getLog() {
 		return SaManager.log;
 	}
-	
+
+	/**
+	 * TOTP 算法类，支持 生成/验证 动态一次性密码
+	 */
+	private volatile static SaTotpTemplate totpTemplate;
+	public static void setSaTotpTemplate(SaTotpTemplate totpTemplate) {
+		SaManager.totpTemplate = totpTemplate;
+		SaTokenEventCenter.doRegisterComponent("SaTotpTemplate", totpTemplate);
+	}
+	public static SaTotpTemplate getSaTotpTemplate() {
+		if (totpTemplate == null) {
+			synchronized (SaManager.class) {
+				if (totpTemplate == null) {
+					SaManager.totpTemplate = new SaTotpTemplate();
+				}
+			}
+		}
+		return totpTemplate;
+	}
+
+	/**
+	 * ApiKey 数据加载器
+	 */
+	private volatile static SaApiKeyDataLoader apiKeyDataLoader;
+	public static void setSaApiKeyDataLoader(SaApiKeyDataLoader apiKeyDataLoader) {
+		SaManager.apiKeyDataLoader = apiKeyDataLoader;
+		SaTokenEventCenter.doRegisterComponent("SaApiKeyDataLoader", apiKeyDataLoader);
+	}
+	public static SaApiKeyDataLoader getSaApiKeyDataLoader() {
+		if (apiKeyDataLoader == null) {
+			synchronized (SaManager.class) {
+				if (apiKeyDataLoader == null) {
+					SaManager.apiKeyDataLoader = new SaApiKeyDataLoaderDefaultImpl();
+				}
+			}
+		}
+		return apiKeyDataLoader;
+	}
+
+	/**
+	 * ApiKey 操作类
+	 */
+	private volatile static SaApiKeyTemplate apiKeyTemplate;
+	public static void setSaApiKeyTemplate(SaApiKeyTemplate apiKeyTemplate) {
+		SaManager.apiKeyTemplate = apiKeyTemplate;
+		SaTokenEventCenter.doRegisterComponent("SaApiKeyTemplate", apiKeyTemplate);
+	}
+	public static SaApiKeyTemplate getSaApiKeyTemplate() {
+		if (apiKeyTemplate == null) {
+			synchronized (SaManager.class) {
+				if (apiKeyTemplate == null) {
+					SaManager.apiKeyTemplate = new SaApiKeyTemplate();
+				}
+			}
+		}
+		return apiKeyTemplate;
+	}
+
+
+	// ------------------- StpLogic 相关 -------------------
+
 	/**
 	 * StpLogic 集合, 记录框架所有成功初始化的 StpLogic
 	 */

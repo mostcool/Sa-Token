@@ -23,24 +23,29 @@ StpUtil.getTokenInfo();   // 获取当前 Token 的详细参数。
 StpUtil.login(10001);   // 会话登录
 StpUtil.login(10001, "APP");   // 会话登录，并指定设备类型
 StpUtil.login(10001, true);   // 会话登录，并指定是否 [记住我]
-StpUtil.login(10001, loginModel);   // 会话登录，并指定所有登录参数Model
+StpUtil.login(10001, loginParameter);   // 会话登录，并指定所有登录参数Model
 StpUtil.createLoginSession(10001);   // 创建指定账号id的登录会话，此方法不会将 Token 注入到上下文 
-StpUtil.createLoginSession(10001, loginModel);   // 创建指定账号id的登录会话，此方法不会将 Token 注入到上下文 
+StpUtil.createLoginSession(10001, loginParameter);   // 创建指定账号id的登录会话，此方法不会将 Token 注入到上下文 
 ```
 
-SaLoginModel 配置示例：
+SaLoginParameter 配置示例：
 ``` java
-// SaLoginModel 配置登录相关参数  
-StpUtil.login(10001, new SaLoginModel()
-            .setDevice("PC")                // 此次登录的客户端设备类型, 用于[同端互斥登录]时指定此次登录的设备类型
-            .setIsLastingCookie(true)        // 是否为持久Cookie（临时Cookie在浏览器关闭时会自动删除，持久Cookie在重新打开后依然存在）
-            .setTimeout(60 * 60 * 24 * 7)    // 指定此次登录token的有效期, 单位:秒 （如未指定，自动取全局配置的 timeout 值）
-            .setToken("xxxx-xxxx-xxxx-xxxx") // 预定此次登录生成的Token 
-	        .setExtra("name", "zhangsan")    // Token挂载的扩展参数 （此方法只有在集成jwt插件时才会生效）
-            .setIsWriteHeader(false)         // 是否在登录后将 Token 写入到响应头
-			.setActiveTimeout(300)           // 指定此次登录token的最低活跃频率, 单位:秒，设置此参数需要在配置文件打开dynamicActiveTimeout=true
-			.setTokenSignTag("xxx")          // 指定此次登录挂载在 TokenSign 上的 tag 值, 任意值
-            );
+// SaLoginParameter 配置登录相关参数  
+StpUtil.login(10001, new SaLoginParameter()
+		.setDeviceType("PC")             // 此次登录的客户端设备类型, 一般用于完成 [同端互斥登录] 功能
+		.setDeviceId("xxxxxxxxx")        // 此次登录的客户端设备ID, 登录成功后该设备将标记为可信任设备
+		.setIsLastingCookie(true)        // 是否为持久Cookie（临时Cookie在浏览器关闭时会自动删除，持久Cookie在重新打开后依然存在）
+		.setTimeout(60 * 60 * 24 * 7)    // 指定此次登录 token 的有效期, 单位:秒，-1=永久有效
+		.setActiveTimeout(60 * 60 * 24 * 7) // 指定此次登录 token 的最低活跃频率, 单位:秒，-1=不进行活跃检查
+		.setIsConcurrent(true)           // 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+		.setIsShare(false)                // 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个token, 为 false 时每次登录新建一个 token）
+		.setMaxLoginCount(12)            // 同一账号最大登录数量，-1代表不限 （只有在 isConcurrent=true, isShare=false 时此配置项才有意义）
+		.setMaxTryTimes(12)              // 在每次创建 token 时的最高循环次数，用于保证 token 唯一性（-1=不循环尝试，直接使用）
+		.setExtra("key", "value")        // 记录在 Token 上的扩展参数（只在 jwt 模式下生效）
+		.setToken("xxxx-xxxx-xxxx-xxxx") // 预定此次登录的生成的Token 
+		.setIsWriteHeader(false)         // 是否在登录后将 Token 写入到响应头
+		.setTerminalExtra("key", "value")// 本次登录挂载到 SaTerminalInfo 的自定义扩展数据
+);
 ```
 
 
@@ -87,6 +92,7 @@ StpUtil.getAnonTokenSession();   // 获取当前匿名 Token-Session （可在�
 
 // 其它
 StpUtil.getSessionBySessionId("xxxx-xxxx-xxxx");   // 获取指定key的Session, 如果Session尚未创建，则返回 null
+StpUtil.isTrustDeviceId(123456, "xxxxxxxxxxxxxxxxxxxxxxxx");   // 判断对于指定 loginId 来讲，指定设备 id 是否为可信任设备
 ```
 
 
@@ -129,7 +135,7 @@ StpUtil.hasPermission(permission);   // 判断：当前账号是否拥有指定�
 StpUtil.hasPermission(loginId, permission);   // 判断：指定账号是否含有指定权限标识, 返回true或false 
 StpUtil.hasPermissionAnd(...permissionArray);   // 判断：当前账号是否含有指定权限标识 [指定多个，必须全部验证通过] 
 StpUtil.hasPermissionOr(...permissionArray);   // 判断：当前账号是否含有指定权限标识 [指定多个，只要其一验证通过即可] 
-StpUtil.checkPermission(permission);   // 校验：当前账号是否含有指定权限标识, 如果验证未通过，则抛出异常: NotRoleException 
+StpUtil.checkPermission(permission);   // 校验：当前账号是否含有指定权限标识, 如果验证未通过，则抛出异常: NotRPermissionException 
 StpUtil.checkPermissionAnd(...permissionArray);   // 校验：当前账号是否含有指定权限标识 [指定多个，必须全部验证通过] 
 StpUtil.checkPermissionOr(...permissionArray);   // 校验：当前账号是否含有指定权限标识 [指定多个，只要其一验证通过即可] 
 ```
@@ -141,8 +147,10 @@ StpUtil.getTokenValueByLoginId(10001);   // 获取指定账号id的tokenValue
 StpUtil.getTokenValueByLoginId(10001, "PC");   // 获取指定账号id指定设备类型端的tokenValue
 StpUtil.getTokenValueListByLoginId(10001);   // 获取指定账号id的tokenValue集合 
 StpUtil.getTokenValueListByLoginId(10001, "APP");   // 获取指定账号id指定设备类型端的tokenValue 集合 
+StpUtil.getTerminalListByLoginId(10001);   // 获取指定账号 id 已登录设备信息集合
+StpUtil.getTerminalListByLoginId(10001, "PC");   // 获取指定账号 id 指定设备类型端的已登录设备信息集合
 StpUtil.getLoginDevice();   // 返回当前会话的登录设备类型
-StpUtil.getLoginDeviceByToken(xxx);   // // 返回任意 token 的登录设备类型
+StpUtil.getLoginDeviceByToken(xxx);   // 返回任意 token 的登录设备类型
 ```
 
 

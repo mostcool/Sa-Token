@@ -114,6 +114,12 @@ public class TestController {
 
 ![登录](https://oss.dev33.cn/sa-token/doc/sa-quick-login-index.png 's-w')
 
+也可以通过 Http Basic 的方式直接进行认证 (一般需要在专门的 API 测试工具下才能正常测试，浏览器会自动忽略@之前的信息)
+
+``` url
+http://sa:123456@localhost:8081/
+```
+
 
 ### 可配置信息
 你可以在yml中添加如下配置 (所有配置都是可选的) 
@@ -180,7 +186,9 @@ sa.copr=true
 
 ##### 打包步骤
 
-首先放上懒人链接：[sa-quick-dist.jar](https://gitee.com/dromara/sa-token/attach_files/695353/download) ，不想手动操作的同学可以直接点此链接下载打包后的jar文件 
+<!-- [sa-quick-dist.jar](https://gitee.com/dromara/sa-token/attach_files/695353/download) -->
+
+首先放上懒人链接：[sa-quick-dist.jar](https://pan.quark.cn/s/04fd34a24928)，不想手动操作的同学可以直接点此链接下载打包后的jar文件 
 
 1、首先将 `sa-token-demo-quick-login` 模块添加到顶级父模块的`<modules>`节点中
 

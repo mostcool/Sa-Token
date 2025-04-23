@@ -27,7 +27,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 对 SaRequest 包装类的实现（Servlet 版）
@@ -71,13 +74,8 @@ public class SaRequestForServlet implements SaRequest {
 	 * @return 参数名称列表
 	 */
 	@Override
-	public List<String> getParamNames(){
-		Enumeration<String> parameterNames = request.getParameterNames();
-		List<String> list = new ArrayList<>();
-		while (parameterNames.hasMoreElements()) {
-			list.add(parameterNames.nextElement());
-		}
-		return list;
+	public Collection<String> getParamNames(){
+		return Collections.list(request.getParameterNames());
 	}
 
 	/**
@@ -176,12 +174,20 @@ public class SaRequestForServlet implements SaRequest {
 	}
 
 	/**
+	 * 查询请求 host
+	 */
+	@Override
+	public String getHost() {
+		return request.getServerName();
+	}
+
+	/**
 	 * 转发请求 
 	 */
 	@Override
 	public Object forward(String path) {
 		try {
-			HttpServletResponse response = (HttpServletResponse)SaManager.getSaTokenContextOrSecond().getResponse().getSource();
+			HttpServletResponse response = (HttpServletResponse)SaManager.getSaTokenContext().getResponse().getSource();
 			request.getRequestDispatcher(path).forward(request, response);
 			return null;
 		} catch (ServletException | IOException e) {

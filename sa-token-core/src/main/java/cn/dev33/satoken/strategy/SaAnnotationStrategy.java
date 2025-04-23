@@ -17,6 +17,7 @@ package cn.dev33.satoken.strategy;
 
 import cn.dev33.satoken.annotation.*;
 import cn.dev33.satoken.annotation.handler.*;
+import cn.dev33.satoken.fun.strategy.SaCheckELRootMapExtendFunction;
 import cn.dev33.satoken.fun.strategy.SaCheckMethodAnnotationFunction;
 import cn.dev33.satoken.fun.strategy.SaGetAnnotationFunction;
 import cn.dev33.satoken.fun.strategy.SaIsAnnotationPresentFunction;
@@ -64,6 +65,8 @@ public final class SaAnnotationStrategy {
 		annotationHandlerMap.put(SaCheckHttpBasic.class, new SaCheckHttpBasicHandler());
 		annotationHandlerMap.put(SaCheckHttpDigest.class, new SaCheckHttpDigestHandler());
 		annotationHandlerMap.put(SaCheckOr.class, new SaCheckOrHandler());
+		annotationHandlerMap.put(SaCheckSign.class, new SaCheckSignHandler());
+		annotationHandlerMap.put(SaCheckApiKey.class, new SaCheckApiKeyHandler());
 	}
 
 	/**
@@ -129,5 +132,14 @@ public final class SaAnnotationStrategy {
 		return instance.getAnnotation.apply(method, annotationClass) != null ||
 				instance.getAnnotation.apply(method.getDeclaringClass(), annotationClass) != null;
 	};
+
+	/**
+	 * SaCheckELRootMap 扩展函数
+	 */
+	public SaCheckELRootMapExtendFunction checkELRootMapExtendFunction = rootMap -> {
+		// 默认不做任何处理
+	};
+
+
 
 }

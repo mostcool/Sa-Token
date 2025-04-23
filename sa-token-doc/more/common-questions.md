@@ -9,57 +9,11 @@
 
 ## 一、常见报错
 
-### Q：报错：非 web 上下文无法获取 HttpServletRequest。
 
-报错原因解析：
+### Q：报错：SaTokenContext 上下文尚未初始化
 
-Sa-Token 的部分 API 只能在 Web 上下文中才能调用，例如：`StpUtil.getLoginId()` 获取当前用户Id，这个方法第一步需要先从前端提交的参数里获取 token 值，
-当你在 main 方法里调用这个 API 时，由于 main 方法本质上不是一个 Controller 请求，所以框架无法完成 *“从前端提交的参数里获取 token 值”* 这一步骤，框架就只能抛出异常。
+报这个错说明你在异步上下文/响应式上下文里调用了 Sa-Token 的同步 API，解决方案参考：[异步 & Mock 上下文](/fun/async--mock)
 
-按照此标准，Sa-Token 的 API 可粗浅的分为两大类：
-- 必须在 Web 上下文中才能调用的 API，例如：`StpUtil.getLoginId()`、`StpUtil.getTokenValue()` 等等。
-- 无需 Web 上下文也能调用的 API，例如：`StpUtil.getLoginType()`、`SaManager.getConfig()` 等等。
-
-此处无法逐一列出到底哪些 API 属于 *“必须依赖 Web 上下文的 API”*，因为太多了，你只需要记住关键的一点：
-**当一个 API 执行的代码需要先从前端请求中获取一些数据时，这个 API 就属于 *“必须依赖 Web 上下文的 API”*。**
-
-如果你的代码报这个错，说明你在不是 Web 上下文中的地方，调用了 *“必须依赖 Web 上下文的 API”*，请排查：
-
-1. 是否在 main 方法中调用了 *“必须依赖 Web 上下文的 API”*。
-2. 是否在带有 `@Async` 注解的方法中调用了 *“必须依赖 Web 上下文的 API”*。
-3. 是否在一些丢失 web 上下文的子线程中调用了 *“必须依赖 Web 上下文的 API”*，例如 `MyBatis-Plus` 的 `insertFill` 自动填充。
-4. 是否在一些非 Http 协议的 RPC 框架中（例如 Dubbo）调用了 *“必须依赖 Web 上下文的 API”*。
-5. 是否在 SpringBoot 启动初始化的方法中调用了 *“必须依赖 Web 上下文的 API”*，例如 `@PostConstruct` 修饰的方法。
-6. 是否在定时任务中调用了 *“必须依赖 Web 上下文的 API”*。
-
-
-### Q：报错：未能获取有效的上下文处理器。
-
-报错原因解析：
-
-在 sa-token-core 核心包中，Sa-Token 底层不能确认最终运行的 web 容器，所以抽象了 `SaTokenContext` 接口，对接不同容器时需要注入不同的实现，
-通常这个注入工作都是框架自动完成的，你只需要按照文档开始部分集成相应的依赖即可。例如：
-
-- 你要在 Springboot2.x 中使用 Sa-Token，就引入：`sa-token-spring-boot-starter`。
-- 你要在 Springboot3.x 中使用 Sa-Token，就引入：`sa-token-spring-boot3-starter`。
-- 你要在基于 webflux 架构的网关中使用 Sa-Token，就引入：`sa-token-reactor-spring-boot-starter`。
-- 你要在 Solon 中使用 Sa-Token，就引入：`sa-token-solon-plugin`。
-- 等等等等……
-
-如果你的代码报 *“未能获取有效的上下文处理器”* 这个错，大概率是因为你没有正确引入所需的包，导致框架没有注入正确的 `SaTokenContext` 上下文实现，请排查：
-
-1. 如果你的项目是微服务项目，请直接参考：[微服务-依赖引入说明](/micro/import-intro)，如果是单体项目，请往下看：
-2. 请判断你的项目是 SpringMVC 环境还是 WebFlux 环境：
-	- 如果是 SpringMVC 环境就引入 `sa-token-spring-boot-starter` 依赖，参考：[在SpringBoot环境集成](/start/example)
-	- 如果是 WebFlux 环境就引入 `sa-token-reactor-spring-boot-starter` 依赖，参考：[在WebFlux环境集成](/start/webflux-example)
-3. 如果你还无法分辨你是哪个环境，就看你的 pom.xml 依赖：
-	- 如果引入了`spring-boot-starter-web`就是 SpringMVC 环境。
-	- 如果引入了 `spring-boot-starter-webflux` 就是WebFlux环境。
-	- 什么？你说你两个都引入了？那你的项目能启动成功吗？
-4. 如果是 WebFlux 环境而且正确引入了依赖，依然报错，**请检查是否注册了 SaReactorFilter 全局过滤器，在 WebFlux 下这一步是必须的**，具体还是请参考上面的 [ 在WebFlux环境集成 ] 章节。
-5. 需要仔细注意，如果你使用的是 Springboot3.x 版本，就不要错误的引入 `sa-token-spring-boot-starter`，需要引入的是 `sa-token-spring-boot3-starter`，不然就会导致框架报错。
-6. 如果你的项目开启了全局懒加载(spring.main.lazy-initialization=true)后，能启动项目，但是访问接口报异常，请直接参考：[Q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器](/more/common-questions?id=q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器)
-7. 如果以上步骤排除无误后依然报错，请直接提 issue 或者加入QQ群求助。
 
 ### Q：报错：NotLoginException：xxx
 
@@ -332,6 +286,25 @@ public class SaTokenApplication {
 
 解决方案：不要加 `@EnableWebMvc`，不要 `extends WebMvcConfigurationSupport`，要 `implements WebMvcConfigurer`
 
+如果一定要 `extends WebMvcConfigurationSupport` ，可以通过手动注册 Spring 上下文初始化过滤器试试：
+
+``` java
+@Configuration
+public class SaTokenConfigure extends WebMvcConfigurationSupport {
+
+	// Spring 上下文初始化过滤器 可能由于各种原因没有被注册到，这里手动帮忙注册一下 
+	@Bean
+	@ConditionalOnMissingBean({ RequestContextListener.class, RequestContextFilter.class })
+	@ConditionalOnMissingFilterBean(RequestContextFilter.class)
+	public static RequestContextFilter requestContextFilter() {
+		System.out.println("--------------------------- 注册了"); // 加个打印语句或者断点确保这里注册到了
+		return new OrderedRequestContextFilter();
+	}
+	
+}
+```
+
+
 如果不是以上原因，可以加群提供复现demo。
 
 <!-- 目前能复现此问题的情况是：在项目中有配置类继承 `WebMvcConfigurationSupport` 时，再从 `SaServletFilter` 中调用
@@ -492,17 +465,13 @@ spring:
 步骤2：再改 Sa-Token 的：
 ``` java
 /**
- * 自定义 SaTokenContext 实现类，重写 matchPath 方法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
+ * 重写路由匹配算法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
  */
-@Primary
-@Component
-public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringInJakartaServlet {
-
-    @Override
-    public boolean matchPath(String pattern, String path) {
-        return SaPatternsRequestConditionHolder.match(pattern, path);
-    }
-
+@PostConstruct
+public void customRouteMatcher() {
+	SaStrategy.instance.routeMatcher = (pattern, path) -> {
+		return SaPatternsRequestConditionHolder.match(pattern, path);
+	};
 }
 ```
 
@@ -519,17 +488,13 @@ java.lang.NoClassDefFoundError: org/springframework/web/servlet/mvc/condition/Pa
 
 ``` java
 /**
- * 自定义 SaTokenContext 实现类，重写 matchPath 方法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
+ * 重写路由匹配算法，切换为 ant_path_matcher 模式，使之可以支持 `**` 之后再出现内容
  */
-@Primary
-@Component
-public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringReactor {
-
-    @Override
-    public boolean matchPath(String pattern, String path) {
-        return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
-    }
-
+@PostConstruct
+public void customRouteMatcher() {
+	SaStrategy.instance.routeMatcher = (pattern, path) -> {
+		return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
+	};
 }
 ```
 
@@ -552,25 +517,100 @@ java.lang.NoSuchFieldError: defaultInstance
 
 ``` java
 /**
- * 自定义 SaTokenContext 实现类，重写 matchPath 方法，将 PathPatternParser.defaultInstance 改为 SaPathMatcherHolder.getPathMatcher()
+ * 重写路由匹配算法，将 PathPatternParser.defaultInstance 改为 SaPathMatcherHolder.getPathMatcher()
  */
-@Primary
-@Component
-public class SaTokenContextByPatternsRequestCondition extends SaTokenContextForSpringReactor {
-    @Override
-    public boolean matchPath(String pattern, String path) {
-        return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
-    }
+@PostConstruct
+public void customRouteMatcher() {
+	SaStrategy.instance.routeMatcher = (pattern, path) -> {
+		return SaPathMatcherHolder.getPathMatcher().match(pattern, path);
+	};
 }
+```
+
+
+### Q：过低的 SpringBoot 版本引入 Sa-Token 后报错
+
+在低于 2.2.0 时 (不包含2.2.0本身) 的 SpringBoot 项目中引入 Sa-Token 后，项目启动时会报错：
+
+``` txt
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'cn.dev33.satoken.spring.SaBeanInject': Bean instantiation via constructor failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [cn.dev33.satoken.spring.SaBeanInject]: Constructor threw exception; nested exception is java.lang.NoClassDefFoundError: com/fasterxml/jackson/databind/jsontype/PolymorphicTypeValidator
+```
+
+这是由于缺少 jackson 相关依赖导致的，可以手动添加以下依赖来解决：
+
+``` xml
+<!-- SpringBoot 版本过低时，需要追加的包 (低于 2.2.0 时，不包含 2.2.0 本身) -->
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-core</artifactId>
+	<version>2.17.3</version>
+</dependency>
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-annotations</artifactId>
+	<version>2.17.3</version>
+</dependency>
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-databind</artifactId>
+	<version>2.17.3</version>
+</dependency>
 ```
 
 
 
 
+### Q：报错：非 web 上下文无法获取 HttpServletRequest。
+
+报错原因解析：
+
+Sa-Token 的部分 API 只能在 Web 上下文中才能调用，例如：`StpUtil.getLoginId()` 获取当前用户Id，这个方法第一步需要先从前端提交的参数里获取 token 值，
+当你在 main 方法里调用这个 API 时，由于 main 方法本质上不是一个 Controller 请求，所以框架无法完成 *“从前端提交的参数里获取 token 值”* 这一步骤，框架就只能抛出异常。
+
+按照此标准，Sa-Token 的 API 可粗浅的分为两大类：
+- 必须在 Web 上下文中才能调用的 API，例如：`StpUtil.getLoginId()`、`StpUtil.getTokenValue()` 等等。
+- 无需 Web 上下文也能调用的 API，例如：`StpUtil.getLoginType()`、`SaManager.getConfig()` 等等。
+
+此处无法逐一列出到底哪些 API 属于 *“必须依赖 Web 上下文的 API”*，因为太多了，你只需要记住关键的一点：
+**当一个 API 执行的代码需要先从前端请求中获取一些数据时，这个 API 就属于 *“必须依赖 Web 上下文的 API”*。**
+
+如果你的代码报这个错，说明你在不是 Web 上下文中的地方，调用了 *“必须依赖 Web 上下文的 API”*，请排查：
+
+1. 是否在 main 方法中调用了 *“必须依赖 Web 上下文的 API”*。
+2. 是否在带有 `@Async` 注解的方法中调用了 *“必须依赖 Web 上下文的 API”*。
+3. 是否在一些丢失 web 上下文的子线程中调用了 *“必须依赖 Web 上下文的 API”*，例如 `MyBatis-Plus` 的 `insertFill` 自动填充。
+4. 是否在一些非 Http 协议的 RPC 框架中（例如 Dubbo）调用了 *“必须依赖 Web 上下文的 API”*。
+5. 是否在 SpringBoot 启动初始化的方法中调用了 *“必须依赖 Web 上下文的 API”*，例如 `@PostConstruct` 修饰的方法。
+6. 是否在定时任务中调用了 *“必须依赖 Web 上下文的 API”*。
 
 
+### Q：报错：未能获取有效的上下文处理器。
 
+报错原因解析：
 
+在 sa-token-core 核心包中，Sa-Token 底层不能确认最终运行的 web 容器，所以抽象了 `SaTokenContext` 接口，对接不同容器时需要注入不同的实现，
+通常这个注入工作都是框架自动完成的，你只需要按照文档开始部分集成相应的依赖即可。例如：
+
+- 你要在 Springboot2.x 中使用 Sa-Token，就引入：`sa-token-spring-boot-starter`。
+- 你要在 Springboot3.x 中使用 Sa-Token，就引入：`sa-token-spring-boot3-starter`。
+- 你要在基于 webflux 架构的网关中使用 Sa-Token，就引入：`sa-token-reactor-spring-boot-starter`。
+- 你要在 Solon 中使用 Sa-Token，就引入：`sa-token-solon-plugin`。
+- 等等等等……
+
+如果你的代码报 *“未能获取有效的上下文处理器”* 这个错，大概率是因为你没有正确引入所需的包，导致框架没有注入正确的 `SaTokenContext` 上下文实现，请排查：
+
+1. 如果你的项目是微服务项目，请直接参考：[微服务-依赖引入说明](/micro/import-intro)，如果是单体项目，请往下看：
+2. 请判断你的项目是 SpringMVC 环境还是 WebFlux 环境：
+	- 如果是 SpringMVC 环境就引入 `sa-token-spring-boot-starter` 依赖，参考：[在SpringBoot环境集成](/start/example)
+	- 如果是 WebFlux 环境就引入 `sa-token-reactor-spring-boot-starter` 依赖，参考：[在WebFlux环境集成](/start/webflux-example)
+3. 如果你还无法分辨你是哪个环境，就看你的 pom.xml 依赖：
+	- 如果引入了`spring-boot-starter-web`就是 SpringMVC 环境。
+	- 如果引入了 `spring-boot-starter-webflux` 就是WebFlux环境。
+	- 什么？你说你两个都引入了？那你的项目能启动成功吗？
+4. 如果是 WebFlux 环境而且正确引入了依赖，依然报错，**请检查是否注册了 SaReactorFilter 全局过滤器，在 WebFlux 下这一步是必须的**，具体还是请参考上面的 [ 在WebFlux环境集成 ] 章节。
+5. 需要仔细注意，如果你使用的是 Springboot3.x 版本，就不要错误的引入 `sa-token-spring-boot-starter`，需要引入的是 `sa-token-spring-boot3-starter`，不然就会导致框架报错。
+6. 如果你的项目开启了全局懒加载(spring.main.lazy-initialization=true)后，能启动项目，但是访问接口报异常，请直接参考：[Q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器](/more/common-questions?id=q：开启了全局懒加载后，能启动项目，但是访问接口报未能获取有效的上下文处理器)
+7. 如果以上步骤排除无误后依然报错，请直接提 issue 或者加入QQ群求助。
 
 
 
@@ -755,10 +795,129 @@ public SaResult refreshToken(String refreshToken) {
 ```
 
 
+### Q：前后端一体项目下，在拦截未登录进入登录页面时，如何登录完成后原路返回？
+可以在拦截跳转登录页面时，把原 url 作为 back 参数挂载到登录页后方，登录完成后读取 back 参数并跳转
+``` java
+@RestControllerAdvice
+public class GlobalException {
+	// 未登录异常拦截 
+	@ExceptionHandler(NotLoginException.class)
+	public Object handlerException(NotLoginException e) {
+		e.printStackTrace();
+		return SaHolder.getResponse().redirect("/login?back=" + SaHolder.getRequest().getUrl());
+	}
+}
+```
+
+
+
 ### Q：怎么改变请求返回的 http 状态码？
 ``` java
 SaHolder.getResponse().setStatus(401)
 ```
+
+
+
+### Q：Sa-Token 集成 Redis 如何集群？
+以 `sa-token-redis-template` 为例：Sa-Token 底层使用的是 RedisTemplate 对象来操作数据的，也就是说，你只要给 RedisTemplate 配置上集群模式，Sa-Token 自动就是集群模式了。
+
+
+### Q：多个项目共用同一个 redis，怎么防止冲突？
+
+首先，如无特殊需求，建议多个项目不要共用同一个 redis，如果非要共用，有以下方式避免数据冲突：
+
+- 方式 1：使用不同的 db 索引，Redis 默认提供 16 个 database 容器，每个项目配置不同的 db 索引即可。
+- 方式 2：给项目配置不同的 `sa-token.token-name` 值，此配置项默认为 `satoken`，是框架在 Redis 存储数据时使用的统一前缀。
+- 方式 3：使用 `sa-token-three-redis-jackson-add-prefix` 插件，参考：[sa-token-three-plugin](https://gitee.com/sa-tokens/sa-token-three-plugin)。
+
+
+### Q：如何防止 CSRF 攻击？
+CSRF 攻击的核心在于利用浏览器自动提交 Cookie 的特性，代替用户发送自己不想发送的请求。
+
+**方案一：关闭 Cookie模式。**
+
+在配置文件里配置 `sa-token.is-read-cookie=false` 关闭 Cookie 读取模式，采用 localStorage 存储 token + header 头提交，即可避免 CSRF 攻击。
+
+**方案二：增加 csrf-token 验证**
+
+如果项目必须采用 Cookie 模式验证，可以在请求中增加 csrf-token 验证的环节：
+
+1、在登录时，生成一个 `csrf_token` 返回到前端：
+``` java
+// 测试登录 
+@RequestMapping("/login")
+public SaResult login() {
+	StpUtil.login(10001);
+	String csrfToken = StpUtil.getSession().get("csrf_token", () -> SaFoxUtil.getRandomString(60));
+	return SaResult.ok().set("csrf_token", csrfToken);
+}
+```
+
+2、前端将 csrf_token 存储在 localStorage 中（注意一定要存储在 localStorage 而非 Cookie 中，存储在 Cookie 中还是可能会被浏览器自动提交）
+``` java
+localStorage.setItem('csrf_token', csrf_token);
+```
+每次请求将 csrf_token 塞到 Header 中。
+
+3、在需要防止 CSRF 攻击的接口验证 csrf_token：
+``` java
+@RequestMapping("/test")
+public SaResult test() {
+
+	// 先验证 csrfToken 
+	String csrfToken = SaHolder.getRequest().getHeader("csrf_token");
+	if (csrfToken == null || ! csrfToken.equals(StpUtil.getSession().get("csrf_token")) ) {
+		throw new SaTokenException("csrf_token 不匹配");
+	}
+
+	// 通过后再处理具体业务
+	// ...
+
+	return SaResult.ok();
+}
+```
+
+也可以将验证代码写到全局拦截器中，为所有接口提供校验。
+
+
+
+### Q：如何自定义框架读取 token 的方式？
+**方式一：通过 StpUtil.getStpLogic().setTokenValueToStorage("abcdefgxxxxxxxx") 自定义 token 值**
+
+如果你可以在框架读取 token 之前写一些代码，那么你可以通过如下代码自定义当前请求的 token 值：
+``` java
+@RequestMapping("/test")
+public SaResult test() {
+	System.out.println(StpUtil.getTokenValue()); // 此时读取到的是前端提交的: cebcc930-c0f5-4009-8eb0-1b6aee63b4aa
+	StpUtil.getStpLogic().setTokenValueToStorage("abcdefgxxxxxxxx");
+	System.out.println(StpUtil.getTokenValue()); // 此时读取到的是我们自定义的: abcdefgxxxxxxxx
+	return SaResult.ok();
+}
+```
+
+**方式二：重写 StpLogic 读取 token 的方法**
+
+``` java
+@Component
+public class MyStpLogic extends StpLogic {
+    public MyStpLogic() {
+        super("login");
+    }
+	// 自定义 token 读取方式，例如此处改为读取请求头为 my-token 的值 
+    @Override
+    public String getTokenValue() {
+        String token = SaHolder.getRequest().getHeader("my-token");
+        return token;
+    }
+}
+```
+
+
+
+
+### Q：文档是否能下载？是否有离线版？
+文档已完整开源，请访问 Sa-Token 官方仓库，根目录下的 sa-token-doc 文件夹就是文档。
+
 
 
 

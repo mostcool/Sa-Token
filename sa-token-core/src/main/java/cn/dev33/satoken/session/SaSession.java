@@ -18,6 +18,7 @@ package cn.dev33.satoken.session;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.application.SaSetValueInterface;
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.fun.SaTwoParamFunction;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
 import cn.dev33.satoken.util.SaFoxUtil;
 
@@ -87,6 +88,11 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	 * 所属 Token （当此 SaSession 属于 Token-Session 时，此值有效）
 	 */
 	private String token;
+
+	/**
+	 * 当前账号历史总计登录设备数量 （当此 SaSession 属于 Account-Session 时，此值有效）
+	 */
+	private int historyTerminalCount;
 
 	/**
 	 * 此 SaSession 的创建时间（13位时间戳）
@@ -234,135 +240,165 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	}
 
 
-	// ----------------------- TokenSign 相关
+	// ----------------------- SaTerminalInfo 相关
 
 	/**
-	 * 此 Session 绑定的 Token 签名列表 
+	 * 登录终端信息列表
 	 */
-	private List<TokenSign> tokenSignList = new Vector<>();
+	private List<SaTerminalInfo> terminalList = new Vector<>();
 
 	/**
-	 * 写入此 Session 绑定的 Token 签名列表 
-	 * @param tokenSignList Token 签名列表
+	 * 写入登录终端信息列表
+	 * @param terminalList /
 	 */
-	public void setTokenSignList(List<TokenSign> tokenSignList) {
-		this.tokenSignList = tokenSignList;
+	public void setTerminalList(List<SaTerminalInfo> terminalList) {
+		this.terminalList = terminalList;
 	}
 
 	/**
-	 * 获取此 Session 绑定的 Token 签名列表 
+	 * 获取登录终端信息列表
 	 *
-	 * @return Token 签名列表
+	 * @return /
 	 */
-	public List<TokenSign> getTokenSignList() {
-		return tokenSignList;
+	public List<SaTerminalInfo> getTerminalList() {
+		return terminalList;
 	}
 
 	/**
-	 * 获取 Token 签名列表 的拷贝副本
+	 * 获取 登录终端信息列表 (拷贝副本)
 	 *
-	 * @return token签名列表
+	 * @return /
 	 */
-	public List<TokenSign> tokenSignListCopy() {
-		return new ArrayList<>(tokenSignList);
+	public List<SaTerminalInfo> terminalListCopy() {
+		return new ArrayList<>(terminalList);
 	}
 
 	/**
-	 * 返回 Token 签名列表 的拷贝副本，根据 device 筛选 
+	 * 获取 登录终端信息列表 (拷贝副本)，根据 deviceType 筛选
 	 *
-	 * @param device 设备类型，填 null 代表不限设备类型  
-	 * @return token签名列表
+	 * @param deviceType 设备类型，填 null 代表不限设备类型
+	 * @return /
 	 */
-	public List<TokenSign> getTokenSignListByDevice(String device) {
+	public List<SaTerminalInfo> getTerminalListByDeviceType(String deviceType) {
 		// 返回全部
-		if(device == null) {
-			return tokenSignListCopy();
+		if(deviceType == null) {
+			return terminalListCopy();
 		}
 		// 返回筛选后的
-		List<TokenSign> tokenSignList = tokenSignListCopy();
-		List<TokenSign> list = new ArrayList<>();
-		for (TokenSign tokenSign : tokenSignList) {
-			if(SaFoxUtil.equals(tokenSign.getDevice(), device)) {
-				list.add(tokenSign);
+		List<SaTerminalInfo> copyList = terminalListCopy();
+		List<SaTerminalInfo> newList = new ArrayList<>();
+		for (SaTerminalInfo terminal : copyList) {
+			if(SaFoxUtil.equals(terminal.getDeviceType(), deviceType)) {
+				newList.add(terminal);
 			}
 		}
-		return list;
+		return newList;
 	}
 
 	/**
-	 * 获取当前 Session 上的所有 token 列表
+	 * 获取 登录终端 token 列表
 	 *
-	 * @param device 设备类型，填 null 代表不限设备类型
+	 * @param deviceType 设备类型，填 null 代表不限设备类型
 	 * @return 此 loginId 的所有登录 token
 	 */
-	public List<String> getTokenValueListByDevice(String device) {
-		// 遍历解析，按照设备类型进行筛选
-		List<TokenSign> tokenSignList = tokenSignListCopy();
+	public List<String> getTokenValueListByDeviceType(String deviceType) {
 		List<String> tokenValueList = new ArrayList<>();
-		for (TokenSign tokenSign : tokenSignList) {
-			if(device == null || tokenSign.getDevice().equals(device)) {
-				tokenValueList.add(tokenSign.getValue());
-			}
+		for (SaTerminalInfo terminal : getTerminalListByDeviceType(deviceType)) {
+			tokenValueList.add(terminal.getTokenValue());
 		}
 		return tokenValueList;
 	}
 
 	/**
-	 * 查找一个 Token 签名
+	 * 查找一个终端信息，根据 tokenValue
 	 *
-	 * @param tokenValue token值
-	 * @return 查找到的 TokenSign
+	 * @param tokenValue /
+	 * @return /
 	 */
-	public TokenSign getTokenSign(String tokenValue) {
-		for (TokenSign tokenSign : tokenSignListCopy()) {
-			if (SaFoxUtil.equals(tokenSign.getValue(), tokenValue)) {
-				return tokenSign;
+	public SaTerminalInfo getTerminal(String tokenValue) {
+		for (SaTerminalInfo terminal : terminalListCopy()) {
+			if (SaFoxUtil.equals(terminal.getTokenValue(), tokenValue)) {
+				return terminal;
 			}
 		}
 		return null;
 	}
 
 	/**
-	 * 添加一个 Token 签名
+	 * 添加一个终端信息
 	 *
-	 * @param tokenSign Token 签名
+	 * @param terminalInfo /
 	 */
-	public void addTokenSign(TokenSign tokenSign) {
-		// 根据 tokenValue 值查重，如果不存在，则添加
-		TokenSign oldTokenSign = getTokenSign(tokenSign.getValue());
-		if(oldTokenSign == null) {
-			tokenSignList.add(tokenSign);
-			update();
-		} else {
-			// 如果存在，则更新
-			oldTokenSign.setValue(tokenSign.getValue());
-			oldTokenSign.setDevice(tokenSign.getDevice());
-			oldTokenSign.setTag(tokenSign.getTag());
-			update();
+	public void addTerminal(SaTerminalInfo terminalInfo) {
+		// 根据 tokenValue 值查重，如果存在旧的，则先删除
+		SaTerminalInfo oldTerminal = getTerminal(terminalInfo.getTokenValue());
+		if(oldTerminal != null) {
+			terminalList.remove(oldTerminal);
 		}
+		// 然后添加新的
+		this.historyTerminalCount++;
+		terminalInfo.setIndex(this.historyTerminalCount);
+		terminalList.add(terminalInfo);
+		update();
 	}
 
 	/**
-	 * 添加一个 Token 签名
-	 *
-	 * @param tokenValue token值
-	 * @param device 设备类型
-	 */
-	@Deprecated
-	public void addTokenSign(String tokenValue, String device) {
-		addTokenSign(new TokenSign(tokenValue, device, null));
-	}
-
-	/**
-	 * 移除一个 Token 签名
+	 * 移除一个终端信息
 	 *
 	 * @param tokenValue token值 
 	 */
-	public void removeTokenSign(String tokenValue) {
-		TokenSign tokenSign = getTokenSign(tokenValue);
-		if (tokenSignList.remove(tokenSign)) {
+	public void removeTerminal(String tokenValue) {
+		SaTerminalInfo terminalInfo = getTerminal(tokenValue);
+		if (terminalList.remove(terminalInfo)) {
 			update();
 		}
+	}
+
+	/**
+	 * 获取 当前账号历史总计登录设备数量 （当此 SaSession 属于 Account-Session 时，此值有效）
+	 *
+	 * @return /
+	 */
+	public int getHistoryTerminalCount() {
+		return this.historyTerminalCount;
+	}
+
+	/**
+	 * 设置 当前账号历史总计登录设备数量 （当此 SaSession 属于 Account-Session 时，此值有效）
+	 *
+	 * @param historyTerminalCount /
+	 */
+	public void setHistoryTerminalCount(int historyTerminalCount) {
+		this.historyTerminalCount = historyTerminalCount;
+	}
+
+	/**
+	 * 遍历 terminalList 列表，执行特定函数
+	 *
+	 * @param function 需要执行的函数
+	 */
+	public void forEachTerminalList(SaTwoParamFunction<SaSession, SaTerminalInfo> function) {
+		for (SaTerminalInfo terminalInfo: terminalListCopy()) {
+			function.run(this, terminalInfo);
+		}
+	}
+
+
+	/**
+	 * 判断指定设备 id 是否为可信任设备
+	 * @param deviceId /
+	 * @return /
+	 */
+	public boolean isTrustDeviceId(String deviceId) {
+		if(SaFoxUtil.isEmpty(deviceId)) {
+			return false;
+		}
+		for (SaTerminalInfo terminal : terminalListCopy()) {
+			if (SaFoxUtil.equals(terminal.getDeviceId(), deviceId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -382,9 +418,9 @@ public class SaSession implements SaSetValueInterface, Serializable {
 		SaTokenEventCenter.doLogoutSession(id);
 	}
 
-	/** 当Session上的tokenSign数量为零时，注销会话 */
-	public void logoutByTokenSignCountToZero() {
-		if (tokenSignList.size() == 0) {
+	/** 当 Session 上的 SaTerminalInfo 数量为零时，注销会话 */
+	public void logoutByTerminalCountToZero() {
+		if (terminalList.isEmpty()) {
 			logout();
 		}
 	}
@@ -393,7 +429,7 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	 * 获取此Session的剩余存活时间 (单位: 秒) 
 	 * @return 此Session的剩余存活时间 (单位: 秒)
 	 */
-	public long getTimeout() {
+	public long timeout() {
 		return SaManager.getSaTokenDao().getSessionTimeout(this.id);
 	}
 	
@@ -411,7 +447,7 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	 */
 	public void updateMinTimeout(long minTimeout) {
 		long min = trans(minTimeout);
-		long curr = trans(getTimeout());
+		long curr = trans(timeout());
 		if(curr < min) {
 			updateTimeout(minTimeout);
 		}
@@ -423,7 +459,7 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	 */
 	public void updateMaxTimeout(long maxTimeout) {
 		long max = trans(maxTimeout);
-		long curr = trans(getTimeout());
+		long curr = trans(timeout());
 		if(curr > max) {
 			updateTimeout(maxTimeout);
 		}
@@ -545,17 +581,5 @@ public class SaSession implements SaSetValueInterface, Serializable {
 	}
 
 	//
-
-
-	/**
-	 * 请更换为：getTokenSignListByDevice(device)
-	 *
-	 * @param device 设备类型，填 null 代表不限设备类型
-	 * @return token签名列表
-	 */
-	@Deprecated
-	public List<TokenSign> tokenSignListCopyByDevice(String device) {
-		return getTokenSignListByDevice(device);
-	}
 
 }

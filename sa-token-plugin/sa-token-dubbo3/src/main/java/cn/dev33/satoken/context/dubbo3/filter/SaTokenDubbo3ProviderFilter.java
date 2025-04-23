@@ -17,9 +17,13 @@ package cn.dev33.satoken.context.dubbo3.filter;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.same.SaSameUtil;
+import cn.dev33.satoken.util.SaTokenConsts;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.extension.Activate;
-import org.apache.dubbo.rpc.*;
+import org.apache.dubbo.rpc.Filter;
+import org.apache.dubbo.rpc.Invocation;
+import org.apache.dubbo.rpc.Invoker;
+import org.apache.dubbo.rpc.Result;
 
 /**
  * Sa-Token 整合 Dubbo3 Provider端（被调用端）过滤器
@@ -27,11 +31,11 @@ import org.apache.dubbo.rpc.*;
  * @author click33
  * @since 1.34.0
  */
-@Activate(group = {CommonConstants.PROVIDER}, order = -30000)
+@Activate(group = {CommonConstants.PROVIDER}, order = SaTokenConsts.RPC_PERMISSION_FILTER_ORDER)
 public class SaTokenDubbo3ProviderFilter implements Filter {
 
 	@Override
-	public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+	public Result invoke(Invoker<?> invoker, Invocation invocation) {
 		
 		// RPC 调用鉴权 
 		if(SaManager.getConfig().getCheckSameToken()) {

@@ -20,6 +20,7 @@ import cn.dev33.satoken.exception.SaTokenException;
 
 import java.io.Console;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -377,6 +378,36 @@ public class SaFoxUtil {
 	}
 
 	/**
+	 * 将 Map 转化为 Object
+	 * @param map /
+	 * @param clazz /
+	 * @return /
+	 * @param <T> /
+	 */
+	public static <T> T mapToObject(Map<String, Object> map, Class<T> clazz) {
+		if(map == null) {
+			return null;
+		}
+		if(clazz == Map.class) {
+			return (T) map;
+		}
+		try {
+			T obj = clazz.getDeclaredConstructor().newInstance();
+			for (Field field : clazz.getDeclaredFields()) {
+				String fieldName = field.getName();
+				if (map.containsKey(fieldName)) {
+					field.setAccessible(true);
+					field.set(obj, map.get(fieldName));
+				}
+			}
+			return obj;
+		} catch (Exception e) {
+			throw new RuntimeException("转换失败: " + e.getMessage(), e);
+		}
+	}
+
+
+	/**
 	 * 在url上拼接上kv参数并返回
 	 * @param url url
 	 * @param paramStr 参数, 例如 id=1001
@@ -443,15 +474,15 @@ public class SaFoxUtil {
 			url = "";
 		}
 		int index = url.lastIndexOf('#');
-		// ? 不存在
+		// # 不存在
 		if(index == -1) {
 			return url + '#' + paramStr;
 		}
-		// ? 是最后一位
+		// # 是最后一位
 		if(index == url.length() - 1) {
 			return url + paramStr;
 		}
-		// ? 是其中一位
+		// # 是其中一位
 		if(index < url.length() - 1) {
 			String separatorChar = "&";
 			// 如果最后一位是 不是&, 且 paramStr 第一位不是 &, 就赠送一个 &
@@ -777,5 +808,37 @@ public class SaFoxUtil {
 		}
 		return listX;
 	}
+
+	/**
+	 * 检查字符串是否包含非可打印 ASCII 字符
+	 * @param str /
+	 * @return /
+	 */
+	public static boolean hasNonPrintableASCII(String str) {
+		if (str == null) {
+			return false;
+		}
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			// ASCII 范围检查：0-31 或 127
+			if ((c <= 31) || (c == 127)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 将 value 转化为 String，如果 value 为 null，则返回空字符串
+	 * @param value /
+	 * @return /
+	 */
+	public static String valueToString(Object value) {
+		if (value == null) {
+			return "";
+		}
+		return value.toString();
+	}
+
 
 }

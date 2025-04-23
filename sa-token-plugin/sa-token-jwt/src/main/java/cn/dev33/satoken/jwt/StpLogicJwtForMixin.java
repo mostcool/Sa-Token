@@ -15,9 +15,6 @@
  */
 package cn.dev33.satoken.jwt;
 
-import java.util.List;
-import java.util.Map;
-
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.exception.ApiDisabledException;
@@ -29,8 +26,13 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
+import cn.dev33.satoken.stp.parameter.SaLogoutParameter;
 import cn.dev33.satoken.util.SaFoxUtil;
 import cn.dev33.satoken.util.SaTokenConsts;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Sa-Token 整合 jwt -- Mixin 混入模式
@@ -75,8 +77,8 @@ public class StpLogicJwtForMixin extends StpLogic {
 	 * 创建一个TokenValue 
 	 */
 	@Override
-	public String createTokenValue(Object loginId, String device, long timeout, Map<String, Object> extraData) {
-		return SaJwtUtil.createToken(loginType, loginId, device, timeout, extraData, jwtSecretKey());
+	public String createTokenValue(Object loginId, String deviceType, long timeout, Map<String, Object> extraData) {
+		return SaJwtUtil.createToken(loginType, loginId, deviceType, timeout, extraData, jwtSecretKey());
 	}
 
 	/**
@@ -95,7 +97,7 @@ public class StpLogicJwtForMixin extends StpLogic {
 		info.sessionTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
 		info.tokenSessionTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
 		info.tokenActiveTimeout = SaTokenDao.NOT_VALUE_EXPIRE;
-		info.loginDevice = getLoginDevice();
+		info.loginDeviceType = getLoginDeviceType();
 		return info;
 	}
 	
@@ -135,34 +137,20 @@ public class StpLogicJwtForMixin extends StpLogic {
 	}
 
 	/**
-	 * [禁用] 会话注销，根据账号id 和 设备类型
+	 * [work] 注销下线
+	 *
+	 * @param tokenValue 指定 token
+	 * @param logoutParameter 注销参数
 	 */
-	@Override
-	public void logout(Object loginId, String device) {
-		throw new ApiDisabledException(); 
-	}
-	
-	/**
-	 * [禁用] 会话注销，根据指定 Token 
-	 */
-	@Override
-	public void logoutByTokenValue(String tokenValue) {
-		throw new ApiDisabledException(); 
+	public void _logoutByTokenValue(String tokenValue, SaLogoutParameter logoutParameter) {
+		throw new ApiDisabledException();
 	}
 
 	/**
-	 * [禁用] 踢人下线，根据账号id 和 设备类型 
+	 * [禁用] 会话注销
 	 */
 	@Override
-	public void kickout(Object loginId, String device) {
-		throw new ApiDisabledException(); 
-	}
-
-	/**
-	 * [禁用] 踢人下线，根据指定 Token 
-	 */
-	@Override
-	public void kickoutByTokenValue(String tokenValue) { 
+	public void _logout(Object loginId, SaLogoutParameter logoutParameter) {
 		throw new ApiDisabledException(); 
 	}
 
@@ -170,7 +158,7 @@ public class StpLogicJwtForMixin extends StpLogic {
 	 * [禁用] 顶人下线，根据账号id 和 设备类型 
 	 */
 	@Override
-	public void replaced(Object loginId, String device) {
+	public void replaced(Object loginId, String deviceType) {
 		throw new ApiDisabledException(); 
 	}
 
@@ -261,11 +249,11 @@ public class StpLogicJwtForMixin extends StpLogic {
 	// ------------------- Bean对象代理 -------------------  
 	
 	/**
-	 * 返回全局配置对象的 isShare 属性
+	 * 返回当前 StpLogic 是否支持 isShare 
 	 * @return / 
 	 */
 	@Override
-	public boolean getConfigOfIsShare() {
+	public boolean isSupportShareToken() {
 		return false;
 	}
 
@@ -274,7 +262,7 @@ public class StpLogicJwtForMixin extends StpLogic {
 	 * @return /
 	 */
 	@Override
-	public int getConfigOfMaxTryTimes() {
+	public int getConfigOfMaxTryTimes(SaLoginParameter loginParameter) {
 		return -1;
 	}
 

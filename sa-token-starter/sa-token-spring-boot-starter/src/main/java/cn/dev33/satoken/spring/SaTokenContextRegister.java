@@ -15,8 +15,11 @@
  */
 package cn.dev33.satoken.spring;
 
-import cn.dev33.satoken.context.SaTokenContext;
-import cn.dev33.satoken.filter.SaPathCheckFilterForServlet;
+import cn.dev33.satoken.filter.SaFirewallCheckFilterForServlet;
+import cn.dev33.satoken.filter.SaTokenContextFilterForServlet;
+import cn.dev33.satoken.filter.SaTokenCorsFilterForServlet;
+import cn.dev33.satoken.spring.pathmatch.SaPatternsRequestConditionHolder;
+import cn.dev33.satoken.strategy.SaStrategy;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -27,24 +30,41 @@ import org.springframework.context.annotation.Bean;
  */
 public class SaTokenContextRegister {
 
-	/**
-	 * 获取上下文处理器组件 (Spring版)
-	 * 
-	 * @return /
-	 */
-	@Bean
-	public SaTokenContext getSaTokenContextForSpring() {
-		return new SaTokenContextForSpring();
+	public SaTokenContextRegister() {
+		// 重写路由匹配算法
+		SaStrategy.instance.routeMatcher = (pattern, path) -> {
+			return SaPatternsRequestConditionHolder.match(pattern, path);
+		};
 	}
 
 	/**
-	 * 请求 path 校验过滤器
+	 * 上下文过滤器
 	 *
 	 * @return /
 	 */
 	@Bean
-	public SaPathCheckFilterForServlet saPathCheckFilterForServlet() {
-		return new SaPathCheckFilterForServlet();
+	public SaTokenContextFilterForServlet saTokenContextFilterForServlet() {
+		return new SaTokenContextFilterForServlet();
+	}
+
+	/**
+	 * CORS 跨域策略过滤器
+	 *
+	 * @return /
+	 */
+	@Bean
+	public SaTokenCorsFilterForServlet saTokenCorsFilterForServlet() {
+		return new SaTokenCorsFilterForServlet();
+	}
+
+	/**
+	 * 防火墙过滤器
+	 *
+	 * @return /
+	 */
+	@Bean
+	public SaFirewallCheckFilterForServlet saFirewallCheckFilterForServlet() {
+		return new SaFirewallCheckFilterForServlet();
 	}
 
 }

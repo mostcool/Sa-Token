@@ -1209,5 +1209,186 @@ var donateList = [
 		"msg": '感谢您的开源项目！',
 		"date": "2024-08-30"
 	},
-	
+	{
+		"name": "有锦",
+		"link": "https://gitee.com/mushi00",
+		"money": 1.0,
+		"msg": '好厉害的项目啊 我郭威虽然没什么钱但是我郭威还是捐赠一下我郭威真的很认可这个项目，我郭威太崇拜了',
+		"date": "2024-09-03"
+	},
+	{
+		"name": "zhangboyang",
+		"link": "https://gitee.com/zhangboyangos",
+		"money": 10.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-09-04"
+	},
+	{
+		"name": "读钓",
+		"link": "https://gitee.com/songyinyin",
+		"money": 50.0,
+		"msg": '感谢您的开源项目！致敬用爱发电',
+		"date": "2024-09-14"
+	},
+	{
+		"name": "sswiki",
+		"link": "https://gitee.com/sswiki",
+		"money": 50.0,
+		"msg": '感谢开源！私有化部署的企业知识库：<a href="https://doc.zyplayer.com" target="_blank">https://doc.zyplayer.com</a>',
+		"date": "2024-09-24"
+	},
+	{
+		"name": "坚持就是胜利",
+		"link": "https://gitee.com/insistppp",
+		"money": 1.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-09-27"
+	},
+	{
+		"name": "StrawberryerBlue",
+		"link": "https://gitee.com/strawberryerblue",
+		"money": 50.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-10-14"
+	},
+	{
+		"name": "qing",
+		"link": "https://gitee.com/haomao1",
+		"money": 20.0,
+		"msg": '非常好用，感谢您的开源项目！',
+		"date": "2024-10-15"
+	},
+	{
+		"name": "厉飞雨",
+		"link": "https://gitee.com/david666a",
+		"money": 58.0,
+		"msg": '感谢道友，深有启发。',
+		"date": "2024-10-16"
+	},
+	{
+		"name": "李嘉辉",
+		"link": "https://gitee.com/lee_kiahwee",
+		"money": 10.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-10-17"
+	},
+	{
+		"name": "不问烟雨",
+		"link": "https://gitee.com/xiaominfagui",
+		"money": 20.0,
+		"msg": '加油',
+		"date": "2024-11-04"
+	},
+	{
+		"name": "zonglinjiang",
+		"link": "https://gitee.com/jiang-zonglin0427",
+		"money": 5.0,
+		"msg": '已经在至少两个商业项目里面使用了 ，非常好用，感谢作者的开源精神',
+		"date": "2024-11-05"
+	},
+	{
+		"name": "当下",
+		"link": "https://gitee.com/carl1974",
+		"money": 10.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-11-18"
+	},
+	{
+		"name": "唐醋鱼(微信打赏)",
+		"link": "",
+		"money": 8.8,
+		"msg": '小小心意，群主请受纳',
+		"date": "2024-11-19"
+	},
+	{
+		"name": "cunyun",
+		"link": "https://gitee.com/cunyun",
+		"money": 1.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-11-27"
+	},
+	{
+		"name": "guwq",
+		"link": "https://gitee.com/guweiqiang2016",
+		"money": 10.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2024-12-05"
+	},
+	{
+		"name": "kingkick",
+		"link": "https://gitee.com/kingkick",
+		"money": 10.0,
+		"msg": '文档真好！学习到不止是 Sa-Token 框架本身，更是绝大多数场景下权限设计的最佳实践。',
+		"date": "2024-12-12"
+	},
+	{
+		"name": "JavaBean",
+		"link": "https://gitee.com/DearShengGe",
+		"money": 6.6,
+		"msg": '跟着Sa的文档一点点理解仿佛有位老师在带领着一步步去学，尤其是SSO单点登录部分！好东西不能被埋没！',
+		"date": "2024-12-19"
+	},
+	{
+		"name": "焱枫",
+		"link": "https://gitee.com/dellibrunaway",
+		"money": 10.0,
+		"msg": '开心快乐每一天',
+		"date": "2024-12-20"
+	},
+	{
+		"name": "dmyi",
+		"link": "https://gitee.com/dmyi",
+		"money": 20.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-01-03"
+	},
+	{
+		"name": "费雷",
+		"link": "https://gitee.com/feileier",
+		"money": 20.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-01-09"
+	},
+	{
+		"name": "苏俊",
+		"link": "https://gitee.com/fareuwell",
+		"money": 50.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-01-10"
+	},
+	{
+		"name": "阡陌兮",
+		"link": "https://gitee.com/i_kang",
+		"money": 9.9,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-01-16"
+	},
+	{
+		"name": "main",
+		"link": "https://gitee.com/zgx1179399522",
+		"money": 50.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-01-22"
+	},
+	{
+		"name": "shalixiaohu",
+		"link": "https://gitee.com/jiaruozhi",
+		"money": 10.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-02-06"
+	},
+	{
+		"name": "林佳奇",
+		"link": "https://gitee.com/ljq1307",
+		"money": 20.0,
+		"msg": '感谢您的开源项目！',
+		"date": "2025-02-15"
+	},
+	{
+		"name": "AAA方一翻（微信打赏）",
+		"link": "",
+		"money": 28.8,
+		"msg": '请你喝杯奶茶',
+		"date": "2025-04-07"
+	},
 ]

@@ -15,17 +15,16 @@
  */
 package cn.dev33.satoken.reactor.context;
 
-import org.springframework.web.server.ServerWebExchange;
-
-import cn.dev33.satoken.context.SaTokenContextForThreadLocalStorage;
-import cn.dev33.satoken.context.SaTokenContextForThreadLocalStorage.Box;
+import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.context.model.SaRequest;
 import cn.dev33.satoken.context.model.SaResponse;
 import cn.dev33.satoken.context.model.SaStorage;
-import cn.dev33.satoken.fun.SaFunction;
+import cn.dev33.satoken.context.model.SaTokenContextModelBox;
+import cn.dev33.satoken.fun.SaRetGenericFunction;
 import cn.dev33.satoken.reactor.model.SaRequestForReactor;
 import cn.dev33.satoken.reactor.model.SaResponseForReactor;
 import cn.dev33.satoken.reactor.model.SaStorageForReactor;
+import org.springframework.web.server.ServerWebExchange;
 
 /**
  * Reactor上下文操作（同步），持有当前请求的 ServerWebExchange 全局引用
@@ -36,41 +35,41 @@ import cn.dev33.satoken.reactor.model.SaStorageForReactor;
 public class SaReactorSyncHolder {
 	
 	/**
-	 * 写入上下文对象 
-	 * @param exchange see note 
+	 * 在同步上下文写入 ServerWebExchange
+	 * @param exchange /
 	 */
 	public static void setContext(ServerWebExchange exchange) {
 		SaRequest request = new SaRequestForReactor(exchange.getRequest());
 		SaResponse response = new SaResponseForReactor(exchange.getResponse());
 		SaStorage storage = new SaStorageForReactor(exchange);
-		SaTokenContextForThreadLocalStorage.setBox(request, response, storage);
+		SaManager.getSaTokenContext().setContext(request, response, storage);
 	}
-	
+
 	/**
-	 * 获取上下文对象 
-	 * @return see note 
-	 */
-	public static ServerWebExchange getContext() {
-		Box box = SaTokenContextForThreadLocalStorage.getBoxNotNull();
-		return (ServerWebExchange)box.getStorage().getSource();
-	}
-	
-	/**
-	 * 清除上下文对象
+	 * 在同步上下文清除 ServerWebExchange
 	 */
 	public static void clearContext() {
-		SaTokenContextForThreadLocalStorage.clearBox();
+		SaManager.getSaTokenContext().clearContext();
 	}
-	
+
 	/**
-	 * 写入上下文对象, 并在执行函数后将其清除  
-	 * @param exchange see note 
-	 * @param fun see note 
+	 * 在同步上下文获取 ServerWebExchange
+	 * @return /
 	 */
-	public static void setContext(ServerWebExchange exchange, SaFunction fun) {
+	public static ServerWebExchange getExchange() {
+		SaTokenContextModelBox box = SaManager.getSaTokenContext().getModelBox();
+		return (ServerWebExchange)box.getStorage().getSource();
+	}
+
+	/**
+	 * 将 exchange 写入到同步上下文中，并执行一段代码，执行完毕清除上下文
+	 * @param exchange /
+	 * @param fun /
+	 */
+	public static <R>R setContext(ServerWebExchange exchange, SaRetGenericFunction<R> fun) {
 		try {
 			setContext(exchange);
-			fun.run();
+			return fun.run();
 		} finally {
 			clearContext();
 		}

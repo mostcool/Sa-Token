@@ -15,9 +15,14 @@
  */
 package cn.dev33.satoken.config;
 
+import cn.dev33.satoken.stp.parameter.enums.SaLogoutMode;
+import cn.dev33.satoken.stp.parameter.enums.SaLogoutRange;
+import cn.dev33.satoken.stp.parameter.enums.SaReplacedRange;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Sa-Token 配置类 Model
@@ -59,12 +64,22 @@ public class SaTokenConfig implements Serializable {
 	/**
 	 * 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
 	 */
-	private Boolean isShare = true;
+	private Boolean isShare = false;
+
+	/**
+	 * 当 isConcurrent=false 时，顶人下线的范围 (CURR_DEVICE_TYPE=当前指定的设备类型端, ALL_DEVICE_TYPE=所有设备类型端)
+	 */
+	private SaReplacedRange replacedRange = SaReplacedRange.CURR_DEVICE_TYPE;
 
 	/**
 	 * 同一账号最大登录数量，-1代表不限 （只有在 isConcurrent=true, isShare=false 时此配置项才有意义）
 	 */
 	private int maxLoginCount = 12;
+
+	/**
+	 * 溢出 maxLoginCount 的客户端，将以何种方式注销下线 (LOGOUT=注销下线, KICKOUT=踢人下线, REPLACED=顶人下线)
+	 */
+	private SaLogoutMode overflowLogoutMode = SaLogoutMode.LOGOUT;
 
 	/**
 	 * 在每次创建 token 时的最高循环次数，用于保证 token 唯一性（-1=不循环尝试，直接使用）
@@ -87,9 +102,36 @@ public class SaTokenConfig implements Serializable {
 	private Boolean isReadCookie = true;
 
 	/**
+	 * 是否为持久Cookie（临时Cookie在浏览器关闭时会自动删除，持久Cookie在重新打开后依然存在）
+	 */
+	private Boolean isLastingCookie = true;
+
+	/**
 	 * 是否在登录后将 token 写入到响应头
 	 */
 	private Boolean isWriteHeader = false;
+
+	/**
+	 * 注销范围 (TOKEN=只注销当前 token 的会话，ACCOUNT=注销当前 token 指向的 loginId 其所有客户端会话)
+	 * <br/> (此参数只在调用 StpUtil.logout() 时有效)
+	 */
+	private SaLogoutRange logoutRange = SaLogoutRange.TOKEN;
+
+	/**
+	 * 如果 token 已被冻结，是否保留其操作权 (是否允许此 token 调用注销API)
+	 * <br/> (此参数只在调用 StpUtil.[logout/kickout/replaced]ByTokenValue("token") 时有效)
+	 */
+	private Boolean isLogoutKeepFreezeOps = false;
+
+	/**
+	 * 在注销 token 后，是否保留其对应的 Token-Session
+	 */
+	private Boolean isLogoutKeepTokenSession = false;
+
+	/**
+	 * 在登录时，是否立即创建对应的 Token-Session （true=在登录时立即创建，false=在第一次调用 getTokenSession() 时创建）
+	 */
+	private Boolean rightNowCreateTokenSession = false;
 
 	/**
 	 * token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
@@ -115,6 +157,11 @@ public class SaTokenConfig implements Serializable {
 	 * token 前缀, 前端提交 token 时应该填写的固定前缀，格式样例(satoken: Bearer xxxx-xxxx-xxxx-xxxx)
 	 */
 	private String tokenPrefix;
+
+	/**
+	 * cookie 模式是否自动填充 token 前缀
+	 */
+	private Boolean cookieAutoFillPrefix = false;
 
 	/**
 	 * 是否在初始化配置时在控制台打印版本字符画
@@ -181,6 +228,15 @@ public class SaTokenConfig implements Serializable {
 	 */
 	public SaSignConfig sign = new SaSignConfig();
 
+	/**
+	 * API 签名配置 多实例
+	 */
+	public Map<String, SaSignConfig> signMany = new LinkedHashMap<>();
+
+	/**
+	 * API Key 相关配置
+	 */
+	public SaApiKeyConfig apiKey = new SaApiKeyConfig();
 
 	/**
 	 * @return token 名称 （同时也是： cookie 名称、提交 token 时参数的名称、存储 token 时的 key 前缀）
@@ -361,6 +417,26 @@ public class SaTokenConfig implements Serializable {
 	}
 
 	/**
+	 * 获取 是否为持久Cookie（临时Cookie在浏览器关闭时会自动删除，持久Cookie在重新打开后依然存在）
+	 *
+	 * @return isLastingCookie /
+	 */
+	public Boolean getIsLastingCookie() {
+		return this.isLastingCookie;
+	}
+
+	/**
+	 * 设置 是否为持久Cookie（临时Cookie在浏览器关闭时会自动删除，持久Cookie在重新打开后依然存在）
+	 *
+	 * @param isLastingCookie /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setIsLastingCookie(Boolean isLastingCookie) {
+		this.isLastingCookie = isLastingCookie;
+		return this;
+	}
+
+	/**
 	 * @return 是否在登录后将 token 写入到响应头
 	 */
 	public Boolean getIsWriteHeader() {
@@ -455,7 +531,23 @@ public class SaTokenConfig implements Serializable {
 		this.tokenPrefix = tokenPrefix;
 		return this;
 	}
-	
+
+	/**
+	 * @return cookie 模式是否自动填充 token 前缀
+	 */
+	public Boolean getCookieAutoFillPrefix() {
+		return cookieAutoFillPrefix;
+	}
+
+	/**
+	 * @param cookieAutoFillPrefix cookie 模式是否自动填充 token 前缀
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setCookieAutoFillPrefix(Boolean cookieAutoFillPrefix) {
+		this.cookieAutoFillPrefix = cookieAutoFillPrefix;
+		return this;
+	}
+
 	/**
 	 * @return 是否在初始化配置时在控制台打印版本字符画
 	 */
@@ -637,7 +729,127 @@ public class SaTokenConfig implements Serializable {
 		this.checkSameToken = checkSameToken;
 		return this;
 	}
-	
+
+	/**
+	 * 获取 当 isConcurrent=false 时，顶人下线的范围 (CURR_DEVICE_TYPE=当前指定的设备类型端 ALL_DEVICE_TYPE=所有设备类型端)
+	 *
+	 * @return /
+	 */
+	public SaReplacedRange getReplacedRange() {
+		return this.replacedRange;
+	}
+
+	/**
+	 * 设置 当 isConcurrent=false 时，顶人下线的范围 (CURR_DEVICE_TYPE=当前指定的设备类型端 ALL_DEVICE_TYPE=所有设备类型端)
+	 *
+	 * @param replacedRange /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setReplacedRange(SaReplacedRange replacedRange) {
+		this.replacedRange = replacedRange;
+		return this;
+	}
+
+	/**
+	 * 获取 溢出 maxLoginCount 的客户端，将以何种方式注销下线 (LOGOUT=注销下线, KICKOUT=踢人下线, REPLACED=顶人下线)
+	 *
+	 * @return /
+	 */
+	public SaLogoutMode getOverflowLogoutMode() {
+		return this.overflowLogoutMode;
+	}
+
+	/**
+	 * 设置 溢出 maxLoginCount 的客户端，将以何种方式注销下线 (LOGOUT=注销下线, KICKOUT=踢人下线, REPLACED=顶人下线)
+	 *
+	 * @param overflowLogoutMode /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setOverflowLogoutMode(SaLogoutMode overflowLogoutMode) {
+		this.overflowLogoutMode = overflowLogoutMode;
+		return this;
+	}
+
+	/**
+	 * 获取 注销范围 (TOKEN=只注销当前 token 的会话，ACCOUNT=注销当前 token 指向的 loginId 其所有客户端会话)  <br> (此参数只在调用 StpUtil.logout() 时有效)
+	 *
+	 * @return /
+	 */
+	public SaLogoutRange getLogoutRange() {
+		return this.logoutRange;
+	}
+
+	/**
+	 * 设置 注销范围 (TOKEN=只注销当前 token 的会话，ACCOUNT=注销当前 token 指向的 loginId 其所有客户端会话)  <br> (此参数只在调用 StpUtil.logout() 时有效)
+	 *
+	 * @param logoutRange /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setLogoutRange(SaLogoutRange logoutRange) {
+		this.logoutRange = logoutRange;
+		return this;
+	}
+
+	/**
+	 * 获取 如果 token 已被冻结，是否保留其操作权 (是否允许此 token 调用注销API)  <br> (此参数只在调用 StpUtil.[logoutkickoutreplaced]ByTokenValue("token") 时有效)
+	 *
+	 * @return isLogoutKeepFreezeOps /
+	 */
+	public Boolean getIsLogoutKeepFreezeOps() {
+		return this.isLogoutKeepFreezeOps;
+	}
+
+	/**
+	 * 设置 如果 token 已被冻结，是否保留其操作权 (是否允许此 token 调用注销API)  <br> (此参数只在调用 StpUtil.[logoutkickoutreplaced]ByTokenValue("token") 时有效)
+	 *
+	 * @param isLogoutKeepFreezeOps /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setIsLogoutKeepFreezeOps(Boolean isLogoutKeepFreezeOps) {
+		this.isLogoutKeepFreezeOps = isLogoutKeepFreezeOps;
+		return this;
+	}
+
+	/**
+	 * 获取 在注销 token 后，是否保留其对应的 Token-Session
+	 *
+	 * @return isLogoutKeepTokenSession /
+	 */
+	public Boolean getIsLogoutKeepTokenSession() {
+		return this.isLogoutKeepTokenSession;
+	}
+
+	/**
+	 * 设置 在注销 token 后，是否保留其对应的 Token-Session
+	 *
+	 * @param isLogoutKeepTokenSession /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setIsLogoutKeepTokenSession(Boolean isLogoutKeepTokenSession) {
+		this.isLogoutKeepTokenSession = isLogoutKeepTokenSession;
+		return this;
+	}
+
+	/**
+	 * 获取 在登录时，是否立即创建对应的 Token-Session （true=在登录时立即创建，false=在第一次调用 getTokenSession() 时创建）
+	 *
+	 * @return /
+	 */
+	public Boolean getRightNowCreateTokenSession() {
+		return this.rightNowCreateTokenSession;
+	}
+
+	/**
+	 * 设置 在登录时，是否立即创建对应的 Token-Session （true=在登录时立即创建，false=在第一次调用 getTokenSession() 时创建）
+	 *
+	 * @param rightNowCreateTokenSession /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setRightNowCreateTokenSession(Boolean rightNowCreateTokenSession) {
+		this.rightNowCreateTokenSession = rightNowCreateTokenSession;
+		return this;
+	}
+
 	/**
 	 * @return Cookie 全局配置对象
 	 */
@@ -670,6 +882,47 @@ public class SaTokenConfig implements Serializable {
 		return this;
 	}
 
+	/**
+	 * 获取 API 签名配置 多实例
+	 *
+	 * @return /
+	 */
+	public Map<String, SaSignConfig> getSignMany() {
+		return this.signMany;
+	}
+
+	/**
+	 * 设置 API 签名配置 多实例
+	 *
+	 * @param signMany /
+	 * @return /
+	 */
+	public SaTokenConfig setSignMany(Map<String, SaSignConfig> signMany) {
+		this.signMany = signMany;
+		return this;
+	}
+
+	/**
+	 * API Key 相关配置
+	 *
+	 * @return /
+	 */
+	public SaApiKeyConfig getApiKey() {
+		return this.apiKey;
+	}
+
+	/**
+	 * 设置 API Key 相关配置
+	 *
+	 * @param apiKey /
+	 * @return /
+	 */
+	public SaTokenConfig setApiKey(SaApiKeyConfig apiKey) {
+		this.apiKey = apiKey;
+		return this;
+	}
+
+
 	@Override
 	public String toString() {
 		return "SaTokenConfig ["
@@ -677,19 +930,27 @@ public class SaTokenConfig implements Serializable {
 				+ ", timeout=" + timeout 
 				+ ", activeTimeout=" + activeTimeout
 				+ ", dynamicActiveTimeout=" + dynamicActiveTimeout
-				+ ", isConcurrent=" + isConcurrent 
-				+ ", isShare=" + isShare 
+				+ ", isConcurrent=" + isConcurrent
+				+ ", isShare=" + isShare
+				+ ", replacedRange=" + replacedRange
 				+ ", maxLoginCount=" + maxLoginCount
+				+ ", overflowLogoutMode=" + overflowLogoutMode
 				+ ", maxTryTimes=" + maxTryTimes
 				+ ", isReadBody=" + isReadBody
 				+ ", isReadHeader=" + isReadHeader 
 				+ ", isReadCookie=" + isReadCookie
+				+ ", isLastingCookie=" + isLastingCookie
 				+ ", isWriteHeader=" + isWriteHeader
+				+ ", logoutRange=" + logoutRange
+				+ ", isLogoutKeepFreezeOps=" + isLogoutKeepFreezeOps
+				+ ", isLogoutKeepTokenSession=" + isLogoutKeepTokenSession
+				+ ", rightNowCreateTokenSession=" + rightNowCreateTokenSession
 				+ ", tokenStyle=" + tokenStyle
 				+ ", dataRefreshPeriod=" + dataRefreshPeriod 
 				+ ", tokenSessionCheckLogin=" + tokenSessionCheckLogin
-				+ ", autoRenew=" + autoRenew 
+				+ ", autoRenew=" + autoRenew
 				+ ", tokenPrefix=" + tokenPrefix
+				+ ", cookieAutoFillPrefix=" + cookieAutoFillPrefix
 				+ ", isPrint=" + isPrint 
 				+ ", isLog=" + isLog 
 				+ ", logLevel=" + logLevel 
@@ -703,6 +964,8 @@ public class SaTokenConfig implements Serializable {
 				+ ", checkSameToken=" + checkSameToken 
 				+ ", cookie=" + cookie
 				+ ", sign=" + sign
+				+ ", signMany=" + signMany
+				+ ", apiKey=" + apiKey
 				+ "]";
 	}
 
