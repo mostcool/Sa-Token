@@ -143,15 +143,22 @@ public class SaOAuth2ServerController {
 		// oauth2Server.addClient(...)
 		
 		// 配置：未登录时返回的View 
-		oauth2Server.notLoginView = () -> {
-			String msg = "当前会话在OAuth-Server端尚未登录，请先访问"
-						+ "<a href='/oauth2/doLogin?name=sa&pwd=123456' target='_blank'> doLogin登录 </a>"
-						+ "进行登录之后，刷新页面开始授权";
-			return msg;
+		SaOAuth2Strategy.instance.notLoginView = () -> {
+			// 简化模拟表单
+			String doLoginCode =
+					"fetch(`/oauth2/doLogin?name=${document.querySelector('#name').value}&pwd=${document.querySelector('#pwd').value}`) " +
+							" .then(res => res.json()) " +
+							" .then(res => { if(res.code === 200) { location.reload() } else { alert(res.msg) } } )";
+			String res =
+					"<h2>当前客户端在 OAuth-Server 认证中心尚未登录，请先登录</h2>" +
+							"用户：<input id='name' /> <br> " +
+							"密码：<input id='pwd' /> <br>" +
+							"<button onclick=\"" + doLoginCode + "\">登录</button>";
+			return res;
 		};
 		
 		// 配置：登录处理函数 
-		oauth2Server.doLoginHandle = (name, pwd) -> {
+		SaOAuth2Strategy.instance.doLoginHandle = (name, pwd) -> {
 			if("sa".equals(name) && "123456".equals(pwd)) {
 				StpUtil.login(10001);
 				return SaResult.ok();
@@ -160,7 +167,7 @@ public class SaOAuth2ServerController {
 		};
 		
 		// 配置：确认授权时返回的 view 
-		oauth2Server.confirmView = (clientId, scopes) -> {
+		SaOAuth2Strategy.instance.confirmView = (clientId, scopes) -> {
 			String scopeStr = SaFoxUtil.convertListToString(scopes);
 			String yesCode =
 					"fetch('/oauth2/doConfirm?client_id=" + clientId + "&scope=" + scopeStr + "', {method: 'POST'})" +
@@ -220,9 +227,9 @@ http://sa-oauth-server.com:8000/oauth2/authorize?response_type=code&client_id=10
 
 2、由于首次访问，我们在OAuth-Server端暂未登录，会被转发到登录视图 
 
-![sa-oauth2-server-login-view](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-login-view.png 's-w-sh')
+![sa-oauth2-server-login-view](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-login-view--v43.png 's-w-sh')
 
-3、点击doLogin进行登录之后刷新页面，会提示我们确认授权
+3、输入 `sa/123456` 进行登录之后，会提示我们确认授权
 ![sa-oauth2-server-scope](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-scope.png 's-w-sh')
 
 4、点击同意授权之后，我们会被重定向至 redirect_uri 页面，并携带了code参数 

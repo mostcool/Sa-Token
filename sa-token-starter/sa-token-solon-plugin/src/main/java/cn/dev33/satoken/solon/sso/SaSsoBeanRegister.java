@@ -18,6 +18,10 @@ package cn.dev33.satoken.solon.sso;
 import cn.dev33.satoken.sso.SaSsoManager;
 import cn.dev33.satoken.sso.config.SaSsoClientConfig;
 import cn.dev33.satoken.sso.config.SaSsoServerConfig;
+import cn.dev33.satoken.sso.processor.SaSsoClientProcessor;
+import cn.dev33.satoken.sso.processor.SaSsoServerProcessor;
+import cn.dev33.satoken.sso.template.SaSsoClientTemplate;
+import cn.dev33.satoken.sso.template.SaSsoServerTemplate;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Condition;
 import org.noear.solon.annotation.Configuration;
@@ -39,7 +43,7 @@ public class SaSsoBeanRegister {
 	 * @return 配置对象
 	 */
 	@Bean
-	public SaSsoServerConfig getSaSsoServerConfig(@Inject(value = "${sa-token.sso-server)", required = false) SaSsoServerConfig serverConfig) {
+	public SaSsoServerConfig getSaSsoServerConfig(@Inject(value = "${sa-token.sso-server}", required = false) SaSsoServerConfig serverConfig) {
 		if (serverConfig == null) {
 			return new SaSsoServerConfig();
 		} else {
@@ -60,4 +64,27 @@ public class SaSsoBeanRegister {
 			return clientConfig;
 		}
 	}
+
+	/**
+	 * 获取 SSO Server 端 SaSsoServerTemplate
+	 *
+	 * @return /
+	 */
+	@Bean
+	@Condition(onMissingBean = SaSsoServerTemplate.class)
+	public SaSsoServerTemplate getSaSsoServerTemplate() {
+		return SaSsoServerProcessor.instance.ssoServerTemplate;
+	}
+
+	/**
+	 * 获取 SSO Client 端 SaSsoClientTemplate
+	 *
+	 * @return /
+	 */
+	@Bean
+	@Condition(onMissingBean = SaSsoClientTemplate.class)
+	public SaSsoClientTemplate getSaSsoClientTemplate() {
+		return SaSsoClientProcessor.instance.ssoClientTemplate;
+	}
+
 }

@@ -15,15 +15,15 @@
  */
 package cn.dev33.satoken.sso.template;
 
-import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.sign.SaSignTemplate;
+import cn.dev33.satoken.sso.message.SaSsoMessage;
+import cn.dev33.satoken.sso.message.SaSsoMessageHolder;
 import cn.dev33.satoken.sso.name.ApiName;
 import cn.dev33.satoken.sso.name.ParamName;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 
 /**
- * Sa-Token SSO 模板方法类 （公共端）
+ * SSO 模板方法类 （公共端）
  *
  * @author click33
  * @since 1.30.0
@@ -61,21 +61,55 @@ public class SaSsoTemplate {
 	}
 
 	/**
-	 * 获取底层使用的会话对象 
+	 * 底层使用的 StpLogic 对象
+	 */
+	StpLogic stpLogic;
+
+	/**
+	 * 写入底层使用的会话对象
+	 *
+	 * @param stpLogic /
 	 * @return /
 	 */
-	public StpLogic getStpLogic() {
-		return StpUtil.stpLogic;
+	public SaSsoTemplate setStpLogic(StpLogic stpLogic) {
+		this.stpLogic = stpLogic;
+		return this;
 	}
 
 	/**
-	 * 获取底层使用的 API 签名对象
-	 * @param client 指定客户端标识，填 null 代表获取默认的
+	 * 获取底层使用的会话对象
 	 * @return /
 	 */
-	public SaSignTemplate getSignTemplate(String client) {
-		// 框架默认只返回全局 SaSignTemplate，client 参数留作开发者扩展
-		return SaManager.getSaSignTemplate();
+	public StpLogic getStpLogic() {
+		return this.stpLogic;
+	}
+
+	/**
+	 * 获取底层使用的会话对象，如果没有配置则返回全局默认 StpLogic
+	 * @return /
+	 */
+	public StpLogic getStpLogicOrGlobal() {
+		StpLogic stpLogic = getStpLogic();
+		if (stpLogic == null) {
+			return StpUtil.stpLogic;
+		}
+		return stpLogic;
+	}
+
+	// ----------- 消息处理
+
+	/**
+	 * SSO 消息处理器 - 持有器
+	 */
+	public SaSsoMessageHolder messageHolder = new SaSsoMessageHolder();
+
+	/**
+	 * 处理指定消息
+	 *
+	 * @param message /
+	 */
+	public Object handleMessage(SaSsoMessage message) {
+		return messageHolder.handleMessage(this, message);
 	}
 
 }

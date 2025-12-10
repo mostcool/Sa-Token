@@ -27,7 +27,6 @@ import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import org.noear.solon.core.handle.*;
 import org.noear.solon.core.route.RouterInterceptor;
 import org.noear.solon.core.route.RouterInterceptorChain;
-import org.noear.solon.core.route.RoutingTable;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -68,7 +67,8 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param paths 路由
 	 * @return 对象自身
 	 */
-	public SaTokenInterceptor addInclude(String... paths) {
+	@Override
+    public SaTokenInterceptor addInclude(String... paths) {
 		includeList.addAll(Arrays.asList(paths));
 		return this;
 	}
@@ -79,6 +79,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param paths 路由
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor addExclude(String... paths) {
 		excludeList.addAll(Arrays.asList(paths));
 		return this;
@@ -90,6 +91,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param pathList 路由集合
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor setIncludeList(List<String> pathList) {
 		includeList = pathList;
 		return this;
@@ -101,6 +103,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param pathList 路由集合
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor setExcludeList(List<String> pathList) {
 		excludeList = pathList;
 		return this;
@@ -156,6 +159,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param auth see note
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor setAuth(SaFilterAuthStrategy auth) {
 		this.auth = auth;
 		return this;
@@ -167,6 +171,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param error see note
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor setError(SaFilterErrorStrategy error) {
 		this.error = error;
 		return this;
@@ -178,6 +183,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 	 * @param beforeAuth see note
 	 * @return 对象自身
 	 */
+	@Override
 	public SaTokenInterceptor setBeforeAuth(SaFilterAuthStrategy beforeAuth) {
 		this.beforeAuth = beforeAuth;
 		return this;
@@ -190,9 +196,7 @@ public class SaTokenInterceptor implements SaFilter, RouterInterceptor {
 			if (mainHandler instanceof Gateway) {
 				//支持网关处理
 				Gateway gateway = (Gateway) mainHandler;
-				RoutingTable<Handler> mainRouting = gateway.getMainRouting();
-				MethodType method = MethodTypeUtil.valueOf(ctx.method());
-				mainHandler = mainRouting.matchOne(ctx.pathNew(), method);
+				mainHandler = gateway.find(ctx);
 			}
 
 			Action action = (mainHandler instanceof Action ? (Action) mainHandler : null);

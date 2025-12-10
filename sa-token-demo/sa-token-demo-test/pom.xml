@@ -18,7 +18,7 @@
 	
 	<!-- 定义 Sa-Token 版本号 -->
 	<properties>
-		<sa-token.version>1.42.0</sa-token.version>
+		<sa-token.version>1.44.0</sa-token.version>
 		<java.run.main.class>com.pj.SaTokenApplication</java.run.main.class>
 	</properties>
 
@@ -66,7 +66,14 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
-        
+
+		<!-- Sa-Token API 参数签名 -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-sign</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
+
 		<!-- @ConfigurationProperties -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

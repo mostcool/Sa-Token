@@ -15,7 +15,6 @@
  */
 package cn.dev33.satoken.oauth2.scope.handler;
 
-import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaRequest;
 import cn.dev33.satoken.jwt.SaJwtUtil;
@@ -23,13 +22,13 @@ import cn.dev33.satoken.jwt.error.SaJwtErrorCode;
 import cn.dev33.satoken.jwt.exception.SaJwtException;
 import cn.dev33.satoken.oauth2.SaOAuth2Manager;
 import cn.dev33.satoken.oauth2.consts.SaOAuth2Consts;
-import cn.dev33.satoken.oauth2.dao.SaOAuth2Dao;
 import cn.dev33.satoken.oauth2.data.model.AccessTokenModel;
 import cn.dev33.satoken.oauth2.data.model.ClientTokenModel;
 import cn.dev33.satoken.oauth2.data.model.oidc.IdTokenModel;
 import cn.dev33.satoken.oauth2.data.model.request.ClientIdAndSecretModel;
 import cn.dev33.satoken.oauth2.exception.SaOAuth2Exception;
 import cn.dev33.satoken.oauth2.scope.CommonScope;
+import cn.dev33.satoken.sign.SaSignManager;
 import cn.dev33.satoken.util.SaFoxUtil;
 
 import java.net.MalformedURLException;
@@ -83,6 +82,11 @@ public class OidcScopeHandler implements SaOAuth2ScopeHandlerInterface {
 
     }
 
+    @Override
+    public boolean refreshAccessTokenIsWork() {
+        return true;
+    }
+
     /**
      * 获取 iss
      * @return /
@@ -116,14 +120,14 @@ public class OidcScopeHandler implements SaOAuth2ScopeHandlerInterface {
     public String getNonce() {
         String nonce = SaHolder.getRequest().getParam(SaOAuth2Consts.Param.nonce);
         if(SaFoxUtil.isEmpty(nonce)) {
-            //通过code查找nonce
-            //为了避免其它handler可能会用到nonce,任由其自然过期，只取用不删除
+            // 通过 code 查找nonce
+            // 为了避免其它 handler 可能会用到 nonce, 任由其自然过期，只取用不删除
             nonce = SaOAuth2Manager.getDao().getNonce(SaHolder.getRequest().getParam(SaOAuth2Consts.Param.code));
         }
         if(SaFoxUtil.isEmpty(nonce)) {
             nonce = SaFoxUtil.getRandomString(32);
         }
-        SaManager.getSaSignTemplate().checkNonce(nonce);
+        SaSignManager.getSaSignTemplate().checkNonce(nonce);
         return nonce;
     }
 
@@ -132,7 +136,7 @@ public class OidcScopeHandler implements SaOAuth2ScopeHandlerInterface {
      * @return /
      */
     public IdTokenModel workExtraData(IdTokenModel idToken) {
-        //
+        // 留给开发者扩展
         return idToken;
     }
 

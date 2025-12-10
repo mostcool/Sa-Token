@@ -17,12 +17,11 @@ package cn.dev33.satoken.solon;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.handler.SaAnnotationHandlerInterface;
-import cn.dev33.satoken.apikey.SaApiKeyTemplate;
-import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoader;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.context.SaTokenContext;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.fun.strategy.SaCorsHandleFunction;
+import cn.dev33.satoken.http.SaHttpTemplate;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicTemplate;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.httpauth.digest.SaHttpDigestTemplate;
@@ -36,7 +35,6 @@ import cn.dev33.satoken.plugin.SaTokenPluginHolder;
 import cn.dev33.satoken.same.SaSameTemplate;
 import cn.dev33.satoken.secure.totp.SaTotpTemplate;
 import cn.dev33.satoken.serializer.SaSerializerTemplate;
-import cn.dev33.satoken.sign.SaSignTemplate;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
@@ -200,6 +198,17 @@ public class SaBeanInject {
 	}
 
 	/**
+	 * 注入自定义的 Http 转换器 Bean
+	 *
+	 * @param saHttpTemplate Http 转换器
+	 */
+	@Condition(onBean = SaHttpTemplate.class)
+	@Bean
+	public void setSaHttpTemplate(SaHttpTemplate saHttpTemplate) {
+		SaManager.setSaHttpTemplate(saHttpTemplate);
+	}
+
+	/**
 	 * 注入自定义的序列化器 Bean
 	 *
 	 * @param saSerializerTemplate 序列化器
@@ -208,39 +217,6 @@ public class SaBeanInject {
 	@Bean
 	public void setSaSerializerTemplate(SaSerializerTemplate saSerializerTemplate) {
 		SaManager.setSaSerializerTemplate(saSerializerTemplate);
-	}
-
-	/**
-	 * 注入自定义的 参数签名 Bean
-	 *
-	 * @param saSignTemplate 参数签名 Bean
-	 */
-	@Condition(onBean = SaSignTemplate.class)
-	@Bean
-	public void setSaSignTemplate(SaSignTemplate saSignTemplate) {
-		SaManager.setSaSignTemplate(saSignTemplate);
-	}
-
-	/**
-	 * 注入自定义的 ApiKey 模块 Bean
-	 *
-	 * @param apiKeyTemplate /
-	 */
-	@Condition(onBean = SaApiKeyTemplate.class)
-	@Bean
-	public void setSaApiKeyTemplate(SaApiKeyTemplate apiKeyTemplate) {
-		SaManager.setSaApiKeyTemplate(apiKeyTemplate);
-	}
-
-	/**
-	 * 注入自定义的 ApiKey 数据加载器 Bean
-	 *
-	 * @param apiKeyDataLoader /
-	 */
-	@Condition(onBean = SaApiKeyDataLoader.class)
-	@Bean
-	public void setSaApiKeyDataLoader(SaApiKeyDataLoader apiKeyDataLoader) {
-		SaManager.setSaApiKeyDataLoader(apiKeyDataLoader);
 	}
 
 	/**

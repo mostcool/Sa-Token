@@ -916,8 +916,16 @@ public class StpLogic {
 		if(session != null) {
 
 			// 2、遍历此 SaTerminalInfo 客户端列表，清除相关数据
-			List<SaTerminalInfo> terminalList = session.getTerminalListByDeviceType(logoutParameter.getDeviceType());
+			List<SaTerminalInfo> terminalList = session.terminalListCopy();
 			for (SaTerminalInfo terminal: terminalList) {
+				// 不符合 deviceType 的跳过
+				if( ! SaFoxUtil.isEmpty(logoutParameter.getDeviceType()) && ! logoutParameter.getDeviceType().equals(terminal.getDeviceType())) {
+					continue;
+				}
+				// 不符合 deviceId 的跳过
+				if( ! SaFoxUtil.isEmpty(logoutParameter.getDeviceId()) && ! logoutParameter.getDeviceId().equals(terminal.getDeviceId())) {
+					continue;
+				}
 				_removeTerminal(session, terminal, logoutParameter);
 			}
 
@@ -1994,7 +2002,7 @@ public class StpLogic {
 		}
 
 		// 7、$$ 发布事件：某某 token 被续期了
-		SaTokenEventCenter.doRenewTimeout(tokenValue, loginId, timeout);
+		SaTokenEventCenter.doRenewTimeout(loginType, loginId, tokenValue, timeout);
 	}
 
 
@@ -2381,6 +2389,56 @@ public class StpLogic {
 	}
 
 	/**
+	 * 返回当前 token 指向的 SaTerminalInfo 设备信息，如果 token 无效则返回 null
+	 *
+	 * @return /
+	 */
+	public SaTerminalInfo getTerminalInfo() {
+		return getTerminalInfoByToken(getTokenValue());
+	}
+
+	/**
+	 * 返回指定 token 指向的 SaTerminalInfo 设备信息，如果 Token 无效则返回 null
+	 *
+	 * @param tokenValue 指定 token
+	 * @return /
+	 */
+	public SaTerminalInfo getTerminalInfoByToken(String tokenValue) {
+		// 1、如果 token 为 null，直接提前返回
+		if(SaFoxUtil.isEmpty(tokenValue)) {
+			return null;
+		}
+
+		// 2、判断 Token 是否有效
+		Object loginId = getLoginIdNotHandle(tokenValue);
+		if( ! isValidLoginId(loginId)) {
+			return null;
+		}
+
+		// 3、判断 Account-Session 是否存在
+		SaSession session = getSessionByLoginId(loginId, false);
+		if(session == null) {
+			return null;
+		}
+
+		// 4、判断 Token 是否已被冻结
+		if(isFreeze(tokenValue)) {
+			return null;
+		}
+
+		// 5、遍历 Account-Session 上的客户端 token 列表，寻找当前 token 对应的设备类型
+		List<SaTerminalInfo> terminalList = session.terminalListCopy();
+		for (SaTerminalInfo terminal : terminalList) {
+			if(terminal.getTokenValue().equals(tokenValue)) {
+				return terminal;
+			}
+		}
+
+		// 6、没有找到，还是返回 null
+		return null;
+	}
+
+	/**
 	 * 返回当前会话的登录设备类型
 	 *
 	 * @return 当前令牌的登录设备类型
@@ -2396,38 +2454,28 @@ public class StpLogic {
 	 * @return 当前令牌的登录设备类型
 	 */
 	public String getLoginDeviceTypeByToken(String tokenValue) {
-		// 1、如果 token 为 null，直接提前返回
-		if(SaFoxUtil.isEmpty(tokenValue)) {
-			return null;
-		}
+		SaTerminalInfo terminalInfo = getTerminalInfoByToken(tokenValue);
+		return terminalInfo == null ? null : terminalInfo.getDeviceType();
+	}
 
-		// 2、获取此 token 对应的 loginId，如果为null，或者此token已被冻结，直接返回null
-		Object loginId = getLoginIdNotHandle(tokenValue);
-		if( ! isValidLoginId(loginId)) {
-			return null;
-		}
-		if(getTokenActiveTimeoutByToken(tokenValue) == SaTokenDao.NOT_VALUE_EXPIRE ) {
-			return null;
-		}
+	/**
+	 * 返回当前会话的登录设备 ID
+	 *
+	 * @return /
+	 */
+	public String getLoginDeviceId() {
+		return getLoginDeviceIdByToken(getTokenValue());
+	}
 
-		// 3、获取这个账号的 Account-Session
-		SaSession session = getSessionByLoginId(loginId, false);
-
-		// 4、为 null 说明尚未登录，当然也就不存在什么设备类型，直接返回 null
-		if(session == null) {
-			return null;
-		}
-
-		// 5、遍历 Account-Session 上的客户端 token 列表，寻找当前 token 对应的设备类型
-		List<SaTerminalInfo> terminalList = session.terminalListCopy();
-		for (SaTerminalInfo terminal : terminalList) {
-			if(terminal.getTokenValue().equals(tokenValue)) {
-				return terminal.getDeviceType();
-			}
-		}
-
-		// 6、没有找到，还是返回 null
-		return null;
+	/**
+	 * 返回指定 token 会话的登录设备 ID
+	 *
+	 * @param tokenValue 指定token
+	 * @return /
+	 */
+	public String getLoginDeviceIdByToken(String tokenValue) {
+		SaTerminalInfo terminalInfo = getTerminalInfoByToken(tokenValue);
+		return terminalInfo == null ? null : terminalInfo.getDeviceId();
 	}
 
 	/**

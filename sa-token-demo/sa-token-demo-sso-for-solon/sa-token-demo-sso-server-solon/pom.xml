@@ -10,13 +10,13 @@
 	<parent>
 		<groupId>org.noear</groupId>
 		<artifactId>solon-parent</artifactId>
-		<version>3.0.1</version>
+		<version>3.2.1</version>
 		<relativePath/>
 	</parent>
 	
 	<!-- 定义 Sa-Token 版本号 -->
 	<properties>
-		<sa-token.version>1.42.0</sa-token.version>
+		<sa-token.version>1.44.0</sa-token.version>
 	</properties>
 
 	<dependencies>
@@ -42,11 +42,25 @@
             <version>${sa-token.version}</version>
         </dependency>
         
-		<!-- Sa-Token 插件：整合redis (使用jackson序列化方式) -->
+		<!-- Sa-Token 插件：整合redis  -->
 		<dependency>
 			<groupId>cn.dev33</groupId>
 			<artifactId>sa-token-redisx</artifactId>
 			<version>${sa-token.version}</version>
+		</dependency>
+
+		<!-- Sa-Token 插件：整合snack3 (json) -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-snack3</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
+
+		<!-- snack3 版号要 >= 3.2.133 -->
+		<dependency>
+			<groupId>org.noear</groupId>
+			<artifactId>snack3</artifactId>
+			<version>3.2.133</version>
 		</dependency>
 
 		<!-- 视图引擎（在前后端不分离模式下提供视图支持） -->
@@ -55,14 +69,13 @@
 			<artifactId>solon.view.thymeleaf</artifactId>
 			<version>${solon.version}</version>
 		</dependency>
-		
-		<!-- Http请求工具（在模式三的单点注销功能下用到，如不需要可以注释掉） -->
-		<dependency>
-		    <groupId>org.noear</groupId>
-		    <artifactId>forest-solon-plugin</artifactId>
-			<version>${solon.version}</version>
-		</dependency>
 
+		<!-- Sa-Token 插件：整合 Forest 请求工具 (模式三需要通过 http 请求推送消息) -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-forest</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
 
 
 	</dependencies>

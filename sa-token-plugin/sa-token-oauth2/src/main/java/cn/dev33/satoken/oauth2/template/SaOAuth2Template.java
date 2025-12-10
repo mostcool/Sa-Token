@@ -15,6 +15,7 @@
  */
 package cn.dev33.satoken.oauth2.template;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.oauth2.SaOAuth2Manager;
 import cn.dev33.satoken.oauth2.dao.SaOAuth2Dao;
 import cn.dev33.satoken.oauth2.data.model.AccessTokenModel;
@@ -37,7 +38,7 @@ import java.util.List;
  */
 public class SaOAuth2Template {
 
-	// ----------------- ClientModel 相关 -----------------
+	// ----------------- SaClientModel 相关 -----------------
 
 	/**
 	 * 获取 ClientModel，根据 clientId
@@ -65,7 +66,7 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 校验：clientId 与 clientSecret 是否正确
+	 * 校验：clientId 与 clientSecret 是否正确，正确返回 SaClientModel，不正确抛出异常
 	 * @param clientId 应用id
 	 * @param clientSecret 秘钥
 	 * @return SaClientModel对象
@@ -287,6 +288,15 @@ public class SaOAuth2Template {
 		return !isGrantScope(loginId, clientId, scopes);
 	}
 
+	/**
+	 * 删除：指定 loginId 针对指定 Client 的授权信息
+	 * @param loginId 账号id
+	 * @param clientId 应用id
+	 */
+	public void deleteGrantScope(Object loginId, String clientId) {
+		SaOAuth2Manager.getDao().deleteGrantScope(clientId, loginId);
+	}
+
 
 	// --------- 请求数据校验相关
 
@@ -337,10 +347,10 @@ public class SaOAuth2Template {
 		RefreshTokenModel rt = dao.getRefreshToken(refreshToken);
 		SaOAuth2RefreshTokenException.throwBy(rt == null, "无效 refresh_token: " + refreshToken, refreshToken, SaOAuth2ErrorCode.CODE_30111);
 
-		// 校验：ClientId是否一致
+		// 校验：ClientId 是否一致
 		SaOAuth2ClientModelException.throwBy( ! rt.clientId.equals(clientId), "无效 client_id: " + clientId, clientId, SaOAuth2ErrorCode.CODE_30122);
 
-		// 校验：Secret是否正确
+		// 校验：Secret 是否正确
 		String dbSecret = checkClientModel(clientId).clientSecret;
 		SaOAuth2ClientModelException.throwBy(dbSecret == null || ! dbSecret.equals(clientSecret), "无效 client_secret: " + clientSecret,
 				clientId, SaOAuth2ErrorCode.CODE_30115);
@@ -428,13 +438,14 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 获取 Access-Token，根据索引： clientId、loginId
+	 * 获取 Access-Token 列表：此应用下 对 某个用户 签发的所有 Access-token
+	 *
 	 * @param clientId /
 	 * @param loginId /
 	 * @return /
 	 */
-	public String getAccessTokenValue(String clientId, Object loginId) {
-		return SaOAuth2Manager.getDao().getAccessTokenValue(clientId, loginId);
+	public List<String> getAccessTokenValueList(String clientId, Object loginId) {
+		return SaOAuth2Manager.getDao().getAccessTokenValueList_FromAdjustAfter(clientId, loginId);
 	}
 
 	/**
@@ -490,7 +501,7 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 回收 Access-Token
+	 * 回收一个 Access-Token
 	 * @param accessToken Access-Token值
 	 */
 	public void revokeAccessToken(String accessToken) {
@@ -502,21 +513,24 @@ public class SaOAuth2Template {
 		// 删 at、索引
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 		dao.deleteAccessToken(accessToken);
-		dao.deleteAccessTokenIndex(at.clientId, at.loginId);
+		dao.deleteAccessTokenIndex_BySingleData(at.clientId, at.loginId, accessToken);
 	}
 
 	/**
-	 * 回收 Access-Token，根据索引： clientId、loginId
+	 * 回收全部 Access-Token：指定应用下 指定用户 的全部 Access-Token
 	 * @param clientId /
 	 * @param loginId /
 	 */
 	public void revokeAccessTokenByIndex(String clientId, Object loginId) {
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 
-		// 删 at、删索引
-		String accessToken = getAccessTokenValue(clientId, loginId);
-		if(accessToken != null) {
-			dao.deleteAccessToken(accessToken);
+		List<String> accessTokenList = getAccessTokenValueList(clientId, loginId);
+		if( ! accessTokenList.isEmpty()) {
+			// 删 AT
+			for (String accessToken : accessTokenList) {
+				dao.deleteAccessToken(accessToken);
+			}
+			// 删索引
 			dao.deleteAccessTokenIndex(clientId, loginId);
 		}
 	}
@@ -549,17 +563,19 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 获取 Refresh-Token，根据索引： clientId、loginId
+	 * 获取 Refresh-Token 列表：此应用下 对 某个用户 签发的所有 Refresh-Token
+	 *
 	 * @param clientId /
 	 * @param loginId /
 	 * @return /
 	 */
-	public String getRefreshTokenValue(String clientId, Object loginId) {
-		return SaOAuth2Manager.getDao().getRefreshTokenValue(clientId, loginId);
+	public List<String> getRefreshTokenValueList(String clientId, Object loginId) {
+		return SaOAuth2Manager.getDao().getRefreshTokenValueList_FromAdjustAfter(clientId, loginId);
 	}
 
 	/**
-	 * 回收 Refresh-Token
+	 * 回收一个 Refresh-Token
+	 *
 	 * @param refreshToken Refresh-Token 值
 	 */
 	public void revokeRefreshToken(String refreshToken) {
@@ -571,21 +587,25 @@ public class SaOAuth2Template {
 		// 删 rt、索引
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 		dao.deleteRefreshToken(refreshToken);
-		dao.deleteRefreshTokenIndex(rt.clientId, rt.loginId);
+		dao.deleteRefreshTokenIndex_BySingleData(rt.clientId, rt.loginId, refreshToken);
 	}
 
 	/**
-	 * 回收 Refresh-Token，根据索引： clientId、loginId
+	 * 回收全部 Refresh-Token：指定应用下 指定用户 的全部 Refresh-Token
+	 *
 	 * @param clientId /
 	 * @param loginId /
 	 */
 	public void revokeRefreshTokenByIndex(String clientId, Object loginId) {
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 
-		// 删 rt、删索引
-		String refreshToken = getRefreshTokenValue(clientId, loginId);
-		if(refreshToken != null) {
-			dao.deleteRefreshToken(refreshToken);
+		List<String> refreshTokenList = getRefreshTokenValueList(clientId, loginId);
+		if( ! refreshTokenList.isEmpty()) {
+			// 删 RT
+			for (String refreshToken : refreshTokenList) {
+				dao.deleteRefreshToken(refreshToken);
+			}
+			// 删索引
 			dao.deleteRefreshTokenIndex(clientId, loginId);
 		}
 	}
@@ -627,12 +647,13 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 获取 ClientToken，根据索引： clientId
+	 * 获取 Client-Token 列表：此应用下 对 某个用户 签发的所有 Client-token
+	 *
 	 * @param clientId /
 	 * @return /
 	 */
-	public String getClientTokenValue(String clientId) {
-		return SaOAuth2Manager.getDao().getClientTokenValue(clientId);
+	public List<String> getClientTokenValueList(String clientId) {
+		return SaOAuth2Manager.getDao().getClientTokenValueList_FromAdjustAfter(clientId);
 	}
 
 	/**
@@ -670,7 +691,7 @@ public class SaOAuth2Template {
 	}
 
 	/**
-	 * 回收 ClientToken
+	 * 回收一个 ClientToken
 	 *
 	 * @param clientToken /
 	 */
@@ -682,10 +703,11 @@ public class SaOAuth2Template {
 		// 删 ct、删索引
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 		dao.deleteClientToken(clientToken);
-		dao.deleteClientTokenIndex(ct.clientId);
+		dao.deleteClientTokenIndex_BySingleData(ct.clientId, clientToken);
 	}
 
 	/**
+	 * 回收全部 Client-Token：指定应用下的全部 Client-Token
 	 * 回收 ClientToken，根据索引： clientId
 	 *
 	 * @param clientId /
@@ -693,27 +715,36 @@ public class SaOAuth2Template {
 	public void revokeClientTokenByIndex(String clientId) {
 		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
 
-		// 删 clientToken
-		String clientToken = getClientTokenValue(clientId);
-		if(clientToken != null) {
-			dao.deleteClientToken(clientToken);
+		List<String> clientTokenList = getClientTokenValueList(clientId);
+		if( ! clientTokenList.isEmpty()) {
+			// 删 AT
+			for (String clientToken : clientTokenList) {
+				dao.deleteClientToken(clientToken);
+			}
+			// 删索引
 			dao.deleteClientTokenIndex(clientId);
 		}
 	}
 
+
+	// ------------------- 请求查询
+
 	/**
-	 * 回收 Lower-Client-Token，根据索引： clientId
-	 *
-	 * @param clientId /
+	 * 数据读取：从当前请求对象中读取 access_token，并查询到 AccessTokenModel 信息，无效 access_token 抛出异常
+	 * <br /> 1、请求参数 access_token，2、请求头 Authorization Bearer access_token
 	 */
-	public void revokeLowerClientTokenByIndex(String clientId) {
-		SaOAuth2Dao dao = SaOAuth2Manager.getDao();
-		// 删 Lower-Client-Token
-		String lowerClientToken = dao.getLowerClientTokenValue(clientId);
-		if(lowerClientToken != null) {
-			dao.deleteLowerClientToken(lowerClientToken);
-			dao.deleteLowerClientTokenIndex(clientId);
-		}
+	public AccessTokenModel currentAccessToken() {
+		String accessToken = SaOAuth2Manager.getDataResolver().readAccessToken(SaHolder.getRequest());
+		return checkAccessToken(accessToken);
+	}
+
+	/**
+	 * 数据读取：从当前请求对象中读取 client_token，并查询到 ClientTokenModel 信息，无效 client_token 抛出异常
+	 * <br /> 1、请求参数 client_token，2、请求头 Authorization Bearer client_token
+	 */
+	public ClientTokenModel currentClientToken() {
+		String clientToken = SaOAuth2Manager.getDataResolver().readClientToken(SaHolder.getRequest());
+		return checkClientToken(clientToken);
 	}
 
 
@@ -734,8 +765,7 @@ public class SaOAuth2Template {
 	 * @return /
 	 */
 	public List<String> getHigherScopeList() {
-		String higherScope = SaOAuth2Manager.getServerConfig().getHigherScope();
-		return SaOAuth2Manager.getDataConverter().convertScopeStringToList(higherScope);
+		return SaOAuth2Manager.getDataLoader().getHigherScopeList();
 	}
 
 	/**
@@ -743,8 +773,7 @@ public class SaOAuth2Template {
 	 * @return /
 	 */
 	public List<String> getLowerScopeList() {
-		String lowerScope = SaOAuth2Manager.getServerConfig().getLowerScope();
-		return SaOAuth2Manager.getDataConverter().convertScopeStringToList(lowerScope);
+		return SaOAuth2Manager.getDataLoader().getLowerScopeList();
 	}
 
 }

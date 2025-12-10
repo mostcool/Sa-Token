@@ -283,59 +283,66 @@ sa-token.pi-key.is-record-index=true
 
 ### 3、单点登录相关配置 
 
-**SSO-Server 端配置：**
+#### 3.1、SSO-Server 端配置
 
-| 参数名称		| 类型		| 默认值		| 说明																			|
-| :--------		| :--------	| :--------	| :--------																		|
-| mode			| String	| 			| 指定当前系统集成 SSO 时使用的模式（约定型配置项，不对代码逻辑产生任何影响）			|
-| ticketTimeout	| long		| 300		| ticket 有效期 （单位: 秒）														|
-| allowUrl		| String	| *			| 所有允许的授权回调地址，多个用逗号隔开（不在此列表中的URL将禁止下放ticket），参考：[SSO整合：配置域名校验](/sso/sso-check-domain)	|
-| homeRoute		| String	|  			| 主页路由：在 /sso/auth 登录后不指定 redirect 参数的情况下默认跳转的路由			|
-| isSlo			| Boolean	| true		| 是否打开单点注销功能															|
-| isHttp		| Boolean	| false		| 是否打开模式三（此值为 true 时将使用 http 请求：校验 ticket 值、单点注销、获取 userinfo），参考：[详解](/use/config?id=配置项详解：isHttp) 	|
+| 参数名称			| 类型		| 默认值		| 说明																			|
+| :--------			| :--------	| :--------	| :--------																		|
+| mode				| String	| 			| 指定当前系统集成 SSO 时使用的模式（约定型配置项，不对代码逻辑产生任何影响）			|
+| ticketTimeout		| long		| 300		| ticket 有效期 （单位: 秒）														|
+| homeRoute			| String	|  			| 主页路由：在 /sso/auth 登录页不指定 redirect 参数时，默认跳转的地址			|
+| isSlo				| Boolean	| true		| 是否打开单点注销功能															|
 | autoRenewTimeout	| Bolean	| false	| 是否在每次下发 ticket 时，自动续期 token 的有效期（根据全局 timeout 值）			|
-| maxRegClient	| int		| 32		| 在 Access-Session 上记录 Client 信息的最高数量（-1=无限），超过此值将进行自动清退处理，先进先出			|
-| isCheckSign	| Boolean	| true		| 是否校验参数签名（方便本地调试用的一个配置项，生产环境请务必为true）		|
+| maxRegClient		| int		| 32		| 在 Access-Session 上记录 Client 信息的最高数量（-1=无限），超过此值将进行自动清退处理，先进先出			|
+| isCheckSign		| Boolean	| true		| 是否校验参数签名（方便本地调试用的一个配置项，生产环境请务必为true）		|
+| clients			| Map		| new LinkedHashMap<>();		| 以 Map<String, SaSsoClientModel> 格式配置 Client 列表			|
+| allowAnonClient	| Boolean	| false		| 是否允许匿名 Client 接入。参考： [匿名 client 接入](/sso/anon-client)	|
+| allowUrl			| String	| 			| 所有允许的授权回调地址，多个用逗号隔开 (不在此列表中的URL将禁止下放ticket) (匿名 client 使用)，参考：[SSO整合：配置域名校验](/sso/sso-check-domain)	|
+| secretKey			| String	| 			| API 调用签名秘钥 (全局默认 + 匿名 client 使用)		|
 
 配置示例：
 
 <!---------------------------- tabs:start ---------------------------->
 <!------------- tab:yaml 风格  ------------->
-``` yaml
+``` yml
 # Sa-Token 配置
-sa-token:
-    # SSO 单点登录服务端配置 
+sa-token: 
+    # SSO-Server 配置
     sso-server:
         # Ticket有效期 (单位: 秒)，默认五分钟 
         ticket-timeout: 300
-        # 所有允许的授权回调地址
-        allow-url: "*"
+        # 主页路由：在 /sso/auth 登录页不指定 redirect 参数时，默认跳转的地址
+        home-route: /home
 ```
 <!------------- tab:properties 风格  ------------->
 ``` properties
+# SSO-Server 配置
 # Ticket有效期 (单位: 秒)，默认五分钟 
 sa-token.sso-server.ticket-timeout=300
-# 所有允许的授权回调地址
-sa-token.sso-server.allow-url="*"
+# 主页路由：在 /sso/auth 登录页不指定 redirect 参数时，默认跳转的地址
+sa-token.sso-server.home-route=/home
 ```
+
 <!---------------------------- tabs:end ---------------------------->
 
-**SSO-Client 端配置：**
 
-| 参数名称		| 类型		| 默认值		| 说明											|
-| :--------		| :--------	| :--------	| :--------										|
-| mode			| String	| 					| 指定当前系统集成 SSO 时使用的模式（约定型配置项，不对代码逻辑产生任何影响）			|
-| client		| String	| ""				| 当前 Client 名称标识，用于和 ticket 码的互相锁定			|
-| serverUrl		| String	| null				| 配置 Server 端主机总地址，拼接在 `authUrl`、`checkTicketUrl`、`userinfoUrl`、`sloUrl` 属性前面，用以简化各种 url 配置，参考：[详解](/sso/sso-questions?id=问：模式三配置一堆-xxx-url-，有办法简化一下吗？)	|
-| authUrl		| String	| /sso/auth			| 配置 Server 端单点登录授权地址					|
-| checkTicketUrl| String	| /sso/checkTicket	| 配置 Server 端的 `ticket` 校验地址							|
-| getDataUrl	| String	| /sso/getData		| 配置 Server 端的 拉取数据 地址									|
-| sloUrl		| String	| /sso/signout		| 配置 Server 端单点注销地址										|
-| currSsoLogin	| String	| null				| 配置当前 Client 端的登录地址（为空时自动获取）	|
-| currSsoLogoutCall	| String	| null			| 配置当前 Client 端的单点注销回调URL （为空时自动获取）	|
-| isSlo			| Boolean	| true				| 是否打开单点注销功能							|
-| isHttp		| Boolean	| false				| 是否打开模式三（此值为 true 时将使用 http 请求：校验 ticket 值、单点注销、拉取数据getData），参考：[详解](/use/config?id=配置项详解：isHttp) 	|
-| isCheckSign	| Boolean	| true		| 是否校验参数签名（方便本地调试用的一个配置项，生产环境请务必为true）		|
+#### 3.2、SSO-Client 端配置
+
+| 参数名称			| 类型		| 默认值		| 说明											|
+| :--------			| :--------	| :--------	| :--------										|
+| mode				| String	| 					| 指定当前系统集成 SSO 时使用的模式（约定型配置项，不对代码逻辑产生任何影响）			|
+| client			| String	| ""				| 当前 Client 名称标识，用于和 ticket 码的互相锁定			|
+| serverUrl			| String	| null				| 配置 Server 端主机总地址，拼接在 `authUrl`、`checkTicketUrl`、`userinfoUrl`、`sloUrl` 属性前面，用以简化各种 url 配置，参考：[详解](/sso/sso-questions?id=问：模式三配置一堆-xxx-url-，有办法简化一下吗？)	|
+| authUrl			| String	| /sso/auth			| 配置 Server 端单点登录授权地址					|
+| signoutUrl		| String	| /sso/signout		| 配置 Server 端单点注销地址										|
+| pushUrl			| String	| /sso/pushS		| 配置 Server 端的推送消息地址						|
+| getDataUrl		| String	| /sso/getData		| 配置 Server 端的 拉取数据 地址									|
+| currSsoLogin		| String	| null				| 配置当前 Client 端的登录地址（为空时自动获取）	|
+| currSsoLogoutCall	| String	| null				| 配置当前 Client 端的单点注销回调URL （为空时自动获取）	|
+| isHttp			| Boolean	| false				| 是否打开模式三（此值为 true 时将使用 http 请求：校验 ticket 值、单点注销、拉取数据getData），参考：[详解](/use/config?id=配置项详解：isHttp) 	|
+| isSlo				| Boolean	| true				| 是否打开单点注销功能							|
+| regLogoutCall		| Boolean	| false				| 是否注册单点登录注销回调 (为 true 时，登录时附带单点登录回调地址，并且开放 /sso/logoutCall 地址)							|
+| secretKey			| String	| ""				| API 调用签名秘钥					|
+| isCheckSign		| Boolean	| true				| 是否校验参数签名（方便本地调试用的一个配置项，生产环境请务必为true）		|
 
 配置示例：
 
@@ -362,27 +369,86 @@ sa-token.sso-client.is-slo=true
 
 
 
+#### 3.3、SaSsoClientModel 配置
+
+| 参数名称			| 类型		| 默认值		| 说明											|
+| :--------			| :--------	| :--------	| :--------										|
+| client			| String	| ""				| 当前 Client 名称标识，用于和 ticket 码的互相锁定			|
+| allowUrl			| String	| 			| 所有允许的授权回调地址，多个用逗号隔开 (不在此列表中的URL将禁止下放ticket) (匿名 client 使用)，参考：[SSO整合：配置域名校验](/sso/sso-check-domain)	|
+| isPush			| Boolean	| false				| 是否接收推送消息			|
+| isSlo				| Boolean	| true				| 是否打开单点注销功能							|
+| secretKey			| String	| ""				| API 调用签名秘钥					|
+| serverUrl			| String	| null				| 配置 Server 端主机总地址，拼接在 `authUrl`、`checkTicketUrl`、`userinfoUrl`、`sloUrl` 属性前面，用以简化各种 url 配置，参考：[详解](/sso/sso-questions?id=问：模式三配置一堆-xxx-url-，有办法简化一下吗？)	|
+| pushUrl			| String	| /sso/pushC		| 配置此 Client 端的推送消息地址						|
+
+配置示例：
+
+<!---------------------------- tabs:start ---------------------------->
+<!------------- tab:yaml 风格  ------------->
+``` yml
+# Sa-Token 配置
+sa-token: 
+    # SSO-Server 配置
+    sso-server:
+        # 应用列表：配置接入的应用信息
+        clients:
+            # 应用 sso-client1 
+            sso-client1:
+                client: sso-client1
+                allow-url: "*"
+                secret-key: SSO-C1-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+            # 应用 sso-client2 
+            sso-client2:
+                client: sso-client2
+                allow-url: "*"
+                secret-key: SSO-C2-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+```
+<!------------- tab:properties 风格  ------------->
+``` properties
+# 应用列表：配置接入的应用信息
+# 应用 sso-client1 
+sa-token.sso-server.clients.sso-client1.client=sso-client1
+sa-token.sso-server.clients.sso-client1.allow-url=*
+sa-token.sso-server.clients.sso-client1.secret-key=SSO-C1-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+
+# 应用 sso-client2 
+sa-token.sso-server.clients.sso-client2.client=sso-client2
+sa-token.sso-server.clients.sso-client2.allow-url=*
+sa-token.sso-server.clients.sso-client2.secret-key=SSO-C2-kQwIOrYvnXmSDkwEiFngrKidMcdrgKor
+```
+
+<!---------------------------- tabs:end ---------------------------->
+
+
+
+
 
 ### 4、OAuth2.0相关配置 
+
+#### 4.1、OAuth2-Server 相关配置
+
 | 参数名称					| 类型		| 默认值	| 说明																		|
 | :--------					| :--------	| :--------	| :--------																	|
 | enableAuthorizationCode	| Boolean	| true		| 是否打开模式：授权码（`Authorization Code`）								|
 | enableImplicit			| Boolean	| true		| 是否打开模式：隐藏式（`Implicit`）											|
 | enablePassword			| Boolean	| true		| 是否打开模式：密码式（`Password`）											|
 | enableClientCredentials	| Boolean	| true		| 是否打开模式：凭证式（`Client Credentials`）								|
-| isNewRefresh				| Boolean	| false		| 是否在每次 `Refresh-Token` 刷新 `Access-Token` 时，产生一个新的 `Refresh-Token`	|
 | codeTimeout				| long		| 300		| Code授权码 保存的时间（单位：秒） 默认五分钟									|
-| accessTokenTimeout		| long		| 7200		| `Access-Token` 保存的时间（单位：秒）默认两个小时								|
-| refreshTokenTimeout		| long		| 2592000	| `Refresh-Token` 保存的时间（单位：秒） 默认30 天								|
-| clientTokenTimeout		| long		| 7200		| `Client-Token` 保存的时间（单位：秒） 默认两个小时								|
-| lowerClientTokenTimeout	| long		| 7200		| `Lower-Client-Token` 保存的时间（单位：秒） ，默认为-1，代表延续 `Client-Token` 的有效时间 	|
+| accessTokenTimeout		| long		| 7200		| 全局默认配置所有应用：`Access-Token` 保存的时间（单位：秒）默认两个小时								|
+| refreshTokenTimeout		| long		| 2592000	| 全局默认配置所有应用：`Refresh-Token` 保存的时间（单位：秒） 默认30 天								|
+| clientTokenTimeout		| long		| 7200		| 全局默认配置所有应用：`Client-Token` 保存的时间（单位：秒） 默认两个小时								|
+| maxAccessTokenCount		| int		| 12		| 全局默认配置所有应用：单个应用单个用户最多同时存在的 Access-Token 数量				|
+| maxRefreshTokenCount		| int		| 12		| 全局默认配置所有应用：单个应用单个用户最多同时存在的 Refresh-Token 数量			|
+| maxClientTokenCount		| int		| 12		| 全局默认配置所有应用：单个应用最多同时存在的 Client-Token 数量			|
+| isNewRefresh				| Boolean	| false		| 全局默认配置所有应用：是否在每次 `Refresh-Token` 刷新 `Access-Token` 时，产生一个新的 `Refresh-Token`	|
 | openidDigestPrefix		| String	| openid_default_digest_prefix		| 默认 openid 生成算法中使用的摘要前缀				 	|
 | unionidDigestPrefix		| String	| unionid_default_digest_prefix		| 默认 unionid 生成算法中使用的摘要前缀				 	|
 | higherScope				| String	| 		| 指定高级权限，多个用逗号隔开				 	|
 | lowerScope				| String	| 		| 指定低级权限，多个用逗号隔开				 	|
 | mode4ReturnAccessToken	| Boolean	| false	| 模式4是否返回 AccessToken 字段，用于兼容OAuth2标准协议			 	|
 | hideStatusField			| Boolean	| false	| 是否在返回值中隐藏默认的状态字段 (code、msg、data)			 	|
-| oidc		| SaOAuth2OidcConfig	| new SaOAuth2OidcConfig()	| OIDC 相关配置			 	|
+| oidc						| SaOAuth2OidcConfig	| new SaOAuth2OidcConfig()	| OIDC 相关配置			 	|
+| clients					| Map<String, SaClientModel>	| 配置 SaClientModel 列表信息			 	|
 
 配置示例：
 <!---------------------------- tabs:start ---------------------------->
@@ -411,7 +477,7 @@ sa-token.oauth2-server.enable-client-credentials=true
 <!---------------------------- tabs:end ---------------------------->
 
 
-##### OIDC 相关配置
+#### 4.2、OIDC 相关配置
 | 参数名称					| 类型		| 默认值	| 说明																			|
 | :--------					| :--------	| :--------	| :--------																	|
 | iss						| String	| 			| iss 值，如不配置则自动计算													|
@@ -436,19 +502,25 @@ sa-token.oauth2-server.oidc.idTokenTimeout=600
 
 
 
-##### SaClientModel属性定义
+#### 4.3、SaClientModel属性定义
 | 参数名称				| 类型			| 默认值	| 说明													|
 | :--------				| :--------		| :--------	| :--------											|
 | clientId				| String		| null		| 应用id，应该全局唯一								|
 | clientSecret			| String		| null		| 应用秘钥											|
-| contractScopes		| List<String>	| null		| 应用签约的所有权限 									|
-| allowRedirectUris		| List<String>	| null		| 应用允许授权的所有URL（可以使用 `*` 号通配符）			|
-| allowGrantTypes		| List<String>	| new ArrayList<>()	| 应用允许的所有 `grant_type`							|
-| isNewRefresh			| Boolean		| 取全局配置		| 单独配置此Client：是否在每次 `Refresh-Token` 刷新 `Access-Token` 时，产生一个新的 Refresh-Token [ 默认取全局配置 ]	|
-| accessTokenTimeout	| long			| 取全局配置		| 单独配置此Client：`Access-Token` 保存的时间（单位：秒）  [默认取全局配置]	|
-| refreshTokenTimeout	| long			| 取全局配置		| 单独配置此Client：`Refresh-Token` 保存的时间（单位：秒） [默认取全局配置]	|
-| clientTokenTimeout	| long			| 取全局配置		| 单独配置此Client：`Client-Token` 保存的时间（单位：秒） [默认取全局配置]	|
-|lowerClientTokenTimeout	| long		| 取全局配置		| 单独配置此Client：`Lower-Client-Token` 保存的时间（单位：秒） [默认取全局配置]	|
+| contractScopes		| List<String>	| []		| 应用签约的所有权限 									|
+| allowRedirectUris		| List<String>	| []		| 应用允许授权的所有URL（可以使用 `*` 号通配符）			|
+| allowGrantTypes		| List<String>	| []		| 应用允许的所有 `grant_type`							|
+| subjectId				| String		| null		| 应用主体id							|
+| accessTokenTimeout	| long			| 取全局配置 (7200)	| 此应用`Access-Token` 保存的时间（单位：秒）  [默认取全局配置]	|
+| refreshTokenTimeout	| long			| 取全局配置 (2592000)| 此应用`Refresh-Token` 保存的时间（单位：秒） [默认取全局配置]	|
+| clientTokenTimeout	| Boolean		| 取全局配置 (7200)| 此应用`Client-Token` 保存的时间（单位：秒） [默认取全局配置]	|
+| maxAccessTokenCount	| long			| 取全局配置 (12)| 此应用单个用户最多同时存在的 Access-Token 数量	|
+| maxRefreshTokenCount	| long			| 取全局配置 (12)| 此应用单个用户最多同时存在的 Refresh-Token 数量	|
+| maxClientTokenCount	| long			| 取全局配置 (12)| 此应用最多同时存在的 Client-Token 数量	|
+| isNewRefresh			| Boolean		| 取全局配置		| 单独配置此 Client：是否在每次 `Refresh-Token` 刷新 `Access-Token` 时，产生一个新的 Refresh-Token [ 默认取全局配置 ]	|
+| isAutoConfirm			| Boolean		| false		| 是否允许此应用自动确认授权 <span style="color: red;">（高危配置，禁止向不被信任的第三方开启此选项）</span>	|
+
+
 
 
 

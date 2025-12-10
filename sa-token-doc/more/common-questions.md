@@ -12,7 +12,32 @@
 
 ### Q：报错：SaTokenContext 上下文尚未初始化
 
-报这个错说明你在异步上下文/响应式上下文里调用了 Sa-Token 的同步 API，解决方案参考：[异步 & Mock 上下文](/fun/async--mock)
+可能1：:你在 异步上下文 / 响应式上下文 里调用了 Sa-Token 的同步 API，解决方案参考：[异步 & Mock 上下文](/fun/async--mock)
+
+可能2：访问了一个不存在的路由，而且 SaInterceptor 拦截器里有鉴权代码。
+
+SpringBoot 默认会把 404 请求转发到 `/error`，如果恰好 SaInterceptor 里有鉴权代码，就会造成：
+
+写入上下文 → 进入拦截器(有上下文，可调用鉴权代码) → 发现是404 → 清除上下文 → 
+将请求转发至 /error -> 再次进入拦截器(无上下文，不可调用鉴权代码) → 报错：SaTokenContext 上下文尚未初始化。
+
+解决方案：将 "/error" 地址排除在拦截器之外：
+
+``` java
+@Configuration
+public class SaTokenConfigure implements WebMvcConfigurer {
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new SaInterceptor(handle -> {
+			// 鉴权代码 ...
+		}))
+		.addPathPatterns("/**")
+		.excludePathPatterns("/error");
+	}
+}
+```
+
+
 
 
 ### Q：报错：NotLoginException：xxx
@@ -416,7 +441,7 @@ Caused by: java.lang.ClassNotFoundException: cn.dev33.satoken.same.SaSameTemplat
 ### Q：使用拦截器鉴权，访问一个不存在的 path 时，springboot 会自动在控制台打印一下异常。
 可尝试添加以下配置解决：
 ``` properties
-spring.resources.add-mappings=false
+spring.web.resources.add-mappings=false
 spring.mvc.throw-exception-if-no-handler-found=true
 ```
 
@@ -557,6 +582,15 @@ org.springframework.beans.factory.BeanCreationException: Error creating bean wit
 </dependency>
 ```
 
+
+
+### Q：在 idea 导入源码，运行报错：java: 程序包cn.dev33.satoken.oauth2不存在。
+
+在项目根目录进入 cmd，执行 `mvn package`，然后重新运行试试。
+
+如果不行，先执行 `maven clean` ，然后删除 .idea 文件夹里除 `icon.png` 外的所有文件，然后执行 `mvn package`，然后重新运行试试。
+
+如果还不行，删除整个项目，重新从 git 地址拉取一遍，再运行。
 
 
 

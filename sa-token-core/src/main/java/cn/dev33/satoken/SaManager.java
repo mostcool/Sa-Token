@@ -15,9 +15,6 @@
  */
 package cn.dev33.satoken;
 
-import cn.dev33.satoken.apikey.SaApiKeyTemplate;
-import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoader;
-import cn.dev33.satoken.apikey.loader.SaApiKeyDataLoaderDefaultImpl;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.config.SaTokenConfigFactory;
 import cn.dev33.satoken.context.SaTokenContext;
@@ -26,6 +23,8 @@ import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.dao.SaTokenDaoDefaultImpl;
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.SaTokenException;
+import cn.dev33.satoken.http.SaHttpTemplate;
+import cn.dev33.satoken.http.SaHttpTemplateDefaultImpl;
 import cn.dev33.satoken.json.SaJsonTemplate;
 import cn.dev33.satoken.json.SaJsonTemplateDefaultImpl;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
@@ -35,7 +34,6 @@ import cn.dev33.satoken.same.SaSameTemplate;
 import cn.dev33.satoken.secure.totp.SaTotpTemplate;
 import cn.dev33.satoken.serializer.SaSerializerTemplate;
 import cn.dev33.satoken.serializer.impl.SaSerializerTemplateForJson;
-import cn.dev33.satoken.sign.SaSignTemplate;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpInterfaceDefaultImpl;
 import cn.dev33.satoken.stp.StpLogic;
@@ -202,6 +200,25 @@ public class SaManager {
 	}
 
 	/**
+	 * HTTP 转换器
+	 */
+	private volatile static SaHttpTemplate saHttpTemplate;
+	public static void setSaHttpTemplate(SaHttpTemplate saHttpTemplate) {
+		SaManager.saHttpTemplate = saHttpTemplate;
+		SaTokenEventCenter.doRegisterComponent("SaHttpTemplate", saHttpTemplate);
+	}
+	public static SaHttpTemplate getSaHttpTemplate() {
+		if (saHttpTemplate == null) {
+			synchronized (SaManager.class) {
+				if (saHttpTemplate == null) {
+					SaManager.saHttpTemplate = new SaHttpTemplateDefaultImpl();
+				}
+			}
+		}
+		return saHttpTemplate;
+	}
+
+	/**
 	 * 序列化器
 	 */
 	private volatile static SaSerializerTemplate saSerializerTemplate;
@@ -218,25 +235,6 @@ public class SaManager {
 			}
 		}
 		return saSerializerTemplate;
-	}
-
-	/**
-	 * API 参数签名
-	 */
-	private volatile static SaSignTemplate saSignTemplate;
-	public static void setSaSignTemplate(SaSignTemplate saSignTemplate) {
-		SaManager.saSignTemplate = saSignTemplate;
-		SaTokenEventCenter.doRegisterComponent("SaSignTemplate", saSignTemplate);
-	}
-	public static SaSignTemplate getSaSignTemplate() {
-		if (saSignTemplate == null) {
-			synchronized (SaManager.class) {
-				if (saSignTemplate == null) {
-					SaManager.saSignTemplate = new SaSignTemplate();
-				}
-			}
-		}
-		return saSignTemplate;
 	}
 
 	/**
@@ -287,44 +285,6 @@ public class SaManager {
 			}
 		}
 		return totpTemplate;
-	}
-
-	/**
-	 * ApiKey 数据加载器
-	 */
-	private volatile static SaApiKeyDataLoader apiKeyDataLoader;
-	public static void setSaApiKeyDataLoader(SaApiKeyDataLoader apiKeyDataLoader) {
-		SaManager.apiKeyDataLoader = apiKeyDataLoader;
-		SaTokenEventCenter.doRegisterComponent("SaApiKeyDataLoader", apiKeyDataLoader);
-	}
-	public static SaApiKeyDataLoader getSaApiKeyDataLoader() {
-		if (apiKeyDataLoader == null) {
-			synchronized (SaManager.class) {
-				if (apiKeyDataLoader == null) {
-					SaManager.apiKeyDataLoader = new SaApiKeyDataLoaderDefaultImpl();
-				}
-			}
-		}
-		return apiKeyDataLoader;
-	}
-
-	/**
-	 * ApiKey 操作类
-	 */
-	private volatile static SaApiKeyTemplate apiKeyTemplate;
-	public static void setSaApiKeyTemplate(SaApiKeyTemplate apiKeyTemplate) {
-		SaManager.apiKeyTemplate = apiKeyTemplate;
-		SaTokenEventCenter.doRegisterComponent("SaApiKeyTemplate", apiKeyTemplate);
-	}
-	public static SaApiKeyTemplate getSaApiKeyTemplate() {
-		if (apiKeyTemplate == null) {
-			synchronized (SaManager.class) {
-				if (apiKeyTemplate == null) {
-					SaManager.apiKeyTemplate = new SaApiKeyTemplate();
-				}
-			}
-		}
-		return apiKeyTemplate;
 	}
 
 

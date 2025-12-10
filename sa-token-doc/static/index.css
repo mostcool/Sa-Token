@@ -124,6 +124,8 @@ body{font-size: 16px; color: #34495E; font-family: "Source Sans Pro","Helvetica 
 .feature h2{font-size: 22px; color: #000; font-weight: 400;}
 .feature p{margin-top: 14px; font-size: 16px; color: #4e6e8e;}
 
+.sa-token-jss-img{ width: 100%; }
+
 /* 功能结构图介绍 */
 /* .sa-token-js-box{margin-bottom: 50px; transition: all 0.2s;}
 .sa-token-js-box img{max-width: 100%;}
@@ -279,7 +281,7 @@ body{font-size: 16px; color: #34495E; font-family: "Source Sans Pro","Helvetica 
 .zk-box{display: inline-block; padding-right: 0px; margin-right: -25px;}
 /* 外层盒 */
 .zk-box .zk-context{max-height: 0px; position: absolute; overflow: hidden;}
-.zk-box:hover .zk-context{max-height: 300px;}
+.zk-box:hover .zk-context{max-height: 400px;}
 /* 内层盒 */
 .zk-context>div{padding: 1em 0.5em 1em 1em; border: 1px #ccc solid; border-radius: 2px; background-color: #FFF; font-size: 12px; transition: all 0.2s; opacity: 0;}
 .zk-box:hover .zk-context>div{opacity: 1;}

@@ -15,8 +15,7 @@
  */
 package cn.dev33.satoken.oauth2.data.model.loader;
 
-import cn.dev33.satoken.oauth2.SaOAuth2Manager;
-import cn.dev33.satoken.oauth2.config.SaOAuth2ServerConfig;
+import cn.dev33.satoken.oauth2.strategy.SaOAuth2Strategy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -46,12 +45,12 @@ public class SaClientModel implements Serializable {
 	/**
 	 * 应用签约的所有权限
 	 */
-	public List<String> contractScopes;
+	public List<String> contractScopes = new ArrayList<>();
 	
 	/**
 	 * 应用允许授权的所有 redirect_uri
 	 */
-	public List<String> allowRedirectUris;
+	public List<String> allowRedirectUris = new ArrayList<>();
 
 	/**
 	 * 应用允许的所有 grant_type
@@ -63,37 +62,83 @@ public class SaClientModel implements Serializable {
 	 */
 	public String subjectId;
 
-	/** 单独配置此Client：是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置] */
-	public Boolean isNewRefresh;
-
-	/** 单独配置此Client：Access-Token 保存的时间(单位秒)  [默认取全局配置] */
+	/** 此应用 Access-Token 保存的时间(单位秒)  [默认取全局配置] */
 	public long accessTokenTimeout;
 
-	/** 单独配置此Client：Refresh-Token 保存的时间(单位秒) [默认取全局配置] */
+	/** 此应用 Refresh-Token 保存的时间(单位秒) [默认取全局配置] */
 	public long refreshTokenTimeout;
 
-	/** 单独配置此Client：Client-Token 保存的时间(单位秒) [默认取全局配置] */
+	/** 此应用 Client-Token 保存的时间(单位秒) [默认取全局配置] */
 	public long clientTokenTimeout;
 
-	/** 单独配置此Client：Lower-Client-Token 保存的时间(单位：秒) [默认取全局配置] */
-	public long lowerClientTokenTimeout;
+	/** 此应用单个用户最多同时存在的 Access-Token 数量 */
+	public int maxAccessTokenCount;
+
+	/** 此应用单个用户最多同时存在的 Refresh-Token 数量 */
+	public int maxRefreshTokenCount;
+
+	/** 此应用最多同时存在的 Client-Token 数量 */
+	public int maxClientTokenCount;
+
+	/** 此应用 是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置] */
+	public Boolean isNewRefresh;
+
+	/** 是否允许此应用自动确认授权（高危配置，禁止向不被信任的第三方开启此选项） */
+	public Boolean isAutoConfirm = false;
 
 	
 	public SaClientModel() {
-		SaOAuth2ServerConfig config = SaOAuth2Manager.getServerConfig();
-		this.isNewRefresh = config.getIsNewRefresh();
-		this.accessTokenTimeout = config.getAccessTokenTimeout();
-		this.refreshTokenTimeout = config.getRefreshTokenTimeout();
-		this.clientTokenTimeout = config.getClientTokenTimeout();
-		this.lowerClientTokenTimeout = config.getLowerClientTokenTimeout();
+		SaOAuth2Strategy.instance.setSaClientModelDefaultFields.run(this);
 	}
 	public SaClientModel(String clientId, String clientSecret, List<String> contractScopes, List<String> allowRedirectUris) {
-		super();
+		this();
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 		this.contractScopes = contractScopes;
 		this.allowRedirectUris = allowRedirectUris;
 	}
+
+
+	// 追加方法
+
+	/**
+	 * @param scopes 添加应用签约的所有权限
+	 * @return 对象自身
+	 */
+	public SaClientModel addContractScopes(String... scopes) {
+		if(this.contractScopes == null) {
+			this.contractScopes = new ArrayList<>();
+		}
+		this.contractScopes.addAll(Arrays.asList(scopes));
+		return this;
+	}
+
+	/**
+	 * @param redirectUris 添加应用允许授权的所有 redirect_uri
+	 * @return 对象自身
+	 */
+	public SaClientModel addAllowRedirectUris(String... redirectUris) {
+		if(this.allowRedirectUris == null) {
+			this.allowRedirectUris = new ArrayList<>();
+		}
+		this.allowRedirectUris.addAll(Arrays.asList(redirectUris));
+		return this;
+	}
+
+	/**
+	 * @param grantTypes 应用允许的所有 grant_type
+	 * @return 对象自身
+	 */
+	public SaClientModel addAllowGrantTypes(String... grantTypes) {
+		if(this.allowGrantTypes == null) {
+			this.allowGrantTypes = new ArrayList<>();
+		}
+		this.allowGrantTypes.addAll(Arrays.asList(grantTypes));
+		return this;
+	}
+
+
+	// get set
 
 	/**
 	 * @return 应用id
@@ -196,14 +241,14 @@ public class SaClientModel implements Serializable {
 	}
 
 	/**
-	 * @return 此Client：是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置]
+	 * @return 此应用 是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置]
 	 */
 	public Boolean getIsNewRefresh() {
 		return isNewRefresh;
 	}
 	
 	/**
-	 * @param isNewRefresh 单独配置此Client：是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置]
+	 * @param isNewRefresh 此应用 是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token [默认取全局配置]
 	 * @return 对象自身 
 	 */
 	public SaClientModel setIsNewRefresh(Boolean isNewRefresh) {
@@ -212,14 +257,14 @@ public class SaClientModel implements Serializable {
 	}
 	
 	/**
-	 * @return 此Client：Access-Token 保存的时间(单位秒)  [默认取全局配置]
+	 * @return 此应用 Access-Token 保存的时间(单位秒)  [默认取全局配置]
 	 */
 	public long getAccessTokenTimeout() {
 		return accessTokenTimeout;
 	}
 	
 	/**
-	 * @param accessTokenTimeout 单独配置此Client：Access-Token 保存的时间(单位秒)  [默认取全局配置]
+	 * @param accessTokenTimeout 此应用 Access-Token 保存的时间(单位秒)  [默认取全局配置]
 	 * @return 对象自身 
 	 */
 	public SaClientModel setAccessTokenTimeout(long accessTokenTimeout) {
@@ -228,14 +273,14 @@ public class SaClientModel implements Serializable {
 	}
 	
 	/**
-	 * @return 此Client：Refresh-Token 保存的时间(单位秒) [默认取全局配置]
+	 * @return 此应用 Refresh-Token 保存的时间(单位秒) [默认取全局配置]
 	 */
 	public long getRefreshTokenTimeout() {
 		return refreshTokenTimeout;
 	}
 	
 	/**
-	 * @param refreshTokenTimeout 单独配置此Client：Refresh-Token 保存的时间(单位秒) [默认取全局配置]
+	 * @param refreshTokenTimeout 此应用 Refresh-Token 保存的时间(单位秒) [默认取全局配置]
 	 * @return 对象自身 
 	 */
 	public SaClientModel setRefreshTokenTimeout(long refreshTokenTimeout) {
@@ -244,38 +289,94 @@ public class SaClientModel implements Serializable {
 	}
 	
 	/**
-	 * @return 此Client：Client-Token 保存的时间(单位秒) [默认取全局配置]
+	 * @return 此应用 Client-Token 保存的时间(单位秒) [默认取全局配置]
 	 */
 	public long getClientTokenTimeout() {
 		return clientTokenTimeout;
 	}
 	
 	/**
-	 * @param clientTokenTimeout 单独配置此Client：Client-Token 保存的时间(单位秒) [默认取全局配置]
+	 * @param clientTokenTimeout 此应用 Client-Token 保存的时间(单位秒) [默认取全局配置]
 	 * @return 对象自身 
 	 */
 	public SaClientModel setClientTokenTimeout(long clientTokenTimeout) {
 		this.clientTokenTimeout = clientTokenTimeout;
 		return this;
 	}
-	
+
 	/**
-	 * @return 此Client：Lower-Client-Token 保存的时间(单位：秒) [默认取全局配置]
+	 * 获取 是否允许此应用自动确认授权（高危配置，禁止向不被信任的第三方开启此选项）
+	 *
+	 * @return /
 	 */
-	public long getLowerClientTokenTimeout() {
-		return lowerClientTokenTimeout;
+	public Boolean getIsAutoConfirm() {
+		return this.isAutoConfirm;
 	}
-	
+
 	/**
-	 * @param lowerClientTokenTimeout 单独配置此Client：Lower-Client-Token 保存的时间(单位：秒) [默认取全局配置]
-	 * @return 对象自身 
+	 * 设置 是否允许此应用自动确认授权（高危配置，禁止向不被信任的第三方开启此选项）
+	 *
+	 * @param isAutoConfirm /
+	 * @return 对象自身
 	 */
-	public SaClientModel setLowerClientTokenTimeout(long lowerClientTokenTimeout) {
-		this.lowerClientTokenTimeout = lowerClientTokenTimeout;
+	public SaClientModel setIsAutoConfirm(Boolean isAutoConfirm) {
+		this.isAutoConfirm = isAutoConfirm;
 		return this;
 	}
-	
-	//
+
+	/**
+	 *  此应用单个用户最多同时存在的 Access-Token 数量
+	 * @return /
+	 */
+	public int getMaxAccessTokenCount() {
+		return maxAccessTokenCount;
+	}
+
+	/**
+	 * 设置  此应用单个用户最多同时存在的 Access-Token 数量
+	 * @param maxAccessTokenCount /
+	 * @return 对象自身
+	 */
+	public SaClientModel setMaxAccessTokenCount(int maxAccessTokenCount) {
+		this.maxAccessTokenCount = maxAccessTokenCount;
+		return this;
+	}
+
+	/**
+	 * 此应用单个用户最多同时存在的 Refresh-Token 数量
+	 * @return /
+	 */
+	public int getMaxRefreshTokenCount() {
+		return maxRefreshTokenCount;
+	}
+
+	/**
+	 * 此应用单个用户最多同时存在的 Refresh-Token 数量
+	 * @param maxRefreshTokenCount /
+	 * @return 对象自身
+	 */
+	public SaClientModel setMaxRefreshTokenCount(int maxRefreshTokenCount) {
+		this.maxRefreshTokenCount = maxRefreshTokenCount;
+		return this;
+	}
+
+	/**
+	 * 此应用单个用户最多同时存在的 Client-Token 数量
+	 * @return /
+	 */
+	public int getMaxClientTokenCount() {
+		return maxClientTokenCount;
+	}
+
+	/**
+	 * 此应用单个用户最多同时存在的 Client-Token 数量
+	 * @param maxClientTokenCount /
+	 * @return 对象自身
+	 */
+	public SaClientModel setMaxClientTokenCount(int maxClientTokenCount) {
+		this.maxClientTokenCount = maxClientTokenCount;
+		return this;
+	}
 
 	@Override
 	public String toString() {
@@ -290,48 +391,11 @@ public class SaClientModel implements Serializable {
 				", accessTokenTimeout=" + accessTokenTimeout +
 				", refreshTokenTimeout=" + refreshTokenTimeout +
 				", clientTokenTimeout=" + clientTokenTimeout +
-				", lowerClientTokenTimeout=" + lowerClientTokenTimeout +
+				", isAutoConfirm=" + isAutoConfirm +
+				", maxAccessTokenCount=" + maxAccessTokenCount +
+				", refreshTokenTimeout=" + refreshTokenTimeout +
+				", maxClientTokenCount=" + maxClientTokenCount +
 				'}';
 	}
-
-
-	// 追加方法
-
-	/**
-	 * @param scopes 添加应用签约的所有权限
-	 * @return 对象自身
-	 */
-	public SaClientModel addContractScopes(String... scopes) {
-		if(this.contractScopes == null) {
-			this.contractScopes = new ArrayList<>();
-		}
-		this.contractScopes.addAll(Arrays.asList(scopes));
-		return this;
-	}
-
-	/**
-	 * @param redirectUris 添加应用允许授权的所有 redirect_uri
-	 * @return 对象自身
-	 */
-	public SaClientModel addAllowRedirectUris(String... redirectUris) {
-		if(this.allowRedirectUris == null) {
-			this.allowRedirectUris = new ArrayList<>();
-		}
-		this.allowRedirectUris.addAll(Arrays.asList(redirectUris));
-		return this;
-	}
-
-	/**
-	 * @param grantTypes 应用允许的所有 grant_type
-	 * @return 对象自身
-	 */
-	public SaClientModel addAllowGrantTypes(String... grantTypes) {
-		if(this.allowGrantTypes == null) {
-			this.allowGrantTypes = new ArrayList<>();
-		}
-		this.allowGrantTypes.addAll(Arrays.asList(grantTypes));
-		return this;
-	}
-
 
 }

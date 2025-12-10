@@ -62,6 +62,10 @@ body{
 		--doc-left-width: 200px;
 		--doc-context-width: calc( 100vw - 400px - 50px);
 		--doc-right-width: calc(200px - 20px);
+		
+		/* 窄屏幕时，广告更换为上下显示 */
+		.main-box .top-ad-box .mad-img{ float: none; margin-right: 10px;  border: 0px; }
+		.main-box .top-ad-box .mad-text{ float: none; display: block; width: 100%; margin-top: 10px; color: #000; word-break: normal; }
 	}
 }
 /* 小于 1100px时 */
@@ -139,7 +143,7 @@ body{
 .zk-box{display: inline-block;}
 /* 外层盒 */
 .zk-box .zk-context{max-height: 0px; position: absolute; overflow: hidden;}
-.zk-box:hover .zk-context{max-height: 300px;}
+.zk-box:hover .zk-context{max-height: 400px;}
 /* 内层盒 */
 .zk-context>div{padding: 1em 0.5em 1em 1em; border: 1px #ccc solid; border-radius: 2px; background-color: #FFF; font-size: 12px; transition: all 0.2s; opacity: 0;}
 .zk-box:hover .zk-context>div{opacity: 1;}
@@ -207,6 +211,8 @@ body{
 .lang-html .token.tag .attr-name *{color: #A6E22E; opacity: 0.9;}
 .lang-html .token.tag .attr-value,
 .lang-html .token.tag .attr-value *{color: #E6DB74; opacity: 0.9;}
+.lang-html .token.annotation.punctuation{color: #ddd;}
+.lang-html .token.punctuation{color: #ddd;}
 
 /* java语言样式优化 */
 .main-box .lang-java{color: #01a252 !important;; opacity: 1;}
@@ -452,6 +458,11 @@ body {
 .main-box .top-ad-box a:hover{border-bottom: 0px;}
 .main-box .top-ad-box a img{border: 1px #eee solid; width: 100%; /* max-height: 80px; */ border-radius: 2px; transition: all 0.1s !important;}
 .main-box .top-ad-box a img:hover{box-shadow: 0 0 20px #ddd;}
+
+.mad-bg-box{ padding: 10px; background-color: #F4F8FA; /* border: 1px #eee solid; */ overflow: hidden; }
+.mad-wh-box{ width: 100%; }
+.main-box .top-ad-box .mad-img{ width: 130px; float: left; margin-right: 10px;  border: 0px; }
+.main-box .top-ad-box .mad-text{ float: left; width: calc(100% - 140px); color: #000; font-size: 14px; line-height: 20px; word-break: break-all; }
 
 .main-box .top-ad-box2 a img{ width: 48.5%; margin-bottom: 2px; }
 .main-box .top-ad-box2 a:nth-child(2n+1) img{margin-right: 2px; }

@@ -128,6 +128,15 @@ public class SaOAuth2Util {
 		return SaOAuth2Manager.getTemplate().isGrantScope(loginId, clientId, scopes);
 	}
 
+	/**
+	 * 删除：指定 loginId 针对指定 Client 的授权信息
+	 * @param loginId 账号id
+	 * @param clientId 应用id
+	 */
+	public static void deleteGrantScope(Object loginId, String clientId) {
+		SaOAuth2Manager.getTemplate().deleteGrantScope(loginId, clientId);
+	}
+
 
 	// ----------------- Code 相关 -----------------
 
@@ -181,13 +190,13 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 获取 Access-Token，根据索引： clientId、loginId
+	 * 获取 Access-Token 列表：此应用下 对 某个用户 签发的所有 Access-token
 	 * @param clientId /
 	 * @param loginId /
 	 * @return /
 	 */
-	public static String getAccessTokenValue(String clientId, Object loginId) {
-		return SaOAuth2Manager.getTemplate().getAccessTokenValue(clientId, loginId);
+	public static List<String> getAccessTokenValueList(String clientId, Object loginId) {
+		return SaOAuth2Manager.getTemplate().getAccessTokenValueList(clientId, loginId);
 	}
 
 	/**
@@ -227,7 +236,7 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 回收 Access-Token
+	 * 回收一个 Access-Token
 	 * @param accessToken Access-Token值
 	 */
 	public static void revokeAccessToken(String accessToken) {
@@ -235,7 +244,7 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 回收 Access-Token，根据索引： clientId、loginId
+	 * 回收全部 Access-Token：指定应用下 指定用户 的全部 Access-Token
 	 * @param clientId /
 	 * @param loginId /
 	 */
@@ -265,17 +274,19 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 获取 Refresh-Token，根据索引： clientId、loginId
+	 * 获取 Refresh-Token 列表：此应用下 对 某个用户 签发的所有 Refresh-Token
+	 *
 	 * @param clientId /
 	 * @param loginId /
 	 * @return /
 	 */
-	public static String getRefreshTokenValue(String clientId, Object loginId) {
-		return SaOAuth2Manager.getTemplate().getRefreshTokenValue(clientId, loginId);
+	public static List<String> getRefreshTokenValueList(String clientId, Object loginId) {
+		return SaOAuth2Manager.getTemplate().getRefreshTokenValueList(clientId, loginId);
 	}
 
 	/**
-	 * 回收 Refresh-Token
+	 * 回收一个 Refresh-Token
+	 *
 	 * @param refreshToken Refresh-Token 值
 	 */
 	public static void revokeRefreshToken(String refreshToken) {
@@ -283,7 +294,7 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 回收 Refresh-Token，根据索引： clientId、loginId
+	 * 回收全部 Refresh-Token：指定应用下 指定用户 的全部 Refresh-Token
 	 * @param clientId /
 	 * @param loginId /
 	 */
@@ -322,12 +333,13 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 获取 ClientToken，根据索引： clientId
+	 * 获取 Client-Token 列表：此应用下 对 某个用户 签发的所有 Client-token
+	 *
 	 * @param clientId /
 	 * @return /
 	 */
-	public static String getClientTokenValue(String clientId) {
-		return SaOAuth2Manager.getTemplate().getClientTokenValue(clientId);
+	public static List<String> getClientTokenValueList(String clientId) {
+		return SaOAuth2Manager.getTemplate().getClientTokenValueList(clientId);
 	}
 
 	/**
@@ -349,7 +361,7 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 回收 ClientToken
+	 * 回收一个 ClientToken
 	 *
 	 * @param clientToken /
 	 */
@@ -358,7 +370,7 @@ public class SaOAuth2Util {
 	}
 
 	/**
-	 * 回收 ClientToken，根据索引： clientId
+	 * 回收全部 Client-Token：指定应用下的全部 Client-Token
 	 *
 	 * @param clientId /
 	 */
@@ -366,13 +378,23 @@ public class SaOAuth2Util {
 		SaOAuth2Manager.getTemplate().revokeClientTokenByIndex(clientId);
 	}
 
+
+	// ------------------- 请求查询
+
 	/**
-	 * 回收 Lower-Client-Token，根据索引： clientId
-	 *
-	 * @param clientId /
+	 * 数据读取：从当前请求对象中读取 access_token，并查询到 AccessTokenModel 信息，无效 access_token 抛出异常
+	 * <br /> 1、请求参数 access_token，2、请求头 Authorization Bearer access_token
 	 */
-	public static void revokeLowerClientTokenByIndex(String clientId) {
-		SaOAuth2Manager.getTemplate().revokeLowerClientTokenByIndex(clientId);
+	public static AccessTokenModel currentAccessToken() {
+		return SaOAuth2Manager.getTemplate().currentAccessToken();
+	}
+
+	/**
+	 * 数据读取：从当前请求对象中读取 client_token，并查询到 ClientTokenModel 信息，无效 client_token 抛出异常
+	 * <br /> 1、请求参数 client_token，2、请求头 Authorization Bearer client_token
+	 */
+	public static ClientTokenModel currentClientToken() {
+		return SaOAuth2Manager.getTemplate().currentClientToken();
 	}
 
 }

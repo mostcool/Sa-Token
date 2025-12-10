@@ -15,10 +15,12 @@
  */
 package cn.dev33.satoken.solon;
 
-import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.solon.json.SaJsonTemplateForSnack3;
+import cn.dev33.satoken.solon.apikey.SaApiKeyBeanInject;
+import cn.dev33.satoken.solon.apikey.SaApiKeyBeanRegister;
 import cn.dev33.satoken.solon.oauth2.SaOAuth2BeanInject;
 import cn.dev33.satoken.solon.oauth2.SaOAuth2BeanRegister;
+import cn.dev33.satoken.solon.sign.SaSignBeanInject;
+import cn.dev33.satoken.solon.sign.SaSignBeanRegister;
 import cn.dev33.satoken.solon.sso.SaSsoBeanInject;
 import cn.dev33.satoken.solon.sso.SaSsoBeanRegister;
 import org.noear.solon.core.AppContext;
@@ -32,20 +34,24 @@ public class SaSolonPlugin implements Plugin {
 
     @Override
     public void start(AppContext context) {
-
-        // 注入JSON解析器Bean
-        SaManager.setSaJsonTemplate(new SaJsonTemplateForSnack3());
-
-        //sa-token
+        // sa-token
         context.beanMake(SaBeanRegister.class);
         context.beanMake(SaBeanInject.class);
 
-        //sa-sso
+        // sa-sso
         context.beanMake(SaSsoBeanRegister.class);
         context.beanMake(SaSsoBeanInject.class);
 
-        //sa-oauth2
+        // sa-oauth2
         context.beanMake(SaOAuth2BeanRegister.class);
         context.beanMake(SaOAuth2BeanInject.class);
+
+        // sa-apikey
+        context.beanMake(SaApiKeyBeanRegister.class);
+        context.beanMake(SaApiKeyBeanInject.class);
+
+        // sa-sign
+        context.beanMake(SaSignBeanRegister.class);
+        context.beanMake(SaSignBeanInject.class);
     }
 }

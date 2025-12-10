@@ -17,10 +17,6 @@ package cn.dev33.satoken.oauth2.config;
 
 import cn.dev33.satoken.oauth2.consts.SaOAuth2Consts;
 import cn.dev33.satoken.oauth2.data.model.loader.SaClientModel;
-import cn.dev33.satoken.oauth2.function.SaOAuth2ConfirmViewFunction;
-import cn.dev33.satoken.oauth2.function.SaOAuth2DoLoginHandleFunction;
-import cn.dev33.satoken.oauth2.function.SaOAuth2NotLoginViewFunction;
-import cn.dev33.satoken.util.SaResult;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -48,23 +44,29 @@ public class SaOAuth2ServerConfig implements Serializable {
 	/** 是否打开模式：凭证式（Client Credentials） */
 	public Boolean enableClientCredentials = true;
 
-	/** 是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token */
-	public Boolean isNewRefresh = false;
-	
 	/** Code授权码 保存的时间(单位：秒) 默认五分钟 */
 	public long codeTimeout = 60 * 5;
 
-	/** Access-Token 保存的时间(单位：秒) 默认两个小时 */
+	/** 全局默认配置所有应用：Access-Token 保存的时间(单位：秒) 默认两个小时 */
 	public long accessTokenTimeout = 60 * 60 * 2;
 
-	/** Refresh-Token 保存的时间(单位：秒) 默认30 天 */
+	/** 全局默认配置所有应用：Refresh-Token 保存的时间(单位：秒) 默认30 天 */
 	public long refreshTokenTimeout = 60 * 60 * 24 * 30;
 
-	/** Client-Token 保存的时间(单位：秒) 默认两个小时 */
+	/** 全局默认配置所有应用：Client-Token 保存的时间(单位：秒) 默认两个小时 */
 	public long clientTokenTimeout = 60 * 60 * 2;
 
-	/** Lower-Client-Token 保存的时间(单位：秒) 默认为 -1，代表延续 Client-Token 有效期 */
-	public long lowerClientTokenTimeout = -1;
+	/** 全局默认配置所有应用：单个应用单个用户最多同时存在的 Access-Token 数量 */
+	public int maxAccessTokenCount = 12;
+
+	/** 全局默认配置所有应用：单个应用单个用户最多同时存在的 Refresh-Token 数量 */
+	public int maxRefreshTokenCount = 12;
+
+	/** 全局默认配置所有应用：单个应用最多同时存在的 Client-Token 数量 */
+	public int maxClientTokenCount = 12;
+
+	/** 全局默认配置所有应用：是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token */
+	public Boolean isNewRefresh = false;
 
 	/** 默认 openid 生成算法中使用的摘要前缀 */
 	public String openidDigestPrefix = SaOAuth2Consts.OPENID_DEFAULT_DIGEST_PREFIX;
@@ -78,7 +80,7 @@ public class SaOAuth2ServerConfig implements Serializable {
 	/** 指定低级权限，多个用逗号隔开 */
 	public String lowerScope;
 
-	/** 模式4是否返回 AccessToken 字段 */
+	/** 模式4是否返回 AccessToken 字段，以使其更符合 OAuth2 RFC 规范 */
 	public Boolean mode4ReturnAccessToken = false;
 
 	/** 是否在返回值中隐藏默认的状态字段 (code、msg、data) */
@@ -92,345 +94,7 @@ public class SaOAuth2ServerConfig implements Serializable {
 	/** client 列表 */
 	public Map<String, SaClientModel> clients = new LinkedHashMap<>();
 
-	/**
-	 * @return enableCode
-	 */
-	public Boolean getEnableAuthorizationCode() {
-		return enableAuthorizationCode;
-	}
-
-	/**
-	 * @param enableAuthorizationCode 要设置的 enableAuthorizationCode
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setEnableAuthorizationCode(Boolean enableAuthorizationCode) {
-		this.enableAuthorizationCode = enableAuthorizationCode;
-		return this;
-	}
-
-	/**
-	 * @return enableImplicit
-	 */
-	public Boolean getEnableImplicit() {
-		return enableImplicit;
-	}
-
-	/**
-	 * @param enableImplicit 要设置的 enableImplicit
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setEnableImplicit(Boolean enableImplicit) {
-		this.enableImplicit = enableImplicit;
-		return this;
-	}
-
-	/**
-	 * @return enablePassword
-	 */
-	public Boolean getEnablePassword() {
-		return enablePassword;
-	}
-
-	/**
-	 * @param enablePassword 要设置的 enablePassword
-	 */
-	public SaOAuth2ServerConfig setEnablePassword(Boolean enablePassword) {
-		this.enablePassword = enablePassword;
-		return this;
-	}
-
-	/**
-	 * @return enableClientCredentials
-	 */
-	public Boolean getEnableClientCredentials() {
-		return enableClientCredentials;
-	}
-
-	/**
-	 * @param enableClientCredentials 要设置的 enableClientCredentials
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setEnableClientCredentials(Boolean enableClientCredentials) {
-		this.enableClientCredentials = enableClientCredentials;
-		return this;
-	}
-
-	/**
-	 * @return isNewRefresh
-	 */
-	public Boolean getIsNewRefresh() {
-		return isNewRefresh;
-	}
-
-	/**
-	 * @param isNewRefresh 要设置的 isNewRefresh
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setIsNewRefresh(Boolean isNewRefresh) {
-		this.isNewRefresh = isNewRefresh;
-		return this;
-	}
-
-	/**
-	 * @return codeTimeout
-	 */
-	public long getCodeTimeout() {
-		return codeTimeout;
-	}
-
-	/**
-	 * @param codeTimeout 要设置的 codeTimeout
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setCodeTimeout(long codeTimeout) {
-		this.codeTimeout = codeTimeout;
-		return this;
-	}
-
-	/**
-	 * @return accessTokenTimeout
-	 */
-	public long getAccessTokenTimeout() {
-		return accessTokenTimeout;
-	}
-
-	/**
-	 * @param accessTokenTimeout 要设置的 accessTokenTimeout
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setAccessTokenTimeout(long accessTokenTimeout) {
-		this.accessTokenTimeout = accessTokenTimeout;
-		return this;
-	}
-
-	/**
-	 * @return refreshTokenTimeout
-	 */
-	public long getRefreshTokenTimeout() {
-		return refreshTokenTimeout;
-	}
-
-	/**
-	 * @param refreshTokenTimeout 要设置的 refreshTokenTimeout
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setRefreshTokenTimeout(long refreshTokenTimeout) {
-		this.refreshTokenTimeout = refreshTokenTimeout;
-		return this;
-	}
-
-	/**
-	 * @return clientTokenTimeout
-	 */
-	public long getClientTokenTimeout() {
-		return clientTokenTimeout;
-	}
-
-	/**
-	 * @param clientTokenTimeout 要设置的 clientTokenTimeout
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setClientTokenTimeout(long clientTokenTimeout) {
-		this.clientTokenTimeout = clientTokenTimeout;
-		return this;
-	}
-
-	/**
-	 * @return lowerClientTokenTimeout
-	 */
-	public long getLowerClientTokenTimeout() {
-		return lowerClientTokenTimeout;
-	}
-
-	/**
-	 * @param lowerClientTokenTimeout 要设置的 lowerClientTokenTimeout
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setLowerClientTokenTimeout(long lowerClientTokenTimeout) {
-		this.lowerClientTokenTimeout = lowerClientTokenTimeout;
-		return this;
-	}
-
-	/**
-	 * @return openidDigestPrefix
-	 */
-	public String getOpenidDigestPrefix() {
-		return openidDigestPrefix;
-	}
-
-	/**
-	 * @param openidDigestPrefix 要设置的 openidDigestPrefix
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setOpenidDigestPrefix(String openidDigestPrefix) {
-		this.openidDigestPrefix = openidDigestPrefix;
-		return this;
-	}
-
-	/**
-	 * @return unionidDigestPrefix
-	 */
-	public String getUnionidDigestPrefix() {
-		return unionidDigestPrefix;
-	}
-
-	/**
-	 * @param unionidDigestPrefix 要设置的 unionidDigestPrefix
-	 * @return 对象自身
-	 */
-	public SaOAuth2ServerConfig setUnionidDigestPrefix(String unionidDigestPrefix) {
-		this.unionidDigestPrefix = unionidDigestPrefix;
-		return this;
-	}
-
-	/**
-	 * 获取 指定高级权限，多个用逗号隔开
-	 *
-	 * @return higherScope 指定高级权限，多个用逗号隔开
-	 */
-	public String getHigherScope() {
-		return this.higherScope;
-	}
-
-	/**
-	 * 设置 指定高级权限，多个用逗号隔开
-	 *
-	 * @param higherScope 指定高级权限，多个用逗号隔开
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setHigherScope(String higherScope) {
-		this.higherScope = higherScope;
-		return this;
-	}
-
-	/**
-	 * 获取 指定低级权限，多个用逗号隔开
-	 *
-	 * @return lowerScope 指定低级权限，多个用逗号隔开
-	 */
-	public String getLowerScope() {
-		return this.lowerScope;
-	}
-
-	/**
-	 * 设置 指定低级权限，多个用逗号隔开
-	 *
-	 * @param lowerScope 指定低级权限，多个用逗号隔开
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setLowerScope(String lowerScope) {
-		this.lowerScope = lowerScope;
-		return this;
-	}
-
-	/**
-	 * @return mode4ReturnAccessToken
-	 */
-	public Boolean getMode4ReturnAccessToken() {
-		return mode4ReturnAccessToken;
-	}
-
-	/**
-	 * @param mode4ReturnAccessToken 要设置的 mode4ReturnAccessToken
-	 */
-	public SaOAuth2ServerConfig setMode4ReturnAccessToken(Boolean mode4ReturnAccessToken) {
-		this.mode4ReturnAccessToken = mode4ReturnAccessToken;
-		return this;
-	}
-
-	/**
-	 * @return hideStatusField
-	 */
-	public Boolean getHideStatusField() {
-		return hideStatusField;
-	}
-
-	/**
-	 * @param hideStatusField 要设置的 hideStatusField
-	 */
-	public SaOAuth2ServerConfig setHideStatusField(Boolean hideStatusField) {
-		this.hideStatusField = hideStatusField;
-		return this;
-	}
-
-	/**
-	 * 获取 oidc 相关配置
-	 *
-	 * @return oidc 相关配置
-	 */
-	public SaOAuth2OidcConfig getOidc() {
-		return this.oidc;
-	}
-
-	/**
-	 * 设置 oidc 相关配置
-	 *
-	 * @param oidc /
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setOidc(SaOAuth2OidcConfig oidc) {
-		this.oidc = oidc;
-		return this;
-	}
-
-	/**
-	 * 获取 client 列表
-	 * @return /
-	 */
-	public Map<String, SaClientModel> getClients() {
-		return clients;
-	}
-
-	/**
-	 * 写入 client 列表
-	 * @return /
-	 */
-	public SaOAuth2ServerConfig setClients(Map<String, SaClientModel> clients) {
-		this.clients = clients;
-		return this;
-	}
-
-
-	// -------------------- SaOAuth2Handle 所有回调函数 --------------------
-	
-	/**
-	 * OAuth-Server端：未登录时返回的View 
-	 */
-	public SaOAuth2NotLoginViewFunction notLoginView = () -> "当前会话在 OAuth-Server 认证中心尚未登录";
-
-	/**
-	 * OAuth-Server端：确认授权时返回的View 
-	 */
-	public SaOAuth2ConfirmViewFunction confirmView = (clientId, scopes) -> "本次操作需要用户授权";
-
-	/**
-	 * OAuth-Server端：登录函数 
-	 */
-	public SaOAuth2DoLoginHandleFunction doLoginHandle = (name, pwd) -> SaResult.error();
-
-	@Override
-	public String toString() {
-		return "SaOAuth2ServerConfig{" +
-				"enableAuthorizationCode=" + enableAuthorizationCode +
-				", enableImplicit=" + enableImplicit +
-				", enablePassword=" + enablePassword +
-				", enableClientCredentials=" + enableClientCredentials +
-				", isNewRefresh=" + isNewRefresh +
-				", codeTimeout=" + codeTimeout +
-				", accessTokenTimeout=" + accessTokenTimeout +
-				", refreshTokenTimeout=" + refreshTokenTimeout +
-				", clientTokenTimeout=" + clientTokenTimeout +
-				", lowerClientTokenTimeout=" + lowerClientTokenTimeout +
-				", openidDigestPrefix='" + openidDigestPrefix +
-				", unionidDigestPrefix='" + unionidDigestPrefix +
-				", higherScope='" + higherScope +
-				", lowerScope='" + lowerScope +
-				", mode4ReturnAccessToken='" + mode4ReturnAccessToken +
-				", hideStatusField='" + hideStatusField +
-				", oidc='" + oidc +
-				'}';
-	}
-
+	// 额外方法
 
 	/**
 	 * 注册 client
@@ -442,6 +106,395 @@ public class SaOAuth2ServerConfig implements Serializable {
 		}
 		this.clients.put(client.getClientId(), client);
 		return this;
+	}
+
+
+	// get set
+
+	/**
+	 * 是否打开模式：授权码（Authorization Code）
+	 * @return enableAuthorizationCode
+	 */
+	public Boolean getEnableAuthorizationCode() {
+		return enableAuthorizationCode;
+	}
+
+	/**
+	 * 设置是否打开模式：授权码（Authorization Code）
+	 * @param enableAuthorizationCode 是否开启
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setEnableAuthorizationCode(Boolean enableAuthorizationCode) {
+		this.enableAuthorizationCode = enableAuthorizationCode;
+		return this;
+	}
+
+	/**
+	 * 是否打开模式：隐藏式（Implicit）
+	 * @return enableImplicit
+	 */
+	public Boolean getEnableImplicit() {
+		return enableImplicit;
+	}
+
+	/**
+	 * 设置是否打开模式：隐藏式（Implicit）
+	 * @param enableImplicit 是否开启
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setEnableImplicit(Boolean enableImplicit) {
+		this.enableImplicit = enableImplicit;
+		return this;
+	}
+
+	/**
+	 * 是否打开模式：密码式（Password）
+	 * @return enablePassword
+	 */
+	public Boolean getEnablePassword() {
+		return enablePassword;
+	}
+
+	/**
+	 * 设置是否打开模式：密码式（Password）
+	 * @param enablePassword 是否开启
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setEnablePassword(Boolean enablePassword) {
+		this.enablePassword = enablePassword;
+		return this;
+	}
+
+	/**
+	 * 是否打开模式：凭证式（Client Credentials）
+	 * @return enableClientCredentials
+	 */
+	public Boolean getEnableClientCredentials() {
+		return enableClientCredentials;
+	}
+
+	/**
+	 * 设置是否打开模式：凭证式（Client Credentials）
+	 * @param enableClientCredentials 是否开启
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setEnableClientCredentials(Boolean enableClientCredentials) {
+		this.enableClientCredentials = enableClientCredentials;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token
+	 * @return isNewRefresh
+	 */
+	public Boolean getIsNewRefresh() {
+		return isNewRefresh;
+	}
+
+	/**
+	 * 全局默认配置所有应用：设置是否在每次 Refresh-Token 刷新 Access-Token 时，产生一个新的 Refresh-Token
+	 * @param isNewRefresh 是否开启
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setIsNewRefresh(Boolean isNewRefresh) {
+		this.isNewRefresh = isNewRefresh;
+		return this;
+	}
+
+	/**
+	 * Code授权码 保存的时间(单位：秒) 默认五分钟
+	 * @return codeTimeout
+	 */
+	public long getCodeTimeout() {
+		return codeTimeout;
+	}
+
+	/**
+	 * 设置Code授权码保存的时间(单位：秒)
+	 * @param codeTimeout 保存时间(秒)
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setCodeTimeout(long codeTimeout) {
+		this.codeTimeout = codeTimeout;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：Access-Token 保存的时间(单位：秒) 默认两个小时
+	 * @return accessTokenTimeout
+	 */
+	public long getAccessTokenTimeout() {
+		return accessTokenTimeout;
+	}
+
+	/**
+	 * 全局默认配置所有应用：设置Access-Token保存的时间(单位：秒)
+	 * @param accessTokenTimeout 保存时间(秒)
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setAccessTokenTimeout(long accessTokenTimeout) {
+		this.accessTokenTimeout = accessTokenTimeout;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：Refresh-Token 保存的时间(单位：秒) 默认30天
+	 * @return refreshTokenTimeout
+	 */
+	public long getRefreshTokenTimeout() {
+		return refreshTokenTimeout;
+	}
+
+	/**
+	 * 全局默认配置所有应用：设置Refresh-Token保存的时间(单位：秒)
+	 * @param refreshTokenTimeout 保存时间(秒)
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setRefreshTokenTimeout(long refreshTokenTimeout) {
+		this.refreshTokenTimeout = refreshTokenTimeout;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：Client-Token 保存的时间(单位：秒) 默认两个小时
+	 * @return clientTokenTimeout
+	 */
+	public long getClientTokenTimeout() {
+		return clientTokenTimeout;
+	}
+
+	/**
+	 * 全局默认配置所有应用：设置Client-Token保存的时间(单位：秒)
+	 * @param clientTokenTimeout 保存时间(秒)
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setClientTokenTimeout(long clientTokenTimeout) {
+		this.clientTokenTimeout = clientTokenTimeout;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：单个应用单个用户最多同时存在的 Access-Token 数量
+	 * @return maxAccessTokenCount
+	 */
+	public int getMaxAccessTokenCount() {
+		return maxAccessTokenCount;
+	}
+
+	/**
+	 * 设置单个应用单个用户最多同时存在的 Access-Token 数量
+	 * @param maxAccessTokenCount 最大数量
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setMaxAccessTokenCount(int maxAccessTokenCount) {
+		this.maxAccessTokenCount = maxAccessTokenCount;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：单个应用单个用户最多同时存在的 Refresh-Token 数量
+	 * @return maxRefreshTokenCount
+	 */
+	public int getMaxRefreshTokenCount() {
+		return maxRefreshTokenCount;
+	}
+
+	/**
+	 * 设置单个应用单个用户最多同时存在的 Refresh-Token 数量
+	 * @param maxRefreshTokenCount 最大数量
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setMaxRefreshTokenCount(int maxRefreshTokenCount) {
+		this.maxRefreshTokenCount = maxRefreshTokenCount;
+		return this;
+	}
+
+	/**
+	 * 全局默认配置所有应用：单个应用最多同时存在的 Client-Token 数量
+	 * @return maxClientTokenCount
+	 */
+	public int getMaxClientTokenCount() {
+		return maxClientTokenCount;
+	}
+
+	/**
+	 * 设置单个应用最多同时存在的 Client-Token 数量
+	 * @param maxClientTokenCount 最大数量
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setMaxClientTokenCount(int maxClientTokenCount) {
+		this.maxClientTokenCount = maxClientTokenCount;
+		return this;
+	}
+
+	/**
+	 * 默认 openid 生成算法中使用的摘要前缀
+	 * @return openidDigestPrefix
+	 */
+	public String getOpenidDigestPrefix() {
+		return openidDigestPrefix;
+	}
+
+	/**
+	 * 设置默认 openid 生成算法中使用的摘要前缀
+	 * @param openidDigestPrefix 摘要前缀
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setOpenidDigestPrefix(String openidDigestPrefix) {
+		this.openidDigestPrefix = openidDigestPrefix;
+		return this;
+	}
+
+	/**
+	 * 默认 unionid 生成算法中使用的摘要前缀
+	 * @return unionidDigestPrefix
+	 */
+	public String getUnionidDigestPrefix() {
+		return unionidDigestPrefix;
+	}
+
+	/**
+	 * 设置默认 unionid 生成算法中使用的摘要前缀
+	 * @param unionidDigestPrefix 摘要前缀
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setUnionidDigestPrefix(String unionidDigestPrefix) {
+		this.unionidDigestPrefix = unionidDigestPrefix;
+		return this;
+	}
+
+	/**
+	 * 指定高级权限，多个用逗号隔开
+	 * @return higherScope
+	 */
+	public String getHigherScope() {
+		return higherScope;
+	}
+
+	/**
+	 * 设置高级权限，多个用逗号隔开
+	 * @param higherScope 权限字符串
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setHigherScope(String higherScope) {
+		this.higherScope = higherScope;
+		return this;
+	}
+
+	/**
+	 * 指定低级权限，多个用逗号隔开
+	 * @return lowerScope
+	 */
+	public String getLowerScope() {
+		return lowerScope;
+	}
+
+	/**
+	 * 设置低级权限，多个用逗号隔开
+	 * @param lowerScope 权限字符串
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setLowerScope(String lowerScope) {
+		this.lowerScope = lowerScope;
+		return this;
+	}
+
+	/**
+	 * 模式4是否返回 AccessToken 字段，以使其更符合 OAuth2 RFC 规范
+	 * @return mode4ReturnAccessToken
+	 */
+	public Boolean getMode4ReturnAccessToken() {
+		return mode4ReturnAccessToken;
+	}
+
+	/**
+	 * 设置模式4是否返回 AccessToken 字段，以使其更符合 OAuth2 RFC 规范
+	 * @param mode4ReturnAccessToken 是否返回
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setMode4ReturnAccessToken(Boolean mode4ReturnAccessToken) {
+		this.mode4ReturnAccessToken = mode4ReturnAccessToken;
+		return this;
+	}
+
+	/**
+	 * 是否在返回值中隐藏默认的状态字段 (code、msg、data)
+	 * @return hideStatusField
+	 */
+	public Boolean getHideStatusField() {
+		return hideStatusField;
+	}
+
+	/**
+	 * 设置是否在返回值中隐藏默认的状态字段 (code、msg、data)
+	 * @param hideStatusField 是否隐藏
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setHideStatusField(Boolean hideStatusField) {
+		this.hideStatusField = hideStatusField;
+		return this;
+	}
+
+	/**
+	 * 获取oidc相关配置
+	 * @return oidc配置对象
+	 */
+	public SaOAuth2OidcConfig getOidc() {
+		return oidc;
+	}
+
+	/**
+	 * 设置oidc相关配置
+	 * @param oidc oidc配置对象
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setOidc(SaOAuth2OidcConfig oidc) {
+		this.oidc = oidc;
+		return this;
+	}
+
+	/**
+	 * 获取client列表
+	 * @return client列表
+	 */
+	public Map<String, SaClientModel> getClients() {
+		return clients;
+	}
+
+	/**
+	 * 设置client列表
+	 * @param clients client列表
+	 * @return 对象自身
+	 */
+	public SaOAuth2ServerConfig setClients(Map<String, SaClientModel> clients) {
+		this.clients = clients;
+		return this;
+	}
+
+	@Override
+	public String toString() {
+		return "SaOAuth2ServerConfig {" +
+				"enableAuthorizationCode=" + enableAuthorizationCode +
+				", enableImplicit=" + enableImplicit +
+				", enablePassword=" + enablePassword +
+				", enableClientCredentials=" + enableClientCredentials +
+				", isNewRefresh=" + isNewRefresh +
+				", codeTimeout=" + codeTimeout +
+				", accessTokenTimeout=" + accessTokenTimeout +
+				", refreshTokenTimeout=" + refreshTokenTimeout +
+				", clientTokenTimeout=" + clientTokenTimeout +
+				", maxAccessTokenCount=" + maxAccessTokenCount +
+				", maxRefreshTokenCount=" + maxRefreshTokenCount +
+				", maxClientTokenCount=" + maxClientTokenCount +
+				", openidDigestPrefix=" + openidDigestPrefix +
+				", unionidDigestPrefix=" + unionidDigestPrefix +
+				", higherScope=" + higherScope +
+				", lowerScope=" + lowerScope +
+				", mode4ReturnAccessToken=" + mode4ReturnAccessToken +
+				", hideStatusField=" + hideStatusField +
+				", oidc=" + oidc +
+				", clients=" + clients +
+				'}';
 	}
 
 

@@ -41,7 +41,9 @@ public class SaResult extends LinkedHashMap<String, Object> implements Serializa
 
 	// 预定的状态码
 	public static final int CODE_SUCCESS = 200;		
-	public static final int CODE_ERROR = 500;		
+	public static final int CODE_ERROR = 500;
+	public static final int CODE_NOT_PERMISSION = 403;
+	public static final int CODE_NOT_LOGIN = 401;
 
 	/**
 	 * 构建 
@@ -147,8 +149,10 @@ public class SaResult extends LinkedHashMap<String, Object> implements Serializa
 	 * @return 对象自身 
 	 */
 	public SaResult setMap(Map<String, ?> map) {
-		for (String key : map.keySet()) {
-			this.put(key, map.get(key));
+		if(map != null) {
+			for (String key : map.keySet()) {
+				this.put(key, map.get(key));
+			}
 		}
 		return this;
 	}
@@ -212,6 +216,18 @@ public class SaResult extends LinkedHashMap<String, Object> implements Serializa
 	public static SaResult error(String msg) {
 		return new SaResult(CODE_ERROR, msg, null);
 	}
+
+	// 构建未登录
+	public static SaResult notLogin() {
+		return new SaResult(CODE_NOT_LOGIN, "not login", null);
+	}
+
+	// 构建无权限
+	public static SaResult notPermission() {
+		return new SaResult(CODE_NOT_PERMISSION, "not permission", null);
+	}
+
+
 
 	// 构建指定状态码 
 	public static SaResult get(int code, String msg, Object data) {

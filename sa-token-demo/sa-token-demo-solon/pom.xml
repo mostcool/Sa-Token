@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.noear</groupId>
 		<artifactId>solon-parent</artifactId>
-		<version>3.0.4</version>
+		<version>3.2.1</version>
 		<relativePath/>
 	</parent>
 
@@ -19,7 +19,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.traget>17</maven.compiler.traget>
-		<sa-token.version>1.42.0</sa-token.version>
+		<sa-token.version>1.44.0</sa-token.version>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -50,6 +50,13 @@
             <artifactId>sa-token-redisx</artifactId>
             <version>${sa-token.version}</version>
         </dependency>
+
+		<!-- sa-token json 序列化器组件：snack3 实现  -->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-snack3</artifactId>
+			<version>${sa-token.version}</version>
+		</dependency>
 
 		<!-- hutool工具类，用来生成雪花算法唯一id -->
 		<!-- <dependency>

@@ -121,6 +121,11 @@ public class SaHttpDigestTemplate {
             if (kv.length == 2) {
                 map.put(kv[0].trim(), kv[1].trim().replace("\"", ""));
             }
+            // 兼容字符串包含多个=的情况，如：uri 带参数的问题
+            // username="sa", realm="Sa-Token", nonce="IWlEwO23oCAbIAbHX1BYnX5ddKHUdsjW", uri="/test/testDigest?name=zhangsan&age=18", response="c4359210ccb23c985234ee6e02def88d", opaque="H6jPyjwfioc0oUbDE0OSmpX7wznfxxMo", qop=auth, nc=00000002, cnonce="46dd0073c981a9c7"
+            else if (s.contains("=")) {
+				map.put(kv[0].trim(), s.substring(kv[0].length() + 1).trim().replace("\"", ""));
+			}
         }
 
         /*

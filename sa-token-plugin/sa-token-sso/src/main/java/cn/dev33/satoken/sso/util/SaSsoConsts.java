@@ -48,12 +48,24 @@ public class SaSsoConsts {
 	/** client 身份，* 代表通配，可以解析出所有 client 的 ticket */
 	public static final String CLIENT_WILDCARD = "*";
 
+	/** client 身份，代表匿名 client  */
+	public static final String CLIENT_ANON = "anon";
+
 	/** SSO 模式1 */
 	public static final int SSO_MODE_1 = 1;
 	/** SSO 模式2 */
 	public static final int SSO_MODE_2 = 2;
 	/** SSO 模式3 */
 	public static final int SSO_MODE_3 = 3;
+
+	/** 消息类型：校验 ticket */
+	public static final String MESSAGE_CHECK_TICKET = "checkTicket";
+
+	/** 消息类型：单点注销 */
+	public static final String MESSAGE_SIGNOUT = "signout";
+
+	/** 消息类型：单点注销回调 */
+	public static final String MESSAGE_LOGOUT_CALL = "logoutCall";
 
 
 
