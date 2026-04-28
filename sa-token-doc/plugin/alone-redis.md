@@ -7,7 +7,7 @@ Sa-Token默认的Redis集成方式会把权限数据和业务缓存放在一起�
 > 搭建两个Redis服务器，一个专门用来做业务缓存，另一台专门存放Sa-Token权限数据 
 
 
-<button class="show-img" img-src="https://oss.dev33.cn/sa-token/doc/g/g3--alone-redis.gif">加载动态演示图</button>
+<button class="show-img" img-src="/big-file/doc/plugin/g3--alone-redis.gif">加载动态演示图</button>
 
 
 要将Sa-Token的数据单独抽离出来很简单，你只需要为Sa-Token单独配置一个Redis连接信息即可 
@@ -16,6 +16,13 @@ Sa-Token默认的Redis集成方式会把权限数据和业务缓存放在一起�
 
 
 ### 1、首先引入Alone-Redis依赖 
+
+
+> [!WARNING| label:Spring Boot 4 用户]
+> 若使用 Spring Boot 4.x，请引入 `sa-token-alone-redis-by-spring-boot4` 替代 `sa-token-alone-redis`。
+> 注：当前版本下(v1.45.0)，此包尚未发布到 Maven 中央仓库，如需使用请下载源码手动自行打包或直接将源码复制到你的项目中进行使用。
+
+
 <!---------------------------- tabs:start ---------------------------->
 <!-------- tab:Maven 方式 -------->
 ``` xml 
@@ -154,13 +161,11 @@ public class TestController {
 
 分别访问两个接口，观察Redis中增加的数据 
 
-![alone-redis](https://oss.dev33.cn/sa-token/doc/alone-redis.png 's-w')
+<img class="s-w" src="/big-file/doc/plugin/alone-redis.png" alt="alone-redis" />
 
 测试完毕！
 
 ### 4、注意点
 目前 Sa-Token-Alone-Redis 仅对以下插件有 Redis 分离效果：
-- sa-token-redis
-- sa-token-redis-jackson
-- sa-token-redis-fastjson
-- sa-token-redis-fastjson2
+- sa-token-redis-template
+- sa-token-redis-template-jdk-serializer

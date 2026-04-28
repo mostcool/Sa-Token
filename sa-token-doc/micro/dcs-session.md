@@ -24,12 +24,12 @@
 - 方案一：性能消耗太大，不太考虑
 - 方案二：需要从网关处动手，与框架无关
 - 方案三：Sa-Token 整合`Redis`非常简单，详见章节：[集成 Redis](/up/integ-redis)
-- 方案四：详见官方仓库中 Sa-Token 整合`jwt`的示例
+- 方案四：详见官方仓库中 Sa-Token 整合`jwt`的示例（示例压缩包：[Sa-Token 集成示例大全下载](/more/download-demos) ）
 
 由于`jwt`模式不在服务端存储数据，对于比较复杂的业务可能会功能受限，因此更加推荐使用方案三
 
 
-<button class="show-img" img-src="https://oss.dev33.cn/sa-token/doc/g/g3--dcs-session.gif">加载动态演示图</button>
+<button class="show-img" img-src="/big-file/doc/micro/g3--dcs-session.gif">加载动态演示图</button>
 
 
 集成依赖示例：
@@ -37,10 +37,10 @@
 <!---------------------------- tabs:start ------------------------------>
 <!-------- tab:Maven 方式 -------->
 ``` xml 
-<!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+<!-- Sa-Token 整合 RedisTemplate -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-template</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
@@ -50,8 +50,8 @@
 ```
 <!-------- tab:Gradle 方式 -------->
 ``` gradle
-// Sa-Token 整合 Redis （使用 jackson 序列化方式）
-implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
+// Sa-Token 整合 RedisTemplate
+implementation 'cn.dev33:sa-token-redis-template:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 ```
 <!---------------------------- tabs:end ------------------------------>

@@ -10,13 +10,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.1</version>
+		<version>3.5.11</version>
 		<relativePath/>
 	</parent>
 	
 	<!-- 定义 Sa-Token 版本号 -->
 	<properties>
-		<sa-token.version>1.44.0</sa-token.version>
+		<sa-token.version>1.45.0</sa-token.version>
 	</properties>
 
 	<dependencies>
@@ -48,7 +48,7 @@
 		<!-- Sa-Token整合 Redis (使用jackson序列化方式) -->
 		<dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-redis-jackson</artifactId>
+            <artifactId>sa-token-redis-template</artifactId>
             <version>${sa-token.version}</version>
         </dependency>
         

@@ -18,6 +18,9 @@ Sa-Token提供两种解决方案：
 
 本篇主要讲解方案二 `Same-Token` 模块的整合步骤，其鉴权流程与 OAuth2.0 类似，不过使用方式上更加简洁（希望使用方案一的同学可参考Sa-OAuth2模块，此处不再赘述）
 
+<img class="w-100" src="/big-file/doc/micro/micro-network-isolation.svg" alt="Same-Token_同源系统认证.svg" />
+
+
 ### 二、网关转发鉴权 
 
 ##### 1、引入依赖
@@ -25,7 +28,6 @@ Sa-Token提供两种解决方案：
 在网关处引入的依赖为（此处以 SpringCloud Gateway 为例）：
 <!---------------------------- tabs:start ------------------------------>
 <!-------- tab:Maven 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-reactor-spring-boot-starter` 修改为 `sa-token-reactor-spring-boot3-starter` 即可。
 ``` xml 
 <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc -->
 <dependency>
@@ -34,10 +36,10 @@ Sa-Token提供两种解决方案：
     <version>${sa.top.version}</version>
 </dependency>
 
-<!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+<!-- Sa-Token 整合 RedisTemplate -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-template</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
@@ -45,22 +47,25 @@ Sa-Token提供两种解决方案：
     <artifactId>commons-pool2</artifactId>
 </dependency>
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
+
 <!-------- tab:Gradle 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-reactor-spring-boot-starter` 修改为 `sa-token-reactor-spring-boot3-starter` 即可。
 ``` gradle
 // Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc
 implementation 'cn.dev33:sa-token-reactor-spring-boot-starter:${sa.top.version}'
 
-// Sa-Token 整合 Redis （使用 jackson 序列化方式）
-implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
+// Sa-Token 整合 RedisTemplate
+implementation 'cn.dev33:sa-token-redis-template:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
 <!---------------------------- tabs:end ------------------------------>
 
 在下游子服务引入的依赖为：
 <!---------------------------- tabs:start ------------------------------>
 <!-------- tab:Maven 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
 ``` xml 
 <!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc -->
 <dependency>
@@ -69,10 +74,10 @@ implementation 'org.apache.commons:commons-pool2'
     <version>${sa.top.version}</version>
 </dependency>
 
-<!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+<!-- Sa-Token 整合 RedisTemplate -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-template</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
@@ -80,16 +85,20 @@ implementation 'org.apache.commons:commons-pool2'
     <artifactId>commons-pool2</artifactId>
 </dependency>
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
+
 <!-------- tab:Gradle 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
 ``` gradle
 // Sa-Token 权限认证，在线文档：https://sa-token.cc
 implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 
-// Sa-Token 整合 Redis （使用 jackson 序列化方式）
-implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
+// Sa-Token 整合 RedisTemplate
+implementation 'cn.dev33:sa-token-redis-template:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 <!---------------------------- tabs:end ------------------------------>
 
 ##### 2、网关处添加Same-Token
@@ -182,7 +191,7 @@ public class FeignInterceptor implements RequestInterceptor {
  */
 @FeignClient(
 		name = "sp-home", 				// 服务名称 
-		configuration = FeignInterceptor.class,		// 请求拦截器 （关键代码）
+		configuration = FeignInterceptor.class,		// 请求拦截器 （⚠️ 关键代码）
 		fallbackFactory = SpCfgInterfaceFallback.class	// 服务降级处理 
 		)	
 public interface SpCfgInterface {
@@ -201,7 +210,12 @@ public interface SpCfgInterface {
 
 Same-Token —— 专门解决同源系统互相调用时的身份认证校验，它的作用不仅局限于微服务调用场景
 
-基本使用流程为：服务调用方获取Token，提交到请求中，被调用方取出Token进行校验：Token一致则校验通过，否则拒绝服务
+基本使用流程为：服务调用方获取 Same-Token，提交到请求中，被调用方取出 Same-Token 进行校验：如果一致则校验通过，否则拒绝服务。
+
+<img class="w-100" src="/big-file/doc/micro/micro-same-token.svg" alt="Same-Token_同源系统认证.svg" />
+
+
+
 
 首先我们预览一下此模块的相关API：
 ``` java

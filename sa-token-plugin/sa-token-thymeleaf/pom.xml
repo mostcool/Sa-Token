@@ -12,7 +12,7 @@
     </parent>
     <packaging>jar</packaging>
 
-	<name>sa-token-dialect-thymeleaf</name>
+	<name>sa-token-thymeleaf</name>
     <artifactId>sa-token-thymeleaf</artifactId>
 	<description>sa-token-thymeleaf</description>
 
@@ -32,6 +32,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
+			<version>2.5.14</version>
 			<optional>true</optional>
 		</dependency>
 	</dependencies>

@@ -1,8 +1,9 @@
 # SpringBoot 集成 Sa-Token 示例
 
-本篇带你从零开始集成 Sa-Token，从而快速熟悉框架的使用姿势。
 
-整合示例在官方仓库的`/sa-token-demo/sa-token-demo-springboot`文件夹下，如遇到难点可结合源码进行学习测试。
+本篇带你从零开始集成 Sa-Token，只需简单 5 步，你就可以快速熟悉框架的使用姿势。
+
+整合示例在官方仓库的`/sa-token-demo/sa-token-demo-springboot`文件夹下，如遇到难点可结合源码进行学习测试。[Sa-Token 集成示例大全下载](/more/download-demos) 。
 
 ---
 
@@ -15,9 +16,6 @@
 
 <!---------------------------- tabs:start ---------------------------->
 <!-------- tab:Maven 方式 -------->
-
-注：如果你使用的是 SpringBoot 3.x，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
-
 ``` xml 
 <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
 <dependency>
@@ -26,15 +24,16 @@
 	<version>${sa.top.version}</version>
 </dependency>
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 
 <!-------- tab:Gradle 方式 -------->
-
-注：如果你使用的是 SpringBoot 3.x，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
-
 ``` gradle
 // Sa-Token 权限认证，在线文档：https://sa-token.cc
 implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 <!---------------------------- tabs:end ---------------------------->
 
 
@@ -139,9 +138,9 @@ public class UserController {
 ### 6、运行
 启动代码，从浏览器依次访问上述测试接口：
 
-![运行结果](https://oss.dev33.cn/sa-token/doc/test-do-login.png)
+<img src="/big-file/doc/start/test-do-login.png" alt="运行结果">
 
-![运行结果](https://oss.dev33.cn/sa-token/doc/test-is-login.png)
+<img src="/big-file/doc/start/test-is-login.png" alt="运行结果">
 
 <!-- 
 ### 普通Spring环境

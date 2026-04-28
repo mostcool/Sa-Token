@@ -12,7 +12,6 @@
 
 <!---------------------------- tabs:start ---------------------------->
 <!-------- tab:Maven 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
 ``` xml 
 <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
 <dependency>
@@ -21,17 +20,20 @@
 	<version>${sa.top.version}</version>
 </dependency>
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
+
 <!-------- tab:Gradle 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
 ``` gradle
 // Sa-Token 权限认证，在线文档：https://sa-token.cc
 implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 <!---------------------------- tabs:end ---------------------------->
 
 <!---------------------------- tabs:start ------------------------------>
 <!-------- tab:Maven 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-reactor-spring-boot-starter` 修改为 `sa-token-reactor-spring-boot3-starter` 即可。
 ``` xml 
 <!-- Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc -->
 <dependency>
@@ -40,12 +42,16 @@ implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 	<version>${sa.top.version}</version>
 </dependency>
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
+
 <!-------- tab:Gradle 方式 -------->
-注：如果你使用的是 `SpringBoot 3.x`，只需要将 `sa-token-reactor-spring-boot-starter` 修改为 `sa-token-reactor-spring-boot3-starter` 即可。
 ``` gradle
 // Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc
 implementation 'cn.dev33:sa-token-reactor-spring-boot-starter:${sa.top.version}'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
 <!---------------------------- tabs:end ------------------------------>
 
 
@@ -65,10 +71,10 @@ implementation 'cn.dev33:sa-token-reactor-spring-boot-starter:${sa.top.version}'
 <!---------------------------- tabs:start ------------------------------>
 <!-------- tab:Maven 方式 -------->
 ``` xml 
-<!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+<!-- Sa-Token 整合 RedisTemplate -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-template</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
@@ -78,8 +84,8 @@ implementation 'cn.dev33:sa-token-reactor-spring-boot-starter:${sa.top.version}'
 ```
 <!-------- tab:Gradle 方式 -------->
 ``` gradle
-// Sa-Token 整合 Redis （使用 jackson 序列化方式）
-implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
+// Sa-Token 整合 RedisTemplate
+implementation 'cn.dev33:sa-token-redis-template:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 ```
 <!---------------------------- tabs:end ------------------------------>

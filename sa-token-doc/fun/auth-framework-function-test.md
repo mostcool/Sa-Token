@@ -713,13 +713,13 @@ public class StpInterfaceImpl implements StpInterface {
 
 	// 加载角色信息
 	@Override
-	public List<String> getPermissionList(Object loginId, String loginType) {
+	public List<String> getRoleList(Object loginId, String loginType) {
 		return Arrays.asList("admin", "super-admin", "ceo");
 	}
 
 	// 加载权限信息
 	@Override
-	public List<String> getRoleList(Object loginId, String loginType) {
+	public List<String> getPermissionList(Object loginId, String loginType) {
 		return Arrays.asList("user:add", "user:delete", "user:update");
 	}
 
@@ -1493,7 +1493,7 @@ public AjaxJson doLogin(String username, String password) {
 	// 登录
 	StpUtil.login(user.getId());
 	StpUtil.getSession().set("user", user);
-	return AjaxJson.getSuccess("登录成功").set("satoken", StpUtil.getTokenValue());  // 关键代码 
+	return AjaxJson.getSuccess("登录成功").set("satoken", StpUtil.getTokenValue());  // ⚠️ 关键代码 
 }
 ```
 
@@ -1580,8 +1580,8 @@ public AjaxJson doLogin(String username, String password) {
 	Subject subject = SecurityUtils.getSubject();
 	try {
 		subject.login(new UsernamePasswordToken(username, password));
-		String token = subject.getSession().getId().toString();    // 关键代码
-		return AjaxJson.getSuccess("登录成功!").set("token", token);    // 关键代码
+		String token = subject.getSession().getId().toString();    // ⚠️ 关键代码
+		return AjaxJson.getSuccess("登录成功!").set("token", token);    // ⚠️ 关键代码
 	} catch (AuthenticationException e) {
 		e.printStackTrace();
 		return AjaxJson.getError(e.getMessage());
@@ -1621,10 +1621,10 @@ if(localStorage.token) {
 
 pom.xml 引入依赖
 ``` xml
-<!-- Sa-Token整合 Redis (使用jackson序列化方式) -->
+<!-- Sa-Token 整合 RedisTemplate -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
+	<artifactId>sa-token-redis-template</artifactId>
 	<version>${sa-token.version}</version>
 </dependency>
 

@@ -2,7 +2,7 @@
 
 本篇介绍在 Solon 应用中如何集成 Sa-Token。
 
-整合示例在官方仓库的 `/sa-token-demo/sa-token-demo-solon` 文件夹下，如遇到难点可结合源码进行学习测试。
+整合示例在官方仓库的 `/sa-token-demo/sa-token-demo-solon` 文件夹下，如遇到难点可结合源码进行学习测试。[Sa-Token 集成示例大全下载](/more/download-demos) 。
 
 > [!tip| label:Solon 是什么？] 
 > Solon 是一个高效的国产应用开发框架：更快、更小、更简单。
@@ -155,10 +155,10 @@ public class UserController {
 
 启动代码，从浏览器依次访问上述测试接口：
 
-![](https://oss.dev33.cn/sa-token/doc/test-do-login.png)
+<img src="/big-file/doc/start/test-do-login.png" alt="运行结果">
 
 
-![](https://oss.dev33.cn/sa-token/doc/test-is-login.png)
+<img src="/big-file/doc/start/test-is-login.png" alt="运行结果">
 
 
 ### 详细了解

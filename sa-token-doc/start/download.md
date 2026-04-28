@@ -1,6 +1,8 @@
 # 其它环境引入 Sa-Token 的示例
 
-目前已实现的对接框架综合
+目前已实现的对接框架综合。
+
+如需一次性获取官方仓库内全部可运行示例的压缩包，请见：[Sa-Token 集成示例大全下载](/more/download-demos) 。
 
 ------
 
@@ -19,7 +21,8 @@
 	<version>${sa.top.version}</version>
 </dependency>
 ```
-注：如果你使用的 `SpringBoot 3.x`，只需要将 `sa-token-spring-boot-starter` 修改为 `sa-token-spring-boot3-starter` 即可。
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 
 <!------------- tab:WebFlux环境 （Reactor）  ------------->
 注：如果你使用的框架基于 Reactor 模型构建（WebFlux、SpringCloud Gateway 等），请引入此包
@@ -31,7 +34,8 @@
 	<version>${sa.top.version}</version>
 </dependency>
 ```
-注：如果你使用的 `SpringBoot 3.x`，只需要将 `sa-token-reactor-spring-boot-starter` 修改为 `sa-token-reactor-spring-boot3-starter` 即可。
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
 
 <!------------- tab:Solon 集成  ------------->
 参考：[Solon官网](https://solon.noear.org/)
@@ -62,6 +66,17 @@
 <dependency>
 	<groupId>cn.dev33</groupId>
 	<artifactId>sa-token-jboot-plugin</artifactId>
+	<version>${sa.top.version}</version>
+</dependency>
+```
+
+<!------------- tab:LoveQQ-Framework 集成  ------------->
+参考：[LoveQQ-Framework](https://gitee.com/kfyty725/loveqq-framework)
+``` xml
+<!-- Sa-Token 整合 LoveQQ-Framework, 在线文档：https://sa-token.cc -->
+<dependency>
+	<groupId>cn.dev33</groupId>
+	<artifactId>sa-token-loveqq-boot-starter</artifactId>
 	<version>${sa.top.version}</version>
 </dependency>
 ```
@@ -110,11 +125,15 @@
 ``` gradle
 implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-spring-boot4-starter`。
 
 <!-- tab:WebFlux环境 （Reactor）  -->
 ``` gradle
 implementation 'cn.dev33:sa-token-reactor-spring-boot-starter:${sa.top.version}'
 ```
+- 如果你使用的 `SpringBoot 3.x`，请引入 `sa-token-reactor-spring-boot3-starter`。
+- 如果你使用的 `SpringBoot 4.x`，请引入 `sa-token-reactor-spring-boot4-starter`。
 
 <!-- tab:Solon 集成  -->
 ``` gradle
@@ -129,6 +148,11 @@ implementation 'cn.dev33:sa-token-jfinal-plugin:${sa.top.version}'
 <!-- tab:Jboot 集成  -->
 ``` gradle
 implementation 'cn.dev33:sa-token-jboot-plugin:${sa.top.version}'
+```
+
+<!-- tab:LoveQQ-Framework 集成  -->
+``` gradle
+implementation 'cn.dev33:sa-token-loveqq-boot-starter:${sa.top.version}'
 ```
 
 <!-- tab:Quarkus 集成  -->
@@ -180,4 +204,4 @@ Maven依赖一直无法加载成功？[参考解决方案](https://sa-token.cc/d
 - 2、从根目录导入项目。
 - 3、选择相应的示例添加为 Maven 项目，打开 XxxApplication.java 运行。
 
-![运行示例](https://oss.dev33.cn/sa-token/doc/import-demo-run.png  's-w-sh')
+<img src="/big-file/doc/start/import-demo-run.png" alt="运行示例" title="s-w-sh">

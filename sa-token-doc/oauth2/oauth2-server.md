@@ -11,7 +11,7 @@
 
 
 ### 2、引入依赖 
-创建SpringBoot项目 `sa-token-demo-oauth2-server`（不会的同学自行百度或参考仓库示例），引入 `pom.xml` 依赖：
+创建SpringBoot项目 `sa-token-demo-oauth2-server`（不会的同学自行百度或参考仓库示例：[Sa-Token 集成示例大全下载](/more/download-demos) 获取全套 Demo），引入 `pom.xml` 依赖：
 
 <!---------------------------- tabs:start ---------------------------->
 <!-------- tab:Maven 方式 -------->
@@ -30,11 +30,11 @@
 	<version>${sa.top.version}</version>
 </dependency>
 
-<!-- Sa-Token 整合 Redis (可选) -->
+<!-- Sa-Token 整合 RedisTemplate (可选) -->
 <dependency>
 	<groupId>cn.dev33</groupId>
-	<artifactId>sa-token-redis-jackson</artifactId>
-	<version>${sa-token.version}</version>
+	<artifactId>sa-token-redis-template</artifactId>
+	<version>${sa.top.version}</version>
 </dependency>
 <dependency>
 	<groupId>org.apache.commons</groupId>
@@ -49,8 +49,8 @@ implementation 'cn.dev33:sa-token-spring-boot-starter:${sa.top.version}'
 // Sa-Token OAuth2.0 模块
 implementation 'cn.dev33:sa-token-oauth2:${sa.top.version}'
 
-// Sa-Token 整合 Redis (可选)
-implementation 'cn.dev33:sa-token-redis-jackson:${sa.top.version}'
+// Sa-Token 整合 RedisTemplate (可选)
+implementation 'cn.dev33:sa-token-redis-template:${sa.top.version}'
 implementation 'org.apache.commons:commons-pool2'
 ```
 <!---------------------------- tabs:end ---------------------------->
@@ -227,14 +227,14 @@ http://sa-oauth-server.com:8000/oauth2/authorize?response_type=code&client_id=10
 
 2、由于首次访问，我们在OAuth-Server端暂未登录，会被转发到登录视图 
 
-![sa-oauth2-server-login-view](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-login-view--v43.png 's-w-sh')
+<img class="s-w-sh" src="/big-file/doc/oauth2-new/sa-oauth2-server-login-view--v43.png" alt="sa-oauth2-server-login-view" />
 
 3、输入 `sa/123456` 进行登录之后，会提示我们确认授权
-![sa-oauth2-server-scope](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-scope.png 's-w-sh')
+<img class="s-w-sh" src="/big-file/doc/oauth2-new/sa-oauth2-server-scope.png" alt="sa-oauth2-server-scope" />
 
 4、点击同意授权之后，我们会被重定向至 redirect_uri 页面，并携带了code参数 
 
-![sa-oauth2-server-code](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-server-code.png 's-w-sh')
+<img class="s-w-sh" src="/big-file/doc/oauth2-new/sa-oauth2-server-code.png" alt="sa-oauth2-server-code" />
 
 4、我们拿着code参数，访问以下地址：
 ``` url
@@ -259,7 +259,6 @@ http://sa-oauth-server.com:8000/oauth2/token?grant_type=authorization_code&clien
 }
 ```
 
-<!-- ![sa-oauth2-server-token](https://oss.dev33.cn/sa-token/doc/oauth2/sa-oauth2-server-token.png 's-w-sh') -->
 
 测试完毕
 
@@ -272,7 +271,7 @@ http://sa-oauth-server.com:8000/oauth2/token?grant_type=authorization_code&clien
 
 依次启动`OAuth2-Server` 与 `OAuth2-Client`，然后从浏览器访问：[http://sa-oauth-client.com:8002](http://sa-oauth-client.com:8002)
 
-![sa-oauth2-client-index](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-client-index.png 's-w-sh')
+<img class="s-w-sh" src="/big-file/doc/oauth2-new/sa-oauth2-client-index.png" alt="sa-oauth2-client-index" />
 
 如图，可以针对OAuth2.0四种模式进行详细测试 
 
@@ -286,7 +285,7 @@ OAuth2 前端测试页：
 
 此示例允许你在前端自由配置 OAuth-Client 端所需的各个参数，方便对 OAuth2 四种模式的测试。
 
-![sa-oauth2-client-index](https://oss.dev33.cn/sa-token/doc/oauth2-new/sa-oauth2-client-test-h5-page.png 's-w-sh')
+<img class="s-w-sh" src="/big-file/doc/oauth2-new/sa-oauth2-client-test-h5-page.png" alt="sa-oauth2-client-index" />
 
 <p><a class="case-btn case-btn-video" href="https://www.bilibili.com/video/BV13LSMYzEmE/" target="_blank">
 	参考视频：OAuth2 四种模式 前端测试页
