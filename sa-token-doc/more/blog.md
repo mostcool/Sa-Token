@@ -6,6 +6,26 @@
 --- 
 
 
+
+
+- [[ CSDN ] ChaperTwo-整合 SaToken 实现 JWT 登录功能](https://blog.csdn.net/2503_91700196/article/details/161235399) （2026-5-19）
+
+- [[ CSDN ] Spring Boot + Sa-Token 实时聊天系统：用户注册流程源码深度剖析](https://blog.csdn.net/2401_89707442/article/details/161193882) （2026-5-18）
+
+- [[ 公众号 ] 9 大框架统一接入，sa-token-rust 为什么值得关注](https://mp.weixin.qq.com/s/kLx5ff2DNIACXnSclv00ZA) （2026-5-7）
+
+- [[ CSDN ] Sa-Token基础篇](https://blog.csdn.net/2401_87882047/article/details/160829277) （2026-5-6）
+
+- [[ 公众号 ] Sa-Token：一行代码搞定登录，Java鉴权框架还能这么简单](https://mp.weixin.qq.com/s/gB89MRuBOaElBdUXtP8OjQ) （2026-5-4）
+
+- [[ 公众号 ] Sa-Token 核心流程](https://mp.weixin.qq.com/s/Y_8neMzyUg5danEU3Y1PdQ) （2026-5-1）
+
+- [[ 51cto ] SpringBoot结合Sa-token实现权限认证（3）](https://blog.51cto.com/u_16099187/14575721) （2026-4-29）
+
+- [[ 掘金 ] Spring @Async 异步无法获取当前登录用户？Sa-Token 1.34.0 终极踩坑解决方案](https://juejin.cn/post/7633614065114316851) （2026-4-28）
+
+- [[ 掘金 ] 把 Sa-Token 搬到 NestJS 生态：xlt-token 1.0 的几个设计取舍](https://juejin.cn/post/7632620169131343914) （2026-4-26）
+
 - [[ 公众号 ] Sa-Token 的 switchTo，不是 "管理员冒充用户"](https://mp.weixin.qq.com/s/Uqh1sDhjnJIBEkNwoxqA-g) （2026-4-24）
 
 - [[ 公众号 ] 权限框架怎么选？SpringSecurity、Shiro、Sa-Token 全面对比](https://mp.weixin.qq.com/s/ilOjwq92KK3FIOHUwjKOLA) （2026-4-24）
@@ -14,6 +34,8 @@
 
 - [[ 公众号 ] Sa-Token权限框架](https://mp.weixin.qq.com/s/X-Ew5ig_nQUoGw5uPSPLgw) （2026-4-23）
 
+- [[ 掘金 ] Sa-Token 使用方法及实现原理](https://juejin.cn/post/7630724767640928290) （2026-4-20）
+
 - [[ CSDN ] 【RuoYi-Vue-Plus】Sa-Token 拦截器升级实战：从源码拆解 SaInterceptor 的设计哲学与性能优化](https://blog.csdn.net/weixin_42568801/article/details/160306227) （2026-4-19）
 
 - [[ 公众号 ] SpringBoot + JWT + Sa-Token：认证鉴权双框架对比，安全登录与权限控制最佳实践](https://mp.weixin.qq.com/s/NoO5wd-B1Jl4exlLYX8y2g) （2026-4-18）
@@ -21,6 +43,8 @@
 - [[ 公众号 ] 别再盲目上 SSO 了！Sa-Token 多端跳转的「作弊级」解法](https://mp.weixin.qq.com/s/x828OMUIjQMf7RqiwGIgcw) （2026-4-17）
 
 - [[ CSDN ] Sa-Token vs Spring Security权限认证对比：Ruoyi-vue-plus项目该选哪个？](https://blog.csdn.net/weixin_42563415/article/details/160171603) （2026-4-15）
+
+- [[ 掘金 ] 在nest.js中我想把Java的Sa-Token搬来](https://juejin.cn/post/7628910305003946011) （2026-4-15）
 
 - [[ 公众号 ] 真相：别再复制粘贴了！Sa-Token 全链路权限架构，一次落地所有项目](https://mp.weixin.qq.com/s/3Msd1UNA0GgY81fioDDahQ) （2026-4-14）
 
@@ -72,13 +96,15 @@
 
 - [[ 公众号 ] 告别Spring Security！Sa-Token一行代码搞定登录+权限（有料有源码）](https://mp.weixin.qq.com/s/ciTXQTSCeihR6axa8MxiJg) （2026-3-20）
 
+- [[ 掘金 ] 基于 Spring Cloud Gateway + Sa-Token 的架构为例，Token 异常的执行链路](https://juejin.cn/post/7619201247540166675) （2026-3-20）
+
 - [[ 公众号 ] 面试官：你能手写一个 SSO 单点登录流程吗？](https://mp.weixin.qq.com/s/abhYTjpshCQo4Tbyv71GYw) （2026-3-19）
 
 - [[ 公众号 ] 面试官："你们项目用的什么权限框架，为什么这么选?"，用了Sa-Token，上手快开箱即用。。。](https://mp.weixin.qq.com/s/kojBf_Qo5a6giBlU9Y18vg) （2026-3-18）
 
 - [[ PHP中文网 ] 怎样在Java中搭建Sa-Token权限认证环境_Java安全新选型](https://www.php.cn/faq/2211433.html) （2026-3-16）
 
-- [[ 公众号 ] SpringBoot3 + Sa-Token 双Token登录认证实战（避坑版）](https://mp.weixin.qq.com/s/rOZ8LvghG64ZSTsIokiUhA) （2026-3-12）
+<!-- - [[ 公众号 ] SpringBoot3 + Sa-Token 双Token登录认证实战（避坑版）](https://mp.weixin.qq.com/s/rOZ8LvghG64ZSTsIokiUhA) （2026-3-12） -->
 
 - [[ 公众号 ] Sa-Token 多端会话管控解析：构建统一身份认证秩序，解决多端登录难题](https://mp.weixin.qq.com/s/mpoOxgz4jDPcFBoGHVhoiw) （2026-3-11）
 
@@ -185,6 +211,8 @@
 - [[ 公众号 ] Sa-Token 1.44.0：Java权限认证的“轻量级王者”，让鉴权优雅如诗](https://mp.weixin.qq.com/s/UprusTkp9LZOH9TJDTKJRw) （2025-11-20）
 
 - [[ 公众号 ] sa-token-rust 项目：高性能的 Rust 认证授权框架](https://mp.weixin.qq.com/s/jlQAX1K1M64DtUgrHrDX1A) （2025-11-17）
+
+- [[ 知乎 ] Sa-Token 与 Spring Security 对比分析](https://zhuanlan.zhihu.com/p/1975162115833754745) （2025-11-12）
 
 - [[ 公众号 ] 不会吧，居然还有人没有用过？全网爆火的权限校验框架 Sa-Token 超详细教程它来了](https://mp.weixin.qq.com/s/kNYq0MmlYB_0tRWI-HvU1g) （2025-11-6）
 

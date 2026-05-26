@@ -31,6 +31,8 @@
 
 Sa-Token 是一个轻量级 Java 权限认证框架，目前拥有五大核心模块：登录认证、权限认证、单点登录、OAuth2.0、微服务鉴权。
 
+**你还在手搓以下功能？Stop ⚠️ 让 Sa-Token 来！**
+
 ![sa-token-jss](https://sa-token.cc/big-file/index/intro/sa-token-jss--tran.png)
 
 要在 SpringBoot 项目中使用 Sa-Token，你只需要在 pom.xml 中引入依赖：
@@ -229,6 +231,28 @@ Sa-Token 采用 Apache-2.0 开源协议，承诺框架本身与在线文档永�
 
 不是。Sa-Token 不是一个后台模板，也不是针对 xx 框架的二次封装套壳，而是从 0 开始的纯血自研框架，核心包零依赖，完全自主可控的架构内核 + 众多主流框架的集成适配。
 						
+
+
+
+#### 证书 ⭐ 奖杯 🏆 荣誉展示 
+
+<table align="center">
+  <tr>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gvp.jpg" title="GVP - Gitee 最有价值开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/g-star.jpg" title="GitCode G-Star 优质开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/osc-2021.jpg" title="OSCHINA 2021 人气指数 TOP 30 开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/osc-2022--chang.jpg" title="OSCHINA 2022 年度最火热中国开源项目社区" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/kexin.jpg" title="可信开源社区共同体预备成员" /></td>
+  </tr>
+  <tr>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gitee-star-5000.jpg" title="Gitee 5000 star 专属奖杯" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gitee-2025--chang.jpg" title="Gitee 2025年度开源项目 Web应用开发 Top 2" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/dromara.jpg" title="Dromara 组织顶尖项目（之一）" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/kaifangyuanzi2--chang.jpg" title="开放原子基金会2023快速成长开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/dromara-2024-tzds.jpg" title="Dromara 荣获《2024中国互联网发展创新与投资大赛（开源）》二等奖" /></td>
+  </tr>
+</table>
+
 
 
 ### 🚀 优秀开源集成案例
