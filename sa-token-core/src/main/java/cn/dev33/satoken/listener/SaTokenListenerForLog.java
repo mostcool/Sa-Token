@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ public class SaTokenListenerForLog implements SaTokenListener {
 	 */
 	@Override
 	public void doRenewTimeout(String loginType, Object loginId, String tokenValue, long timeout) {
-		log.info("token 续期成功, {} 秒后到期, 帐号={}, token值={} ", timeout, loginId, tokenValue);
+		log.info("token 续期成功, {} 秒后到期, 账号={}, token值={} ", timeout, loginId, tokenValue);
 	}
 
 	/**

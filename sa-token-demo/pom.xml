@@ -12,6 +12,10 @@
 		<module>sa-token-demo-alone-redis</module>
 		<module>sa-token-demo-alone-redis-cluster</module>
 		<module>sa-token-demo-alone-redis-sb4</module>
+		<module>sa-token-demo-alone-redisson</module>
+		<module>sa-token-demo-alone-redisson-cluster</module>
+		<module>sa-token-demo-alone-redisson-sb3</module>
+		<module>sa-token-demo-alone-redisson-sb4</module>
 		<module>sa-token-demo-apikey</module>
 		<module>sa-token-demo-async</module>
 		<module>sa-token-demo-beetl</module>
@@ -24,6 +28,7 @@
 		<module>sa-token-demo-dubbo/sa-token-demo-dubbo3-provider</module>
 		<module>sa-token-demo-dubbo/sa-token-demo-dubbo3-consumer</module>
 		<module>sa-token-demo-freemarker</module>
+		<module>sa-token-demo-first-run</module>
 <!--		<module>sa-token-demo-grpc</module>-->
 		<module>sa-token-demo-hutool-timed-cache</module>
 		<module>sa-token-demo-jwt</module>
@@ -58,6 +63,9 @@
 		<module>sa-token-demo-webflux</module>
 		<module>sa-token-demo-webflux-springboot3</module>
 		<module>sa-token-demo-webflux-springboot4</module>
+		<module>sa-token-demo-bug-reproduce</module>
+		<module>sa-token-demo-json-typing-security</module>
+		<module>sa-token-demo-json-typing-security-for-solon</module>
 		<module>sa-token-demo-websocket</module>
 		<module>sa-token-demo-websocket-spring</module>
         <module>sa-token-demo-loveqq-boot</module>

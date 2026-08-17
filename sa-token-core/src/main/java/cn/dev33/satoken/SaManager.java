@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ import cn.dev33.satoken.strategy.SaStrategy;
 import cn.dev33.satoken.temp.SaTempTemplate;
 import cn.dev33.satoken.util.SaFoxUtil;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 管理 Sa-Token 所有全局组件，可通过此类快速获取、写入各种全局组件对象
@@ -85,6 +85,9 @@ public class SaManager {
 	 * @return 全局配置信息
 	 */
 	public static SaTokenConfig getConfig() {
+		if (SaStrategy.instance.getSaTokenConfig != null) {
+			return SaStrategy.instance.getSaTokenConfig.get();
+		}
 		if (config == null) {
 			synchronized (SaManager.class) {
 				if (config == null) {
@@ -293,7 +296,7 @@ public class SaManager {
 	/**
 	 * StpLogic 集合, 记录框架所有成功初始化的 StpLogic
 	 */
-	public static Map<String, StpLogic> stpLogicMap = new LinkedHashMap<>();
+	public static Map<String, StpLogic> stpLogicMap = new ConcurrentHashMap<>();
 	
 	/**
 	 * 向全局集合中 put 一个 StpLogic 

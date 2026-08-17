@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 package cn.dev33.satoken.httpauth.digest;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 /**
  * Sa-Token Http Digest 认证 - 参数实体类
  *
  * @author click33
  * @since 1.38.0
  */
-public class SaHttpDigestModel {
+public class SaHttpDigestModel implements SaJsonType {
 
     /**
      * 默认的 Realm 领域名称

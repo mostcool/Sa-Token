@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ package cn.dev33.satoken.solon.integration;
 import cn.dev33.satoken.exception.BackResultException;
 import cn.dev33.satoken.exception.FirewallCheckException;
 import cn.dev33.satoken.exception.StopMatchException;
-import cn.dev33.satoken.solon.model.SaRequestForSolon;
-import cn.dev33.satoken.solon.model.SaResponseForSolon;
+import cn.dev33.satoken.context.model.SaRequest;
+import cn.dev33.satoken.context.model.SaResponse;
 import cn.dev33.satoken.solon.util.SaSolonOperateUtil;
 import cn.dev33.satoken.strategy.SaFirewallStrategy;
+import cn.dev33.satoken.strategy.SaStrategy;
 import org.noear.solon.core.handle.Context;
 import org.noear.solon.core.handle.Filter;
 import org.noear.solon.core.handle.FilterChain;
@@ -37,8 +38,8 @@ public class SaFirewallCheckFilterForSolon implements Filter {
 	@Override
 	public void doFilter(Context ctx, FilterChain chain) throws Throwable {
 
-		SaRequestForSolon saRequest = new SaRequestForSolon();
-		SaResponseForSolon saResponse = new SaResponseForSolon();
+		SaRequest saRequest = SaStrategy.instance.createSaRequest.apply(ctx);
+		SaResponse saResponse = SaStrategy.instance.createSaResponse.apply(ctx);
 
 		try {
 			SaFirewallStrategy.instance.check.execute(saRequest, saResponse, null);

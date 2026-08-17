@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@ import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.solon.integration.SaFirewallCheckFilterForSolon;
 import cn.dev33.satoken.solon.integration.SaTokenContextFilterForSolon;
 import cn.dev33.satoken.solon.integration.SaTokenCorsFilterForSolon;
+import cn.dev33.satoken.solon.model.SaRequestForSolon;
+import cn.dev33.satoken.solon.model.SaResponseForSolon;
+import cn.dev33.satoken.solon.model.SaStorageForSolon;
 import cn.dev33.satoken.strategy.SaStrategy;
 import cn.dev33.satoken.util.SaTokenConsts;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Configuration;
 import org.noear.solon.annotation.Inject;
+import org.noear.solon.core.handle.Context;
 import org.noear.solon.core.handle.Filter;
-import org.noear.solon.core.util.PathAnalyzer;
+import org.noear.solon.core.util.PathMatcher;
 
 /**
  * 注册Sa-Token所需要的Bean 
@@ -39,8 +43,14 @@ public class SaBeanRegister {
 	public SaBeanRegister() {
 		// 重写路由匹配算法
 		SaStrategy.instance.routeMatcher = (pattern, path) -> {
-			return PathAnalyzer.get(pattern).matches(path);
+			return PathMatcher.get(pattern).matches(path);
 		};
+		// 重写 SaRequest 创建策略
+		SaStrategy.instance.createSaRequest = source -> new SaRequestForSolon((Context) source);
+		// 重写 SaResponse 创建策略
+		SaStrategy.instance.createSaResponse = source -> new SaResponseForSolon((Context) source);
+		// 重写 SaStorage 创建策略
+		SaStrategy.instance.createSaStorage = source -> new SaStorageForSolon((Context) source);
 	}
 
 	/**

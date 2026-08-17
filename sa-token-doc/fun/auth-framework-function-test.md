@@ -23,7 +23,7 @@
 <!------------- tab:Sa-Token ------------->
 
 ``` xml
-<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
+<!-- Sa-Token 权限认证, 在线文档：https://sa-token.com/ -->
 <dependency>
 	<groupId>cn.dev33</groupId>
 	<artifactId>sa-token-spring-boot3-starter</artifactId>
@@ -1250,7 +1250,7 @@ public class GlobalException {
 <dependency>
 	<groupId>cn.dev33</groupId>
 	<artifactId>sa-token-dialect-thymeleaf</artifactId>
-	<version>${sa-token.version}</version>
+	<version>1.39.0</version>
 </dependency>
 ```
 
@@ -1625,7 +1625,7 @@ pom.xml 引入依赖
 <dependency>
 	<groupId>cn.dev33</groupId>
 	<artifactId>sa-token-redis-template</artifactId>
-	<version>${sa-token.version}</version>
+	<version>1.39.0</version>
 </dependency>
 
 <!-- 提供Redis连接池 -->

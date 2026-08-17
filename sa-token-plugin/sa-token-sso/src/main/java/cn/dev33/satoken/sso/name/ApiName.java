@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  */
 package cn.dev33.satoken.sso.name;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 /**
  * SSO 模块所有 API 路由名称定义 
  * 
  * @author click33
  * @since 1.32.0
  */
-public class ApiName {
+public class ApiName implements SaJsonType {
 
 	/** SSO-Server端：授权地址 */ 
 	public String ssoAuth = "/sso/auth";

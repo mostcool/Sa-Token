@@ -1,5 +1,7 @@
+简体中文 | [繁體中文](./README_zh_TW.md) | [English](./README_en.md) | [日本語](./README_ja.md) | [한국어](./README_ko.md) | [Русский](./README_ru.md)
+
 <p align="center">
-	<img alt="logo" src="https://sa-token.cc/logo.png" width="150" height="150">
+	<img alt="logo" src="https://sa-token.com/logo.png" width="150" height="150">
 </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Sa-Token v1.45.0</h1>
 <h4 align="center">✨ 开源、免费、一站式 java 权限认证框架，让鉴权变得简单、优雅！ </h4>
@@ -14,7 +16,11 @@
 	<a href="https://github.com/dromara/sa-token/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dromara/sa-token.svg?style=flat-square"></a>
 </p>
 <!-- <p align="center">学习测试请拉取 master 分支，dev 是在开发分支 (在根目录执行 `git checkout master`)</p> -->
-<p align="center"><a href="https://sa-token.cc?way=readme" target="_blank">在线文档：https://sa-token.cc</a></p>
+<p align="center">
+	<a href="https://sa-token.com?way=readme" target="_blank">在线文档：https://sa-token.com</a>
+	&nbsp;|&nbsp;
+	<a href="https://sa-token.com/doc.html#/more/demand-commit" target="_blank">需求提交</a>
+</p>
 
 
 ---
@@ -33,12 +39,12 @@ Sa-Token 是一个轻量级 Java 权限认证框架，目前拥有五大核心�
 
 **你还在手搓以下功能？Stop ⚠️ 让 Sa-Token 来！**
 
-![sa-token-jss](https://sa-token.cc/big-file/index/intro/sa-token-jss--tran.png)
+![sa-token-jss](https://sa-token.com/big-file/index/intro/sa-token-jss--tran.png)
 
 要在 SpringBoot 项目中使用 Sa-Token，你只需要在 pom.xml 中引入依赖：
 
 ``` xml
-<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc -->
+<!-- Sa-Token 权限认证, 在线文档：https://sa-token.com -->
 <dependency>
 	<groupId>cn.dev33</groupId>
 	<artifactId>sa-token-spring-boot-starter</artifactId>
@@ -158,14 +164,14 @@ registry.addInterceptor(new SaInterceptor(handler -> {
 
 Sa-Token SSO 分为三种模式，可解决：`同域、跨域、共享Redis、跨Redis、前后端一体、前后端分离、纯 js、vue2、vue3、java 项目、非 java 项目` 等架构下的 SSO 认证需求：
 
-![sa-token-jss](https://sa-token.cc/big-file/doc/sso/sa-token-sso--white.png)
+![sa-token-jss](https://sa-token.com/big-file/doc/sso/sa-token-sso--white.png)
 
 
 | 系统架构						| 采用模式	| 简介						        |  文档链接	|
 | :--------						| :--------	|:----------------| :--------	|
-| 前端同域 + 后端同 Redis			| 模式一		| 共享Cookie同步会话			 | [文档](https://sa-token.cc/doc.html#/sso/sso-type1)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso1-client)	|
-| 前端不同域 + 后端同 Redis		| 模式二		| URL重定向传播会话 			  | [文档](https://sa-token.cc/doc.html#/sso/sso-type2)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso2-client)	|
-| 前端不同域 + 后端 不同Redis		| 模式三		| HTTP请求获取会话			   | [文档](https://sa-token.cc/doc.html#/sso/sso-type3)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso3-client)	|
+| 前端同域 + 后端同 Redis			| 模式一		| 共享Cookie同步会话			 | [文档](https://sa-token.com/doc.html#/sso/sso-type1)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso1-client)	|
+| 前端不同域 + 后端同 Redis		| 模式二		| URL重定向传播会话 			  | [文档](https://sa-token.com/doc.html#/sso/sso-type2)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso2-client)	|
+| 前端不同域 + 后端 不同Redis		| 模式三		| HTTP请求获取会话			   | [文档](https://sa-token.com/doc.html#/sso/sso-type3)、[示例](https://gitee.com/dromara/sa-token/blob/master/sa-token-demo/sa-token-demo-sso3-client)	|
 
 
 1. 前端同域：就是指多个系统可以部署在同一个主域名之下，比如：`c1.domain.com`、`c2.domain.com`、`c3.domain.com`
@@ -190,22 +196,22 @@ Sa-Token OAuth2 模块分为四种授权模式，解决不同场景下的授权�
 | 密码式					| client 直接拿着用户的账号密码换取授权 access_token				|
 | 客户端凭证式				| server 端针对 client 级别的 client_token，代表应用自身的资源授权		|
 
-详细参考文档：[https://sa-token.cc/doc.html#/oauth2/readme](https://sa-token.cc/doc.html#/oauth2/readme)
+详细参考文档：[https://sa-token.com/doc.html#/oauth2/readme](https://sa-token.com/doc.html#/oauth2/readme)
 
 
 ### 📖❓ 疑问解答
 
-**1、Sa-Token 功能全不全？** 
+**1、Sa-Token 功能全不全？**
 
 七年磨一剑：五大核心模块(登录、鉴权、SSO、OAuth2、微服务) + 众多实用插件 (短 token、jwt 集成、API 参数签名、API Key 秘钥授权...) 我们提供的不只是权限认证，我们提供的是一站式解决方案。
 
 
-**2、Sa-Token 好不好学？** 
+**2、Sa-Token 好不好学？**
 
 中文文档 + 中文代码注释 + 中文交流社区 + 大量实战案例博客 + 多个视频教程 + 大量优秀开源项目集成案例。
 
 
-**3、Sa-Token 用的人多不多？** 
+**3、Sa-Token 用的人多不多？**
 
 截止统计日 (2026-1-25) 起，Sa-Token 在：
 
@@ -216,18 +222,18 @@ Sa-Token OAuth2 模块分为四种授权模式，解决不同场景下的授权�
 这是众多开发者用脚投票的数据，相信这些数据比任何言语都能证明 Sa-Token 的热度。
 
 
-**4、Sa-Token 有哪些权威认证？** 
+**4、Sa-Token 有哪些权威认证？**
 
 曾获荣誉包括但不限于：Gitee GVP 最有价值开源项目、GitCode G-Star 优质开源项目、OSCHINA 2021 人气指数 TOP 30 开源项目、OSCHINA 2022 年度最火热中国开源项目社区之一、开放原子基金会2023快速成长开源项目、 Dromara 组织顶尖项目（之一）、可信开源社区共同体预备成员、所在开源社区 “Dromara” 荣获《2024中国互联网发展创新与投资大赛（开源）》二等奖。 Gitee High Star 计划项目(5000+star)。Gitee 2025年度开源项目 Web应用开发 Top 2。
 
 
-**5、Sa-Token 收费吗？** 
+**5、Sa-Token 收费吗？**
 
-Sa-Token 采用 Apache-2.0 开源协议，承诺框架本身与在线文档永久免费开放。当然如果您有心赞助 Sa-Token，我们也不回避：[赞助链接](https://sa-token.cc/doc.html#/more/sa-token-donate)。
+Sa-Token 采用 Apache-2.0 开源协议，承诺框架本身与在线文档永久免费开放。当然如果您有心赞助 Sa-Token，我们也不回避：[赞助链接](https://sa-token.com/doc.html#/more/sa-token-donate)。
 我们将定期同步赞助者名单到在线文档展示。（您需要注意的一点是：该赞助仅为友情赞助，不提供任何商业交换）
 
 
-**6、Sa-Token 是封装的 SpringSecurity 吗？是套壳 ApacheShiro 吗？** 
+**6、Sa-Token 是封装的 SpringSecurity 吗？是套壳 ApacheShiro 吗？**
 
 不是。Sa-Token 不是一个后台模板，也不是针对 xx 框架的二次封装套壳，而是从 0 开始的纯血自研框架，核心包零依赖，完全自主可控的架构内核 + 众多主流框架的集成适配。
 						
@@ -238,18 +244,18 @@ Sa-Token 采用 Apache-2.0 开源协议，承诺框架本身与在线文档永�
 
 <table align="center">
   <tr>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gvp.jpg" title="GVP - Gitee 最有价值开源项目" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/g-star.jpg" title="GitCode G-Star 优质开源项目" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/osc-2021.jpg" title="OSCHINA 2021 人气指数 TOP 30 开源项目" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/osc-2022--chang.jpg" title="OSCHINA 2022 年度最火热中国开源项目社区" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/kexin.jpg" title="可信开源社区共同体预备成员" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/gvp.jpg" title="GVP - Gitee 最有价值开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/g-star.jpg" title="GitCode G-Star 优质开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/osc-2021.jpg" title="OSCHINA 2021 人气指数 TOP 30 开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/osc-2022--chang.jpg" title="OSCHINA 2022 年度最火热中国开源项目社区" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/kexin.jpg" title="可信开源社区共同体预备成员" /></td>
   </tr>
   <tr>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gitee-star-5000.jpg" title="Gitee 5000 star 专属奖杯" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/gitee-2025--chang.jpg" title="Gitee 2025年度开源项目 Web应用开发 Top 2" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/dromara.jpg" title="Dromara 组织顶尖项目（之一）" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/kaifangyuanzi2--chang.jpg" title="开放原子基金会2023快速成长开源项目" /></td>
-    <td align="center" width="330"><img src="https://sa-token.cc/big-file/index/awards-zip/dromara-2024-tzds.jpg" title="Dromara 荣获《2024中国互联网发展创新与投资大赛（开源）》二等奖" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/gitee-star-5000.jpg" title="Gitee 5000 star 专属奖杯" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/gitee-2025--chang.jpg" title="Gitee 2025年度开源项目 Web应用开发 Top 2" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/dromara.jpg" title="Dromara 组织顶尖项目（之一）" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/kaifangyuanzi2--chang.jpg" title="开放原子基金会2023快速成长开源项目" /></td>
+    <td align="center" width="330"><img src="https://sa-token.com/big-file/index/awards-zip/dromara-2024-tzds.jpg" title="Dromara 荣获《2024中国互联网发展创新与投资大赛（开源）》二等奖" /></td>
   </tr>
 </table>
 
@@ -273,8 +279,9 @@ Sa-Token 采用 Apache-2.0 开源协议，承诺框架本身与在线文档永�
 
 Sa-Token 社区成员贡献了多语言实现版本：
 
-- Rust 版本：[https://gitee.com/sa-tokens/sa-token-rust](https://gitee.com/sa-tokens/sa-token-rust)
-- Go 版本：[https://gitee.com/sa-tokens/sa-token-go](https://gitee.com/sa-tokens/sa-token-go)
+- Rust 版本：[https://github.com/sa-tokens/sa-token-rust](https://github.com/sa-tokens/sa-token-rust)
+- Go 版本：[https://github.com/sa-tokens/sa-token-go](https://github.com/sa-tokens/sa-token-go)
+- NodeJS 版本：[https://github.com/xiaoLangtou/xlt-token](https://github.com/xiaoLangtou/xlt-token)
 - PHP 版本：[https://gitee.com/jinan-jimeng-network_0/real-token](https://gitee.com/jinan-jimeng-network_0/real-token)
 
 我们诚邀对上述语言较为熟练的开发者，一起建设相关版本。🤝
@@ -283,7 +290,7 @@ Sa-Token 社区成员贡献了多语言实现版本：
 ### 🔗 友情链接
 - [[ OkHttps ]](https://gitee.com/ejlchina-zhxu/okhttps)：轻量级 http 通信框架，API无比优雅，支持 WebSocket、Stomp 协议
 - [[ Forest ]](https://gitee.com/dromara/forest)：声明式与编程式双修，让天下没有难以发送的 HTTP 请求
-- [[ Bean Searcher ]](https://github.com/ejlchina/bean-searcher)：专注高级查询的只读 ORM，使一行代码实现复杂列表检索！
+- [[ Bean Searcher ]](https://github.com/troyzhxu/bean-searcher)：REST 版的 GraphQL — 实体定义边界，参数驱动查询，一行代码实现复杂查询！
 - [[ Jpom ]](https://gitee.com/dromara/Jpom)：简而轻的低侵入式在线构建、自动部署、日常运维、项目监控软件。
 - [[ TLog ]](https://gitee.com/dromara/TLog)：一个轻量级的分布式日志标记追踪神器。
 - [[ hippo4j ]](https://gitee.com/agentart/hippo4j)：强大的动态线程池框架，附带监控报警功能。
@@ -304,28 +311,29 @@ Sa-Token 社区成员贡献了多语言实现版本：
 
 **我们为框架几乎所有技术点均单独制作了对应的集成示例，此压缩包共计 60+ Demo**：涵盖 Sa-Token 登录认证、权限认证、SSO 单点登录、OAUth2 统一认证、微服务鉴权、API Key 认证、JWT集成、跨系统调用参数签名校验 等鉴权认证的方方面面。
 
-下载地址：[https://sa-token.cc/doc.html#/more/download-demos](https://sa-token.cc/doc.html#/more/download-demos) 
+下载地址：[https://sa-token.com/doc.html#/more/download-demos](https://sa-token.com/doc.html#/more/download-demos) 
 
-<img class="s-w" src="https://sa-token.cc/big-file/contact/show/sa-token-demos-pre-liubai.png" />
+<img class="s-w" src="https://sa-token.com/big-file/contact/show/sa-token-demos-pre-liubai.png" />
 
 
 
 ### 💬 交流群
 <!-- QQ交流群：685792424 [点击加入](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Y05Ld4125W92YSwZ0gA8e3RhG9Q4Vsfx&authKey=IomXuIuhP9g8G7l%2ByfkrRsS7i%2Fna0lIBpkTXxx%2BQEaz0NNEyJq00kgeiC4dUyNLS&noverify=0&group_code=685792424)-->
+<!-- QQ交流群：1081649142 [点击加入](https://qm.qq.com/q/SCAaZ6Ros2) -->
 
-QQ交流群：1081649142 [点击加入](https://qm.qq.com/q/SCAaZ6Ros2) 
+QQ交流群：1098917026 [点击加入](https://qm.qq.com/q/26OFBGd2Zy) 
 
 微信交流群：
 
 <!-- <img src="https://oss.dev33.cn/sa-token/qr/wx-qr-m-400k.png" width="230px" title="微信群" /> -->
 
-<img src="https://sa-token.cc/big-file/contact/i-wx-qr2.jpg" width="230px" title="微信群" />
+<img src="https://sa-token.com/big-file/contact/i-wx-qr2.jpg" width="230px" title="微信群" />
 
 PS：扫码添加微信 (备注：sa-token)，邀您加入群聊。
 
 <br>
 
-<img class="s-w" src="https://sa-token.cc/big-file/contact/show/wx-group-show3--liubai.png" style="max-width: 50%;" alt="微信群" />
+<img class="s-w" src="https://sa-token.com/big-file/contact/show/wx-group-show3--liubai.png" style="max-width: 50%;" alt="微信群" />
 
 
 加入群聊的好处：

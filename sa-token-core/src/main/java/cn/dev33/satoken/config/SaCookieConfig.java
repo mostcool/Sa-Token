@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package cn.dev33.satoken.config;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ import java.util.Map;
  * @author click33
  * @since 1.27.0
  */
-public class SaCookieConfig {
+public class SaCookieConfig implements SaJsonType {
 
 	/*
 		Cookie 功能为浏览器通用标准，建议大家自行搜索文章了解各个属性的功能含义，此处源码仅做简单解释。

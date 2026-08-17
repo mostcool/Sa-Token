@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import cn.dev33.satoken.config.SaCookieConfig;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.fun.SaParamFunction;
+import cn.dev33.satoken.json.SaJsonType;
 import cn.dev33.satoken.stp.parameter.enums.SaLogoutMode;
 import cn.dev33.satoken.stp.parameter.enums.SaReplacedLoginExitMode;
 import cn.dev33.satoken.stp.parameter.enums.SaReplacedRange;
@@ -39,7 +40,7 @@ import java.util.Map;
  * @author click33
  * @since 1.13.2
  */
-public class SaLoginParameter {
+public class SaLoginParameter implements SaJsonType {
 
 	// --------- 单独参数
 
@@ -252,7 +253,7 @@ public class SaLoginParameter {
 	 * @return /
 	 */
 	public int getCookieTimeout() {
-		if( ! getIsLastingCookie()) {
+		if (!Boolean.TRUE.equals(getIsLastingCookie())) {
 			return -1;
 		}
 		long _timeout = getTimeout();

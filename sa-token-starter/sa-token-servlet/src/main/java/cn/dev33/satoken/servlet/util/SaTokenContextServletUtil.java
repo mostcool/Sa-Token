@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@ import cn.dev33.satoken.context.model.SaStorage;
 import cn.dev33.satoken.context.model.SaTokenContextModelBox;
 import cn.dev33.satoken.fun.SaFunction;
 import cn.dev33.satoken.fun.SaRetGenericFunction;
-import cn.dev33.satoken.servlet.model.SaRequestForServlet;
-import cn.dev33.satoken.servlet.model.SaResponseForServlet;
-import cn.dev33.satoken.servlet.model.SaStorageForServlet;
+import cn.dev33.satoken.strategy.SaStrategy;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,9 +41,9 @@ public class SaTokenContextServletUtil {
 	 * @param response /
 	 */
 	public static void setContext(HttpServletRequest request, HttpServletResponse response) {
-		SaRequest req = new SaRequestForServlet(request);
-		SaResponse res = new SaResponseForServlet(response);
-		SaStorage stg = new SaStorageForServlet(request);
+		SaRequest req = SaStrategy.instance.createSaRequest.apply(request);
+		SaResponse res = SaStrategy.instance.createSaResponse.apply(response);
+		SaStorage stg = SaStrategy.instance.createSaStorage.apply(request);
 		SaManager.getSaTokenContext().setContext(req, res, stg);
 	}
 

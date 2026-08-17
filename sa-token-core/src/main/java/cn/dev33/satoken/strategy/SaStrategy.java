@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,11 +185,53 @@ public final class SaStrategy {
 	};
 
 	/**
+	 * 创建 SaRequest 的策略
+	 */
+	public SaCreateSaRequestFunction createSaRequest = (source) -> {
+		throw new NotImplException("未实现具体 SaRequest 创建策略").setCode(SaErrorCode.CODE_12402);
+	};
+
+	/**
+	 * 创建 SaResponse 的策略
+	 */
+	public SaCreateSaResponseFunction createSaResponse = (source) -> {
+		throw new NotImplException("未实现具体 SaResponse 创建策略").setCode(SaErrorCode.CODE_12403);
+	};
+
+	/**
+	 * 创建 SaStorage 的策略
+	 */
+	public SaCreateSaStorageFunction createSaStorage = (source) -> {
+		throw new NotImplException("未实现具体 SaStorage 创建策略").setCode(SaErrorCode.CODE_12404);
+	};
+
+	/**
 	 * CORS 策略处理函数
 	 */
 	public SaCorsHandleFunction corsHandle = (req, res, sto) -> {
 
 	};
+
+	/**
+	 * 获取 SaTokenConfig 的策略
+	 * <p>
+	 * 	默认值为 null，表示使用框架内置逻辑获取配置（先读 {@link SaManager#config}，为空时自动读取 sa-token.properties）。
+	 * 	赋值后，每次调用 {@link SaManager#getConfig()} 时都会执行此策略并直接返回其结果。
+	 * </p>
+	 * <p>
+	 * 	注意：策略内请勿再调用 {@link SaManager#getConfig()}，否则会陷入无限递归。
+	 * </p>
+	 * <p>
+	 * 	使用示例：
+	 * </p>
+	 * <pre>
+	 * SaStrategy.instance.setGetSaTokenConfig(() -> {
+	 * 	// 从数据库读取配置 ...
+	 * 	return config;
+	 * });
+	 * </pre>
+	 */
+	public SaGetSaTokenConfigFunction getSaTokenConfig = null;
 
 
 	// ----------------------- 重写策略 set连缀风格
@@ -259,6 +301,51 @@ public final class SaStrategy {
         this.autoRenew = autoRenew;
         return this;
     }
+
+	/**
+	 * 创建 SaRequest 的策略
+	 *
+	 * @param createSaRequest /
+	 * @return /
+	 */
+	public SaStrategy setCreateSaRequest(SaCreateSaRequestFunction createSaRequest) {
+		this.createSaRequest = createSaRequest;
+		return this;
+	}
+
+	/**
+	 * 创建 SaResponse 的策略
+	 *
+	 * @param createSaResponse /
+	 * @return /
+	 */
+	public SaStrategy setCreateSaResponse(SaCreateSaResponseFunction createSaResponse) {
+		this.createSaResponse = createSaResponse;
+		return this;
+	}
+
+	/**
+	 * 创建 SaStorage 的策略
+	 *
+	 * @param createSaStorage /
+	 * @return /
+	 */
+	public SaStrategy setCreateSaStorage(SaCreateSaStorageFunction createSaStorage) {
+		this.createSaStorage = createSaStorage;
+		return this;
+	}
+
+	/**
+	 * 获取 SaTokenConfig 的策略
+	 * <p> 默认 null 表示不启用；启用后由 {@link #getSaTokenConfig} 接管 {@link SaManager#getConfig()} 的返回值 </p>
+	 *
+	 * @param getSaTokenConfig /
+	 * @return /
+	 */
+	public SaStrategy setGetSaTokenConfig(SaGetSaTokenConfigFunction getSaTokenConfig) {
+		this.getSaTokenConfig = getSaTokenConfig;
+		return this;
+	}
 
 	//
 

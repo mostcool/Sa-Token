@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,9 @@ public interface SaErrorCode {
 	/** HTTP 请求处理器未实现 */
 	int CODE_10004 = 10004;
 
+	/** SaJsonStrategy 状态非法（已初始化后注册、SPI 加载失败等） */
+	int CODE_10005 = 10005;
+
 	/** 未能从全局 StpLogic 集合中找到对应 type 的 StpLogic */
 	int CODE_10011 = 10011;
 
@@ -76,6 +79,9 @@ public interface SaErrorCode {
 
 	/** 登录时的账号id值为空 */
 	int CODE_11002 = 11002;
+
+	/** loginId 不能包含冒号（:） */
+	int CODE_11018 = 11018;
 
 	/** 更改 Token 指向的 账号Id 时，账号Id值为空 */
 	int CODE_11003 = 11003;
@@ -201,5 +207,14 @@ public interface SaErrorCode {
 
 	/** 未实现具体的路由匹配策略 */
 	int CODE_12401 = 12401;
+
+	/** 未实现具体的 SaRequest 创建策略 */
+	int CODE_12402 = 12402;
+
+	/** 未实现具体的 SaResponse 创建策略 */
+	int CODE_12403 = 12403;
+
+	/** 未实现具体的 SaStorage 创建策略 */
+	int CODE_12404 = 12404;
 
 }

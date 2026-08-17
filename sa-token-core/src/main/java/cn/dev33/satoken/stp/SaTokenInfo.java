@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package cn.dev33.satoken.stp;
+
+import cn.dev33.satoken.json.SaJsonType;
 
 /**
  * Token 信息 Model: 用来描述一个 Token 的常见参数。
@@ -39,7 +41,7 @@ package cn.dev33.satoken.stp;
  * @author click33
  * @since 1.10.0
  */
-public class SaTokenInfo {
+public class SaTokenInfo implements SaJsonType {
 
 	/** token 名称 */
 	public String tokenName;

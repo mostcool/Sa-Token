@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package cn.dev33.satoken.sso.config;
+
+import cn.dev33.satoken.json.SaJsonType;
 
 
 import cn.dev33.satoken.sso.error.SaSsoErrorCode;
@@ -30,7 +32,7 @@ import java.util.List;
  * @author click33
  * @since 1.43.0
  */
-public class SaSsoClientModel implements Serializable {
+public class SaSsoClientModel implements SaJsonType, Serializable {
 
     private static final long serialVersionUID = -6541180061782004705L;
 

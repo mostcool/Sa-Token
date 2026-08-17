@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,19 @@ package cn.dev33.satoken.spring;
 import cn.dev33.satoken.filter.SaFirewallCheckFilterForServlet;
 import cn.dev33.satoken.filter.SaTokenContextFilterForServlet;
 import cn.dev33.satoken.filter.SaTokenCorsFilterForServlet;
+import cn.dev33.satoken.servlet.model.SaRequestForServlet;
+import cn.dev33.satoken.servlet.model.SaResponseForServlet;
+import cn.dev33.satoken.servlet.model.SaStorageForServlet;
 import cn.dev33.satoken.spring.pathmatch.SaPatternsRequestConditionHolder;
 import cn.dev33.satoken.strategy.SaStrategy;
+import cn.dev33.satoken.util.SaTokenConsts;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.EnumSet;
 
 /**
  * 注册 Sa-Token 框架所需要的 Bean
@@ -35,6 +45,12 @@ public class SaTokenContextRegister {
 		SaStrategy.instance.routeMatcher = (pattern, path) -> {
 			return SaPatternsRequestConditionHolder.match(pattern, path);
 		};
+		// 重写 SaRequest 创建策略
+		SaStrategy.instance.createSaRequest = source -> new SaRequestForServlet((HttpServletRequest) source);
+		// 重写 SaResponse 创建策略
+		SaStrategy.instance.createSaResponse = source -> new SaResponseForServlet((HttpServletResponse) source);
+		// 重写 SaStorage 创建策略
+		SaStrategy.instance.createSaStorage = source -> new SaStorageForServlet((HttpServletRequest) source);
 	}
 
 	/**
@@ -43,8 +59,13 @@ public class SaTokenContextRegister {
 	 * @return /
 	 */
 	@Bean
-	public SaTokenContextFilterForServlet saTokenContextFilterForServlet() {
-		return new SaTokenContextFilterForServlet();
+	public FilterRegistrationBean<SaTokenContextFilterForServlet> saTokenContextFilterForServlet() {
+		FilterRegistrationBean<SaTokenContextFilterForServlet> bean = new FilterRegistrationBean<>(new SaTokenContextFilterForServlet());
+		bean.addUrlPatterns("/*");
+		bean.setOrder(SaTokenConsts.SA_TOKEN_CONTEXT_FILTER_ORDER);
+		bean.setAsyncSupported(true);
+		bean.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC));
+		return bean;
 	}
 
 	/**

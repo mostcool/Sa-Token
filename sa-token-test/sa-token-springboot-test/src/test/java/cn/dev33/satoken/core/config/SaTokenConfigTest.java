@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,9 @@ public class SaTokenConfigTest {
 
 		config.setCheckSameToken(false);
 		Assertions.assertEquals(config.getCheckSameToken(), false);
+
+		config.setAllowLoginIdColon(true);
+		Assertions.assertEquals(config.getAllowLoginIdColon(), true);
 
 		SaCookieConfig scc = new SaCookieConfig();
 		config.setCookie(scc);

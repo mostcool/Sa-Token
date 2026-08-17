@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,16 @@ public class SaJsonConvertException extends SaTokenException {
 	 */
 	public SaJsonConvertException(Throwable cause) {
 		super(cause);
+	}
+
+	/**
+	 * 一个异常：代表 JSON 转换失败
+	 *
+	 * @param message 异常描述信息
+	 * @param cause 异常对象
+	 */
+	public SaJsonConvertException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

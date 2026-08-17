@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package cn.dev33.satoken.stp.parameter;
+
+import cn.dev33.satoken.json.SaJsonType;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.config.SaTokenConfig;
@@ -31,7 +33,7 @@ import cn.dev33.satoken.stp.parameter.enums.SaLogoutRange;
  * @author click33
  * @since 1.41.0
  */
-public class SaLogoutParameter {
+public class SaLogoutParameter implements SaJsonType {
 
 	// --------- 单独参数
 

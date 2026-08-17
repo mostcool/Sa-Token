@@ -23,6 +23,7 @@
         <module>sa-token-jackson3</module>
         <module>sa-token-fastjson</module>
         <module>sa-token-fastjson2</module>
+        <module>sa-token-fory-json</module>
         <module>sa-token-snack3</module>
         <module>sa-token-snack4</module>
         <module>sa-token-hutool-timed-cache</module>
@@ -49,6 +50,7 @@
         <module>sa-token-redis-jackson</module>
         <module>sa-token-alone-redis</module>
         <module>sa-token-alone-redis-by-spring-boot4</module>
+        <module>sa-token-alone-redisson</module>
         <module>sa-token-spring-aop</module>
         <module>sa-token-spring-el</module>
         <module>sa-token-grpc</module>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package cn.dev33.satoken.config;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 import cn.dev33.satoken.stp.parameter.enums.SaLogoutMode;
 import cn.dev33.satoken.stp.parameter.enums.SaLogoutRange;
 import cn.dev33.satoken.stp.parameter.enums.SaReplacedLoginExitMode;
@@ -28,13 +30,13 @@ import java.io.Serializable;
  *
  * <p>
  *     你可以通过yml、properties、java代码等形式配置本类参数，具体请查阅官方文档:
- *     <a href="https://sa-token.cc">https://sa-token.cc</a>
+ *     <a href="https://sa-token.com">https://sa-token.com</a>
  * </p>
  *
  * @author click33
  * @since 1.10.0
  */
-public class SaTokenConfig implements Serializable {
+public class SaTokenConfig implements SaJsonType, Serializable {
 
 	private static final long serialVersionUID = -6541180061782004705L;
 
@@ -136,6 +138,12 @@ public class SaTokenConfig implements Serializable {
 	 * 在登录时，是否立即创建对应的 Token-Session （true=在登录时立即创建，false=在第一次调用 getTokenSession() 时创建）
 	 */
 	private Boolean rightNowCreateTokenSession = false;
+
+	/**
+	 * 是否允许 loginId 包含冒号（:），默认 false。
+	 * <p> Sa-Token 持久化 key 使用冒号分段，loginId 含冒号会导致 key 难以解析，不建议使用。 </p>
+	 */
+	private Boolean allowLoginIdColon = false;
 
 	/**
 	 * token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
@@ -856,6 +864,26 @@ public class SaTokenConfig implements Serializable {
 	}
 
 	/**
+	 * 获取 是否允许 loginId 包含冒号（:）
+	 *
+	 * @return /
+	 */
+	public Boolean getAllowLoginIdColon() {
+		return this.allowLoginIdColon;
+	}
+
+	/**
+	 * 设置 是否允许 loginId 包含冒号（:）
+	 *
+	 * @param allowLoginIdColon /
+	 * @return 对象自身
+	 */
+	public SaTokenConfig setAllowLoginIdColon(Boolean allowLoginIdColon) {
+		this.allowLoginIdColon = allowLoginIdColon;
+		return this;
+	}
+
+	/**
 	 * @return Cookie 全局配置对象
 	 */
 	public SaCookieConfig getCookie() {
@@ -895,6 +923,7 @@ public class SaTokenConfig implements Serializable {
 				+ ", isLogoutKeepFreezeOps=" + isLogoutKeepFreezeOps
 				+ ", isLogoutKeepTokenSession=" + isLogoutKeepTokenSession
 				+ ", rightNowCreateTokenSession=" + rightNowCreateTokenSession
+				+ ", allowLoginIdColon=" + allowLoginIdColon
 				+ ", tokenStyle=" + tokenStyle
 				+ ", dataRefreshPeriod=" + dataRefreshPeriod 
 				+ ", tokenSessionCheckLogin=" + tokenSessionCheckLogin

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,9 @@ public class StpLogic {
 
 	/**
 	 * 安全的重置当前账号类型
+	 *
+	 * <p> 注意：此方法只能在项目启动时调用，项目启动后不可动态更改 loginType。
+	 * 若在运行时修改，可能造成线程安全问题和严重的逻辑问题。
 	 *
 	 * @param loginType 账号类型标识
 	 * @return 对象自身
@@ -616,12 +619,17 @@ public class StpLogic {
 			throw new SaTokenException("loginId 不能为以下值：" + NotLoginException.ABNORMAL_LIST);
 		}
 
-		// 3、账号 id 不能是复杂类型
+		// 3、账号 id 不能包含冒号（:），除非配置 allowLoginIdColon=true
+		if( ! Boolean.TRUE.equals(getConfigOrGlobal().getAllowLoginIdColon()) && id.toString().contains(":")) {
+			throw new SaTokenException("loginId 不能包含冒号（:）").setCode(SaErrorCode.CODE_11018);
+		}
+
+		// 4、账号 id 不能是复杂类型
 		if( ! SaFoxUtil.isBasicType(id.getClass())) {
 			SaManager.log.warn("loginId 应该为简单类型，例如：String | int | long，不推荐使用复杂类型：" + id.getClass());
 		}
 
-		// 4、判断当前 StpLogic 是否支持 extra 扩展参数
+		// 5、判断当前 StpLogic 是否支持 extra 扩展参数
 		if( ! isSupportExtra()) {
 			// 如果不支持，开发者却传入了 extra 扩展参数，那么就打印警告信息
 			if(loginParameter.haveExtraData()) {
@@ -629,7 +637,7 @@ public class StpLogic {
 			}
 		}
 
-		// 5、如果全局配置未启动动态 activeTimeout 功能，但是此次登录却传入了 activeTimeout 参数，那么就打印警告信息
+		// 6、如果全局配置未启动动态 activeTimeout 功能，但是此次登录却传入了 activeTimeout 参数，那么就打印警告信息
 		if( ! getConfigOrGlobal().getDynamicActiveTimeout() && loginParameter.getActiveTimeout() != null) {
 			SaManager.log.warn("当前全局配置未开启动态 activeTimeout 功能，传入的 activeTimeout 参数将被忽略");
 		}
@@ -786,24 +794,65 @@ public class StpLogic {
 			return;
 		}
 
-		// 2、清除这个 token 的最后活跃时间记录
+		// 2、$$ 发布注销前事件通知
+		_fireBeforeLogoutEvent(loginId, tokenValue, logoutParameter);
+
+		// 3、清除这个 token 的最后活跃时间记录
 		if(isOpenCheckActiveTimeout()) {
 			clearLastActive(tokenValue);
 		}
 
-		// 3、清除 Token-Session
+		// 4、清除 Token-Session
 		if( ! logoutParameter.getIsKeepTokenSession()) {
 			deleteTokenSession(tokenValue);
 		}
 
-		// 4、清理或更改 Token 映射
-		// 5、发布事件通知
+		// 5、清理或更改 Token 映射，并发布事件通知
+		_fireLogoutEvent(loginId, tokenValue, logoutParameter);
+
+		// 6、清理这个账号的 Account-Session 上的 terminal 信息，并且尝试注销掉 Account-Session
+		SaSession session = getSessionByLoginId(loginId, false);
+		if(session != null) {
+			session.removeTerminal(tokenValue);
+			session.logoutByTerminalCountToZero();
+		}
+	}
+
+	/**
+	 * [work] 发布注销前事件通知
+	 * <p> 根据 {@link SaLogoutParameter#getMode()} 触发 doBeforeLogout / doBeforeKickout / doBeforeReplaced </p>
+	 *
+	 * @param loginId 账号id
+	 * @param tokenValue token值
+	 * @param logoutParameter 注销参数
+	 */
+	private void _fireBeforeLogoutEvent(Object loginId, String tokenValue, SaLogoutParameter logoutParameter) {
+		if(logoutParameter.getMode() == SaLogoutMode.LOGOUT) {
+			SaTokenEventCenter.doBeforeLogout(loginType, loginId, tokenValue, logoutParameter);
+		}
+		if(logoutParameter.getMode() == SaLogoutMode.KICKOUT) {
+			SaTokenEventCenter.doBeforeKickout(loginType, loginId, tokenValue, logoutParameter);
+		}
+		if(logoutParameter.getMode() == SaLogoutMode.REPLACED) {
+			SaTokenEventCenter.doBeforeReplaced(loginType, loginId, tokenValue, logoutParameter);
+		}
+	}
+
+	/**
+	 * [work] 清理或更改 Token 映射，并发布注销事件通知
+	 * <p> 根据 {@link SaLogoutParameter#getMode()} 触发 doLogout / doKickout / doReplaced </p>
+	 *
+	 * @param loginId 账号id
+	 * @param tokenValue token值
+	 * @param logoutParameter 注销参数
+	 */
+	private void _fireLogoutEvent(Object loginId, String tokenValue, SaLogoutParameter logoutParameter) {
 		// 		SaLogoutMode.LOGOUT：注销下线
 		if(logoutParameter.getMode() == SaLogoutMode.LOGOUT) {
 			deleteTokenToIdMapping(tokenValue);
 			SaTokenEventCenter.doLogout(loginType, loginId, tokenValue);
 		}
-		// 		SaLogoutMode.LOGOUT：踢人下线
+		// 		SaLogoutMode.KICKOUT：踢人下线
 		if(logoutParameter.getMode() == SaLogoutMode.KICKOUT) {
 			updateTokenToIdMapping(tokenValue, NotLoginException.KICK_OUT);
 			SaTokenEventCenter.doKickout(loginType, loginId, tokenValue);
@@ -812,13 +861,6 @@ public class StpLogic {
 		if(logoutParameter.getMode() == SaLogoutMode.REPLACED) {
 			updateTokenToIdMapping(tokenValue, NotLoginException.BE_REPLACED);
 			SaTokenEventCenter.doReplaced(loginType, loginId, tokenValue);
-		}
-
-		// 6、清理这个账号的 Account-Session 上的 terminal 信息，并且尝试注销掉 Account-Session
-		SaSession session = getSessionByLoginId(loginId, false);
-		if(session != null) {
-			session.removeTerminal(tokenValue);
-			session.logoutByTerminalCountToZero();
 		}
 	}
 
@@ -992,36 +1034,24 @@ public class StpLogic {
 		Object loginId = session.getLoginId();
 		String tokenValue = terminal.getTokenValue();
 
-		// 1、从 Account-Session 上清除此设备信息
+		// 1、$$ 发布注销前事件通知
+		_fireBeforeLogoutEvent(loginId, tokenValue, logoutParameter);
+
+		// 2、从 Account-Session 上清除此设备信息
 		session.removeTerminal(tokenValue);
 
-		// 2、清除这个 token 的最后活跃时间记录
+		// 3、清除这个 token 的最后活跃时间记录
 		if(isOpenCheckActiveTimeout()) {
 			clearLastActive(tokenValue);
 		}
 
-		// 3、清除这个 token 的 Token-Session 对象
+		// 4、清除这个 token 的 Token-Session 对象
 		if( ! logoutParameter.getIsKeepTokenSession()) {
 			deleteTokenSession(tokenValue);
 		}
 
-		// 4、清理或更改 Token 映射
-		// 5、发布事件通知
-		// 		SaLogoutMode.LOGOUT：注销下线
-		if(logoutParameter.getMode() == SaLogoutMode.LOGOUT) {
-			deleteTokenToIdMapping(tokenValue);
-			SaTokenEventCenter.doLogout(loginType, loginId, tokenValue);
-		}
-		// 		SaLogoutMode.LOGOUT：踢人下线
-		if(logoutParameter.getMode() == SaLogoutMode.KICKOUT) {
-			updateTokenToIdMapping(tokenValue, NotLoginException.KICK_OUT);
-			SaTokenEventCenter.doKickout(loginType, loginId, tokenValue);
-		}
-		//		SaLogoutMode.REPLACED：顶人下线
-		if(logoutParameter.getMode() == SaLogoutMode.REPLACED) {
-			updateTokenToIdMapping(tokenValue, NotLoginException.BE_REPLACED);
-			SaTokenEventCenter.doReplaced(loginType, loginId, tokenValue);
-		}
+		// 5、清理或更改 Token 映射，并发布事件通知
+		_fireLogoutEvent(loginId, tokenValue, logoutParameter);
 	}
 
 	/**
@@ -1953,7 +1983,7 @@ public class StpLogic {
 	}
 
 	/**
-	 * 对当前 token 的 timeout 值进行续期
+	 * 重置当前 token 的 timeout 有效期
 	 *
 	 * @param timeout 要修改成为的有效时间 (单位: 秒)
 	 */
@@ -1974,7 +2004,7 @@ public class StpLogic {
 	}
 
 	/**
-	 * 对指定 token 的 timeout 值进行续期
+	 * 重置指定 token 的 timeout 有效期
 	 *
 	 * @param tokenValue 指定 token
 	 * @param timeout 要修改成为的有效时间 (单位: 秒，填 -1 代表要续为永久有效)

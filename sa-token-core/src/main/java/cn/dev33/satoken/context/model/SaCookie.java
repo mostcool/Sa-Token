@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package cn.dev33.satoken.context.model;
+
+import cn.dev33.satoken.json.SaJsonType;
 
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.SaTokenException;
@@ -32,7 +34,7 @@ import java.util.Map;
  * @author click33
  * @since 1.16.0
  */
-public class SaCookie {
+public class SaCookie implements SaJsonType {
 
 	/**
 	 * 写入响应头时使用的key

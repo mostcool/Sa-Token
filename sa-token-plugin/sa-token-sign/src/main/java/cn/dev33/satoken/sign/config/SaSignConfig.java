@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package cn.dev33.satoken.sign.config;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.fun.SaParamRetFunction;
 import cn.dev33.satoken.secure.SaSecureUtil;
@@ -25,7 +27,7 @@ import cn.dev33.satoken.secure.SaSecureUtil;
  * @author click33
  * @since 1.34.0
  */
-public class SaSignConfig {
+public class SaSignConfig implements SaJsonType {
 
     /**
      * API 调用签名秘钥

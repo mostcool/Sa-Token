@@ -22,8 +22,22 @@ sa-token-doc/big-file/
 .qoder
 .soloncode/
 .cursor
+.firecrawl/
 .agents
+.claude
 .github
 
 AGENTS.md
 CLAUDE.md
+
+/update-log.md
+
+# 本地临时产出（审查报告等）
+temp-file/
+
+# Python 编译缓存
+__pycache__/
+*.pyc
+
+# 本地工具脚本（todo 审查等）
+tools/

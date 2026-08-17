@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,21 @@ import cn.dev33.satoken.dao.auto.SaTokenDaoByObjectFollowString;
 import cn.dev33.satoken.util.SaFoxUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Sa-Token 持久层实现 [ Redis 存储 ] (可用环境: SpringBoot2、SpringBoot3)
+ * Sa-Token 持久层实现 [ Redis 存储 ] (可用环境: SpringBoot2、SpringBoot3、SpringBoot4)
  * 
  * @author click33
  * @since 1.34.0
@@ -70,7 +76,8 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public String get(String key) {
-		return stringRedisTemplate.opsForValue().get(key);
+		String finalKey = wrapKey(key);
+		return stringRedisTemplate.opsForValue().get(finalKey);
 	}
 
 	/**
@@ -78,34 +85,27 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public void set(String key, String value, long timeout) {
+		String finalKey = wrapKey(key);
 		if(timeout == 0 || timeout <= SaTokenDao.NOT_VALUE_EXPIRE)  {
 			return;
 		}
 		// 判断是否为永不过期 
 		if(timeout == SaTokenDao.NEVER_EXPIRE) {
-			stringRedisTemplate.opsForValue().set(key, value);
+			stringRedisTemplate.opsForValue().set(finalKey, value);
 		} else {
-			stringRedisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
+			stringRedisTemplate.opsForValue().set(finalKey, value, timeout, TimeUnit.SECONDS);
 		}
 	}
 
 	/**
-	 * 修改指定key-value键值对 (过期时间不变) 
+	 * 修改指定key-value键值对 (过期时间不变)
+	 *
+	 * <p> 使用 Redis SET KEEPTTL（{@link Expiration#keepTtl()}），要求 Redis 版本 >= 6.0。
+	 * 低于 6.0 的兼容写法见本类文件底部注释。
 	 */
 	@Override
 	public void update(String key, String value) {
-		@SuppressWarnings("all")
-		long expireMs = stringRedisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
-		// -2 = 无此键
-		if (expireMs == SaTokenDao.NOT_VALUE_EXPIRE) {
-			return;
-		}
-		// -1 = 永不过期
-		if(expireMs == SaTokenDao.NEVER_EXPIRE) {
-			stringRedisTemplate.opsForValue().set(key, value);
-		} else {
-			stringRedisTemplate.opsForValue().set(key, value, expireMs, TimeUnit.MILLISECONDS);
-		}
+		setStringAndKeepTTL(wrapKey(key), value);
 	}
 	
 	/**
@@ -113,7 +113,8 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public void delete(String key) {
-		stringRedisTemplate.delete(key);
+		String finalKey = wrapKey(key);
+		stringRedisTemplate.delete(finalKey);
 	}
 
 	/**
@@ -121,7 +122,8 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public long getTimeout(String key) {
-		return stringRedisTemplate.getExpire(key);
+		String finalKey = wrapKey(key);
+		return stringRedisTemplate.getExpire(finalKey);
 	}
 
 	/**
@@ -129,8 +131,10 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public void updateTimeout(String key, long timeout) {
+		String finalKey = wrapKey(key);
 		// 判断是否想要设置为永久
 		if(timeout == SaTokenDao.NEVER_EXPIRE) {
+			// 调用本类其它方法时使用原始 key，避免二次 wrap
 			long expire = getTimeout(key);
 			if(expire == SaTokenDao.NEVER_EXPIRE) {
 				// 如果其已经被设置为永久，则不作任何处理 
@@ -140,7 +144,7 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 			}
 			return;
 		}
-		stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+		stringRedisTemplate.expire(finalKey, timeout, TimeUnit.SECONDS);
 	}
 
 
@@ -150,10 +154,63 @@ public class SaTokenDaoForRedisTemplate implements SaTokenDaoByObjectFollowStrin
 	 */
 	@Override
 	public List<String> searchData(String prefix, String keyword, int start, int size, boolean sortType) {
-		Set<String> keys = stringRedisTemplate.keys(prefix + "*" + keyword + "*");
-		List<String> list = new ArrayList<>(keys);
-		return SaFoxUtil.searchList(list, start, size, sortType);
+		// 对完整匹配串做 wrap，避免用户在 key 尾部等位置加工时只 wrap(prefix) 拼错 pattern
+		String finalPattern = wrapKey(prefix + "*" + keyword + "*");
+		Set<String> keys = new HashSet<>();
+		ScanOptions options = ScanOptions.scanOptions().match(finalPattern).count(1000).build();
+		stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
+			try (Cursor<byte[]> cursor = connection.scan(options)) {
+				while (cursor.hasNext()) {
+					keys.add(stringRedisTemplate.getStringSerializer().deserialize(cursor.next()));
+				}
+			}
+			return null;
+		});
+		return SaFoxUtil.searchList(new ArrayList<>(keys), start, size, sortType);
 	}
-	
-	
+
+	/**
+	 * SET key value XX KEEPTTL：仅 key 存在时覆写 value，并保留原 TTL
+	 */
+	public void setStringAndKeepTTL(String finalKey, String value) {
+		stringRedisTemplate.execute((RedisCallback<Boolean>) connection ->
+			connection.set(
+				stringRedisTemplate.getStringSerializer().serialize(finalKey),
+				stringRedisTemplate.getStringSerializer().serialize(value),
+				Expiration.keepTtl(),
+				RedisStringCommands.SetOption.ifPresent()
+			)
+		);
+	}
+
+	/**
+	 * 包装 key（默认原样返回）。需要给 Redis 键加统一前缀时，可重写此方法。
+	 *
+	 * @param key 原始 key
+	 * @return 包装后的 key
+	 */
+	public String wrapKey(String key) {
+		return key;
+	}
+
+	/*
+	 * Redis < 6.0 时无法使用 KEEPTTL，可将 update 方法替换为下列毫秒写法：
+	 *
+	 * @Override
+	 * public void update(String key, String value) {
+	 *     String finalKey = wrapKey(key);
+	 *     long expireMs = stringRedisTemplate.getExpire(finalKey, TimeUnit.MILLISECONDS);
+	 *     // -2 = 无此键
+	 *     if (expireMs == SaTokenDao.NOT_VALUE_EXPIRE) {
+	 *         return;
+	 *     }
+	 *     // -1 = 永不过期
+	 *     if (expireMs == SaTokenDao.NEVER_EXPIRE) {
+	 *         stringRedisTemplate.opsForValue().set(finalKey, value);
+	 *     } else {
+	 *         stringRedisTemplate.opsForValue().set(finalKey, value, expireMs, TimeUnit.MILLISECONDS);
+	 *     }
+	 * }
+	 */
+
 }

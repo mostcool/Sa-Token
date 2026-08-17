@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,5 +40,8 @@ public interface SaJwtErrorCode {
 
 	/** 登录时提供的账号id为空 */
 	int CODE_30206 = 30206;
+
+	/** extraData 包含 jwt 保留字段 */
+	int CODE_30207 = 30207;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package cn.dev33.satoken.httpauth.basic;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.util.SaFoxUtil;
 
@@ -24,7 +26,7 @@ import cn.dev33.satoken.util.SaFoxUtil;
  * @author click33
  * @since 1.41.0
  */
-public class SaHttpBasicAccount {
+public class SaHttpBasicAccount implements SaJsonType {
 
 	/**
 	 * 账号

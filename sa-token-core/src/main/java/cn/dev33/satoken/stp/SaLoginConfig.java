@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package cn.dev33.satoken.stp;
+
+import cn.dev33.satoken.json.SaJsonType;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
@@ -37,7 +39,7 @@ import java.util.Map;
  * @since 1.29.0
  */
 @Deprecated
-public class SaLoginConfig {
+public class SaLoginConfig implements SaJsonType {
 	
 	private SaLoginConfig() {
 	}

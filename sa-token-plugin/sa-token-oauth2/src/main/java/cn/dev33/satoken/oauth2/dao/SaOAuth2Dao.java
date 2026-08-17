@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 	 * @param removeFun 执行删除 token 的函数
 	 */
 	protected void addTokenIndex_AndAdjust(SaSession session, String tokenIndexMapSaveKey, String token, long timeout, int maxTokenCount, SaParamFunction<String> removeFun) {
-		Map<String, Long> tokenIndexMap = session.get(tokenIndexMapSaveKey, this::newTokenIndexMap);
+		Map<String, Long> tokenIndexMap = session.getMap(tokenIndexMapSaveKey, String.class, Long.class, this::newTokenIndexMap);
 		if(! tokenIndexMap.containsKey(token)) {
 			// 添加
 			tokenIndexMap.put(token, ttlToExpireTime(timeout));
@@ -140,7 +140,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 	 * @param token 待删除的 token
 	 */
 	protected void deleteTokenIndex_AndTryLogout(SaSession session, String tokenIndexMapSaveKey, String token) {
-		Map<String, Long> tokenIndexMap = session.get(tokenIndexMapSaveKey, this::newTokenIndexMap);
+		Map<String, Long> tokenIndexMap = session.getMap(tokenIndexMapSaveKey, String.class, Long.class, this::newTokenIndexMap);
 		tokenIndexMap.remove(token);
 		// 如果删除后还有记录，就再次保存
 		if( ! tokenIndexMap.isEmpty()) {
@@ -222,7 +222,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 		}
 
 		// 根据 ttl 值过滤一遍
-		Map<String, Long> tokenIndexMap = session.get(tokenIndexMapSaveKey, this::newTokenIndexMap);
+		Map<String, Long> tokenIndexMap = session.getMap(tokenIndexMapSaveKey, String.class, Long.class, this::newTokenIndexMap);
 		Map<String, Long> newTokenIndexMap = _removeExpiredIndex(tokenIndexMap);
 
 		// 如果调整后集合长度归零了，说明 token 已全部过期，直接注销此 RawSession
@@ -284,7 +284,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 		if(code == null) {
 			return null;
 		}
-		return (CodeModel)getSaTokenDao().getObject(splicingCodeSaveKey(code));
+		return getSaTokenDao().getObject(splicingCodeSaveKey(code), CodeModel.class);
 	}
 
 
@@ -353,7 +353,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 		if(accessToken == null) {
 			return null;
 		}
-		return (AccessTokenModel)getSaTokenDao().getObject(splicingAccessTokenSaveKey(accessToken));
+		return getSaTokenDao().getObject(splicingAccessTokenSaveKey(accessToken), AccessTokenModel.class);
 	}
 
 
@@ -454,7 +454,7 @@ public class SaOAuth2Dao implements SaTtlMethods {
 		if(refreshToken == null) {
 			return null;
 		}
-		return (RefreshTokenModel)getSaTokenDao().getObject(splicingRefreshTokenSaveKey(refreshToken));
+		return getSaTokenDao().getObject(splicingRefreshTokenSaveKey(refreshToken), RefreshTokenModel.class);
 	}
 
 

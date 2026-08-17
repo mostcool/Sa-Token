@@ -28,7 +28,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
-		<!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
+		<!-- Sa-Token 权限认证, 在线文档：https://sa-token.com/ -->
 		<dependency>
 		    <groupId>cn.dev33</groupId>
 		    <artifactId>sa-token-spring-boot-starter</artifactId>
@@ -42,17 +42,17 @@
             <version>${sa-token.version}</version>
         </dependency>
 
-		<!-- Sa-Token整合Redis (使用jackson序列化方式) -->
+		<!-- Sa-Token整合Redis (使用RedisTemplate方式) -->
 		<dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-redis-jackson</artifactId>
+            <artifactId>sa-token-redis-template</artifactId>
             <version>${sa-token.version}</version>
         </dependency>
 		<dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
-        
+
 		<!-- thymeleaf 视图引擎 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

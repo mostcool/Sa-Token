@@ -108,7 +108,7 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot-reactor-v2v3v4-common</artifactId>
+                <artifactId>sa-token-spring-boot-reactor-v3v4-common</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -147,6 +147,11 @@
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-alone-redis-by-spring-boot4</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-alone-redisson</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -191,7 +196,17 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-fory-json</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-snack3</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-snack4</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

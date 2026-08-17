@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package cn.dev33.satoken.session;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.application.SaSetValueInterface;
+import cn.dev33.satoken.json.SaJsonType;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.fun.SaTwoParamFunction;
 import cn.dev33.satoken.listener.SaTokenEventCenter;
@@ -42,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author click33
  * @since 1.10.0
  */
-public class SaSession implements SaSetValueInterface, Serializable {
+public class SaSession implements SaSetValueInterface, SaJsonType, Serializable {
 
 	/**
 	 * 

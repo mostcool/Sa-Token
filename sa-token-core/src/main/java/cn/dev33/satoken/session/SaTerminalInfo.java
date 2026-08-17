@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2099 sa-token.cc
+ * Copyright 2020-2099 sa-token.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package cn.dev33.satoken.session;
 
+import cn.dev33.satoken.json.SaJsonType;
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,7 +27,7 @@ import java.util.Map;
  * @author click33
  * @since 1.41.0
  */
-public class SaTerminalInfo implements Serializable {
+public class SaTerminalInfo implements SaJsonType, Serializable {
 
 	/**
 	 *
